@@ -1,7 +1,7 @@
 export const runtime = "nodejs";
 
 import { prisma } from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+
 import { NextResponse } from "next/server";
 
 type Context = {
