@@ -244,12 +244,24 @@ export default function WholesaleDetailPage() {
             <div className="text-base font-bold text-neutral-800">핵심 정보</div>
 
             <div className="mt-5 space-y-4 text-sm text-neutral-700">
-              <InfoRow label="위탁 가능 여부" value={site.dropshipping || "-"} />
-              <InfoRow label="사업자 필요 여부" value={site.businessRequired || "-"} />
-              <InfoRow label="이용료" value={("usageFee" in site ? site.usageFee : "") || "-"} />
-              <InfoRow label="이미지 제공 여부" value={site.imageProvided || "-"} />
-              <InfoRow label="조회수" value={displayViews} />
-            </div>
+  <InfoRow
+    label="위탁 가능 여부"
+    value={("dropshipping" in site ? site.dropshipping : "") || "-"}
+  />
+  <InfoRow
+    label="사업자 필요 여부"
+    value={("businessRequired" in site ? site.businessRequired : "") || "-"}
+  />
+  <InfoRow
+    label="이용료"
+    value={("usageFee" in site ? site.usageFee : "") || "-"}
+  />
+  <InfoRow
+    label="이미지 제공 여부"
+    value={("imageProvided" in site ? site.imageProvided : "") || "-"}
+  />
+  <InfoRow label="조회수" value={displayViews} />
+</div>
 
             <div className="mt-6 flex items-center gap-3">
               <button
