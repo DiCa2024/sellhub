@@ -203,7 +203,7 @@ export default function HomePage() {
                 </p>
 
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {(site.tags || []).slice(0, 3).map((tag: string) => (
+                  {(site.tags || []).slice(0, 3).map((tag:string) => (
                   <span
                     key={tag}
                     className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
