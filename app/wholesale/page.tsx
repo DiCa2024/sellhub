@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import WholesalePageClient from "./temp";
+import WholesalePageClient from "./WholesalePageClient";
 
 export default function WholesalePage() {
   return (
