@@ -104,7 +104,7 @@ export default function SalesChannelDetailPage() {
   if (!loaded) {
     return (
       <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
-        <div className="mx-auto max-w-6xl rounded-2xl border bg-white p-8 shadow-sm">
+        <div className="mx-auto max-w-7xl rounded-2xl border bg-white p-8 shadow-sm">
           <p className="text-neutral-600">불러오는 중...</p>
         </div>
       </main>
@@ -114,7 +114,7 @@ export default function SalesChannelDetailPage() {
   if (!channel) {
     return (
       <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
-        <div className="mx-auto max-w-6xl rounded-2xl border bg-white p-8 shadow-sm">
+        <div className="mx-auto max-w-7xl rounded-2xl border bg-white p-8 shadow-sm">
           <h1 className="text-3xl font-bold">판매 채널을 찾을 수 없습니다.</h1>
           <p className="mt-3 text-neutral-600">
             요청한 판매 채널이 없거나 아직 등록되지 않았습니다.
@@ -131,130 +131,119 @@ export default function SalesChannelDetailPage() {
   }
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
-      <div className="mx-auto max-w-6xl">
+    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10 text-neutral-900">
+      <div className="mx-auto max-w-7xl">
         <a
           href="/sales-channel"
           className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
         >
-          ← 판매 채널 목록으로 돌아가기
+          ← 판매 채널 리스트로 돌아가기
         </a>
 
-        <article className="mt-6 overflow-hidden rounded-3xl border bg-white shadow-sm">
-          <div className="border-b bg-gradient-to-b from-neutral-50 to-white px-8 py-10 md:px-12">
-            <div className="mb-4 flex flex-wrap gap-2">
-              <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-                {channel.region}
-              </span>
-              {channel.commission && (
-                <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-                  수수료 {channel.commission}
+        <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
+          <div>
+            <div className="mb-6 overflow-hidden rounded-3xl border border-neutral-200 bg-white">
+              <div className="aspect-[16/9] w-full bg-neutral-100">
+                <img
+                  src={
+                    channel.imageUrl ||
+                    "https://via.placeholder.com/1200x675?text=Sales+Channel"
+                  }
+                  alt={channel.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-4xl font-bold tracking-tight">
+                {channel.name}
+              </h1>
+              {channel.region && (
+                <span className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-600">
+                  {channel.region}
                 </span>
               )}
             </div>
 
-            <h1 className="max-w-4xl text-3xl font-bold leading-tight md:text-5xl">
-              {channel.name}
-            </h1>
-
-            <p className="mt-5 max-w-3xl text-base leading-7 text-neutral-600">
-              {channel.shortDescription}
+            <p className="mt-6 max-w-3xl text-base leading-8 text-neutral-700">
+              {channel.shortDescription || "설명이 아직 등록되지 않았습니다."}
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-neutral-500">
-              <span>조회수 {viewCount}</span>
-            </div>
+            {Array.isArray(channel.tags) && channel.tags.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {channel.tags.map((tag: string) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-600"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="grid gap-8 px-8 py-8 md:px-12 lg:grid-cols-[1.1fr_0.9fr]">
-            <div>
-              <img
-                src={
-                  channel.imageUrl ||
-                  "https://via.placeholder.com/1200x700?text=Sales+Channel"
-                }
-                alt={channel.name}
-                className="h-[260px] w-full rounded-2xl border object-cover md:h-[420px]"
-              />
+          <div className="rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="text-base font-bold text-neutral-800">핵심 정보</div>
 
-              <div className="mt-6 rounded-2xl bg-neutral-50 p-6">
-                <h2 className="text-lg font-bold">채널 요약</h2>
-                <div className="mt-4 space-y-3 text-sm text-neutral-700">
-                  <InfoRow label="채널명" value={channel.name} />
-                  <InfoRow label="지역" value={channel.region || "-"} />
-                  <InfoRow label="수수료" value={channel.commission || "-"} />
-                </div>
-
-                {Array.isArray(channel.tags) && channel.tags.length > 0 && (
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {channel.tags.map((tag: string) => (
-                      <span
-                        key={tag}
-                        className="rounded bg-white px-3 py-1 text-xs border"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <div className="mt-5 space-y-4 text-sm text-neutral-700">
+              <InfoRow label="지역" value={channel.region || "-"} />
+              <InfoRow label="카테고리" value={channel.category || "-"} />
+              <InfoRow label="수수료" value={channel.commission || "-"} />
+              <InfoRow label="정산일" value={channel.settlementDate || "-"} />
+              <InfoRow label="조회수" value={String(viewCount)} />
             </div>
 
-            <div>
-              <div className="rounded-2xl border bg-neutral-50 p-6">
-                <h2 className="text-lg font-bold">이 채널을 보면 좋은 이유</h2>
-                <ul className="mt-4 space-y-3 text-sm leading-6 text-neutral-600">
-                  <li>• 판매 지역 기준으로 채널을 비교할 수 있습니다.</li>
-                  <li>• 공식 사이트로 이동하기 전에 핵심 정보를 먼저 확인할 수 있습니다.</li>
-                  <li>• 관련 도매 사이트와 블로그, 셀러 도구로 바로 이어질 수 있습니다.</li>
-                </ul>
-              </div>
+            <div className="mt-6 flex items-center gap-3">
+              <button
+                onClick={handleToggleSave}
+                className={`rounded-xl px-4 py-2 text-sm ${
+                  saved
+                    ? "bg-neutral-200 text-neutral-900"
+                    : "border border-neutral-300 hover:bg-neutral-100"
+                }`}
+              >
+                {saved ? "관심 채널 저장 해제" : "관심 채널 저장"}
+              </button>
+            </div>
 
-              <div className="mt-6 rounded-2xl border bg-white p-6">
-                <h2 className="text-lg font-bold">바로 이동</h2>
-                <div className="mt-4 flex flex-col gap-3">
-                  <button
-                    onClick={handleToggleSave}
-                    className={`rounded-xl px-4 py-3 text-sm ${
-                      saved
-                        ? "bg-neutral-200 text-neutral-900"
-                        : "border hover:bg-neutral-100"
-                    }`}
-                  >
-                    {saved ? "관심 채널 저장 해제" : "관심 채널 저장"}
-                  </button>
+            <div className="mt-6 flex flex-col gap-3">
+              {channel.website && (
+                <a
+                  href={channel.website}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex w-full items-center justify-center rounded-2xl bg-black px-5 py-4 text-sm font-semibold text-white"
+                >
+                  공식 사이트 방문하기
+                </a>
+              )}
 
-                  <a
-                    href={channel.website}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="rounded-xl bg-black px-4 py-3 text-center text-sm text-white"
-                  >
-                    공식 사이트 방문하기
-                  </a>
-                  <a
-                    href="/wholesale"
-                    className="rounded-xl border px-4 py-3 text-center text-sm hover:bg-neutral-100"
-                  >
-                    도매 리스트 보러가기
-                  </a>
-                  <a
-                    href="/blog"
-                    className="rounded-xl border px-4 py-3 text-center text-sm hover:bg-neutral-100"
-                  >
-                    블로그 보러가기
-                  </a>
-                  <a
-                    href="/sellertool"
-                    className="rounded-xl border px-4 py-3 text-center text-sm hover:bg-neutral-100"
-                  >
-                    Seller Tools 보러가기
-                  </a>
-                </div>
-              </div>
+              {channel.commissionLink && (
+                <a
+                  href={channel.commissionLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex w-full items-center justify-center rounded-2xl border border-neutral-300 px-5 py-4 text-sm font-medium hover:bg-neutral-100"
+                >
+                  수수료 안내 보기
+                </a>
+              )}
+
+              {channel.settlementLink && (
+                <a
+                  href={channel.settlementLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex w-full items-center justify-center rounded-2xl border border-neutral-300 px-5 py-4 text-sm font-medium hover:bg-neutral-100"
+                >
+                  정산일 안내 보기
+                </a>
+              )}
             </div>
           </div>
-        </article>
+        </div>
 
         <SectionTitle title="같은 지역의 다른 판매 채널" href="/sales-channel" />
         <div className="grid gap-6 md:grid-cols-3">
@@ -269,9 +258,24 @@ export default function SalesChannelDetailPage() {
                 href={`/sales-channel/${item.id}`}
                 className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
               >
-                <h3 className="text-lg font-bold">{item.name}</h3>
-                <p className="mt-1 text-sm text-neutral-500">{item.region}</p>
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
+                <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
+                  <img
+                    src={
+                      item.imageUrl ||
+                      "https://via.placeholder.com/600x400?text=Sales+Channel"
+                    }
+                    alt={item.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+                <h3 className="line-clamp-2 text-lg font-bold leading-7">
+                  {item.name}
+                </h3>
+                <p className="mt-1 text-sm text-neutral-500">
+                  {item.region} · {item.category}
+                </p>
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                   {item.shortDescription}
                 </p>
               </a>
@@ -287,11 +291,24 @@ export default function SalesChannelDetailPage() {
               href={`/wholesale/${site.id}`}
               className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
             >
-              <h3 className="text-lg font-bold">{site.name}</h3>
+              <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img
+                  src={
+                    site.imageUrl ||
+                    "https://via.placeholder.com/600x400?text=Wholesale"
+                  }
+                  alt={site.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              <h3 className="line-clamp-2 text-lg font-bold leading-7">
+                {site.name}
+              </h3>
               <p className="mt-1 text-sm text-neutral-500">
                 {site.region} · {site.category}
               </p>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                 {site.shortDescription}
               </p>
             </a>
@@ -306,11 +323,24 @@ export default function SalesChannelDetailPage() {
               href={`/blog/${post.id}`}
               className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
             >
-              <h3 className="text-lg font-bold">{post.title}</h3>
+              <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <img
+                  src={
+                    post.imageUrl ||
+                    "https://via.placeholder.com/600x400?text=Blog"
+                  }
+                  alt={post.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              <h3 className="line-clamp-2 text-lg font-bold leading-7">
+                {post.title}
+              </h3>
               <p className="mt-1 text-sm text-neutral-500">
                 {post.category} · {post.date}
               </p>
-              <p className="mt-3 text-sm leading-6 text-neutral-600">
+              <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                 {post.excerpt}
               </p>
             </a>
@@ -339,7 +369,7 @@ export default function SalesChannelDetailPage() {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between gap-4">
+    <div className="flex items-center justify-between gap-4">
       <span>{label}</span>
       <span className="text-right font-semibold">{value}</span>
     </div>

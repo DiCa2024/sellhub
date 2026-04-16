@@ -178,14 +178,14 @@ export default function SalesChannelPage() {
 
         <section className="mb-14">
           <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h2 className="text-2xl font-bold">국내 판매 채널</h2>
-            <p className="text-sm text-neutral-600">
-            한국에서 먼저 테스트 판매하기 좋은 채널들을 확인할 수 있습니다.
-            </p>
-           </div>
-           <span className="text-sm text-neutral-500">{domesticChannels.length}개</span>
-           </div>
+            <div>
+              <h2 className="text-2xl font-bold">국내 판매 채널</h2>
+              <p className="text-sm text-neutral-600">
+                한국에서 먼저 테스트 판매하기 좋은 채널들을 확인할 수 있습니다.
+              </p>
+            </div>
+            <span className="text-sm text-neutral-500">{domesticChannels.length}개</span>
+          </div>
 
           {domesticPaged.length === 0 ? (
             <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
@@ -209,7 +209,9 @@ export default function SalesChannelPage() {
                       className="h-40 w-full rounded-xl object-cover"
                     />
 
-                    <h3 className="mt-4 text-lg font-bold">{item.name}</h3>
+                    <h3 className="mt-4 line-clamp-2 text-lg font-bold leading-7">
+                      {item.name}
+                    </h3>
                     <p className="mt-1 text-sm text-neutral-500">
                       {item.region} · {item.category}
                     </p>
@@ -225,9 +227,15 @@ export default function SalesChannelPage() {
                       ))}
                     </div>
 
-                    <p className="mt-3 text-sm leading-6 text-neutral-600">
+                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                       {item.shortDescription}
                     </p>
+
+                    <div className="mt-auto pt-4">
+                      <span className="block w-full rounded-xl border border-neutral-300 px-4 py-3 text-center text-sm">
+                        상세 보기
+                      </span>
+                    </div>
                   </a>
                 ))}
               </div>
@@ -243,13 +251,13 @@ export default function SalesChannelPage() {
 
         <section className="mb-14">
           <div className="mb-6 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-           <div>
-           <h2 className="text-2xl font-bold">해외 판매 채널</h2>
-           <p className="text-sm text-neutral-600">
-           국내 판매 이후 글로벌로 확장할 때 참고할 수 있는 채널들입니다.
-           </p>
-          </div>
-           <span className="text-sm text-neutral-500">{globalChannels.length}개</span>
+            <div>
+              <h2 className="text-2xl font-bold">해외 판매 채널</h2>
+              <p className="text-sm text-neutral-600">
+                국내 판매 이후 글로벌로 확장할 때 참고할 수 있는 채널들입니다.
+              </p>
+            </div>
+            <span className="text-sm text-neutral-500">{globalChannels.length}개</span>
           </div>
 
           {globalPaged.length === 0 ? (
@@ -263,7 +271,7 @@ export default function SalesChannelPage() {
                   <a
                     key={item.id}
                     href={`/sales-channel/${item.id}`}
-                     className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
+                    className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
                   >
                     <img
                       src={
@@ -274,7 +282,9 @@ export default function SalesChannelPage() {
                       className="h-40 w-full rounded-xl object-cover"
                     />
 
-                    <h3 className="mt-4 text-lg font-bold">{item.name}</h3>
+                    <h3 className="mt-4 line-clamp-2 text-lg font-bold leading-7">
+                      {item.name}
+                    </h3>
                     <p className="mt-1 text-sm text-neutral-500">
                       {item.region} · {item.category}
                     </p>
@@ -290,9 +300,15 @@ export default function SalesChannelPage() {
                       ))}
                     </div>
 
-                    <p className="mt-3 text-sm leading-6 text-neutral-600">
+                    <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                       {item.shortDescription}
                     </p>
+
+                    <div className="mt-auto pt-4">
+                      <span className="block w-full rounded-xl border border-neutral-300 px-4 py-3 text-center text-sm">
+                        상세 보기
+                      </span>
+                    </div>
                   </a>
                 ))}
               </div>
@@ -324,7 +340,9 @@ export default function SalesChannelPage() {
                 href={`/wholesale/${site.id}`}
                 className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
               >
-                <h3 className="text-lg font-bold">{site.name}</h3>
+                <h3 className="line-clamp-2 text-lg font-bold leading-7">
+                  {site.name}
+                </h3>
                 <p className="mt-1 text-sm text-neutral-500">
                   {site.region} · {site.category}
                 </p>
@@ -340,7 +358,7 @@ export default function SalesChannelPage() {
                   ))}
                 </div>
 
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                   {site.shortDescription}
                 </p>
 
@@ -385,13 +403,15 @@ export default function SalesChannelPage() {
                   {post.category || "블로그"}
                 </div>
 
-                <h3 className="mt-3 text-lg font-bold leading-7">{post.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-neutral-600">
+                <h3 className="mt-3 line-clamp-2 text-lg font-bold leading-7">
+                  {post.title}
+                </h3>
+                <p className="mt-2 line-clamp-3 text-sm leading-6 text-neutral-600">
                   {post.excerpt}
                 </p>
 
                 <div className="mt-auto pt-4 text-xs text-neutral-500">
-                  {post.author || "sellhub"} · {post.date || "-"}
+                  {post.date || "-"}
                 </div>
               </a>
             ))}
