@@ -54,12 +54,18 @@ export default function SalesChannelPage() {
   }, [channels, regionFilter, searchTerm]);
 
   const domesticChannels = useMemo(() => {
-    return filteredChannels.filter((item) => item.region === "한국");
-  }, [filteredChannels]);
+  return filteredChannels.filter((item) => {
+    const region = String(item.region || "").trim().toLowerCase();
+    return region === "한국" || region === "국내" || region === "대한민국";
+  });
+}, [filteredChannels]);
 
-  const globalChannels = useMemo(() => {
-    return filteredChannels.filter((item) => item.region !== "한국");
-  }, [filteredChannels]);
+const globalChannels = useMemo(() => {
+  return filteredChannels.filter((item) => {
+    const region = String(item.region || "").trim().toLowerCase();
+    return !(region === "한국" || region === "국내" || region === "대한민국");
+  });
+}, [filteredChannels]);
 
   const domesticTotalPages = Math.max(
     1,

@@ -117,21 +117,31 @@ export default function BlogPage() {
           <section className="mb-12 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
             <a
               href={`/blog/${featuredPost.id}`}
-              className="overflow-hidden rounded-2xl border bg-white shadow-sm transition hover:shadow-md"
+              className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              
+              <div className="h-64 w-full overflow-hidden bg-neutral-100 md:h-80">
+                <img
+                  src={
+                    featuredPost.imageUrl ||
+                    "https://via.placeholder.com/1200x700?text=Blog"
+                  }
+                  alt={featuredPost.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
               <div className="p-6">
                 <div className="mb-3 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
                   {featuredPost.category}
                 </div>
-                <h2 className="text-2xl font-bold leading-tight">
+                <h2 className="line-clamp-2 text-2xl font-bold leading-tight">
                   {featuredPost.title}
                 </h2>
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                   {featuredPost.excerpt}
                 </p>
                 <div className="mt-4 text-xs text-neutral-500">
-                  {featuredPost.author} · {featuredPost.date}
+                  {featuredPost.date}
                 </div>
               </div>
             </a>
@@ -141,25 +151,31 @@ export default function BlogPage() {
                 <a
                   key={post.id}
                   href={`/blog/${post.id}`}
-                  className="flex gap-4 rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md"
+                  className="flex gap-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <div className="h-24 w-32 overflow-hidden rounded-xl bg-neutral-100">
-  <img
-    src={post.imageUrl || "https://via.placeholder.com/400x300?text=Blog"}
-    alt={post.title}
-    className="h-full w-full object-cover"
-  />
-</div>
+                  <div className="h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                    <img
+                      src={
+                        post.imageUrl ||
+                        "https://via.placeholder.com/400x300?text=Blog"
+                      }
+                      alt={post.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+
                   <div className="min-w-0 flex-1">
                     <div className="mb-2 inline-flex rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
                       {post.category}
                     </div>
-                    <h3 className="truncate text-base font-bold">{post.title}</h3>
+                    <h3 className="line-clamp-2 text-base font-bold leading-6">
+                      {post.title}
+                    </h3>
                     <p className="mt-1 line-clamp-2 text-sm leading-6 text-neutral-600">
                       {post.excerpt}
                     </p>
                     <div className="mt-2 text-xs text-neutral-500">
-                      {post.author} · {post.date}
+                      {post.date}
                     </div>
                   </div>
                 </a>
@@ -185,25 +201,31 @@ export default function BlogPage() {
               <a
                 key={post.id}
                 href={`/blog/${post.id}`}
-                className="flex flex-col gap-4 rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md md:flex-row"
+                className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:flex-row"
               >
                 <div className="h-40 w-full overflow-hidden rounded-xl bg-neutral-100 md:h-32 md:w-48">
-  <img
-    src={post.imageUrl || "https://via.placeholder.com/600x400?text=Blog"}
-    alt={post.title}
-    className="h-full w-full object-cover"
-  />
-</div>
+                  <img
+                    src={
+                      post.imageUrl ||
+                      "https://via.placeholder.com/600x400?text=Blog"
+                    }
+                    alt={post.title}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
                 <div className="min-w-0 flex-1">
                   <div className="mb-2 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
                     {post.category}
                   </div>
-                  <h3 className="text-xl font-bold leading-7">{post.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-neutral-600">
+                  <h3 className="line-clamp-2 text-xl font-bold leading-7">
+                    {post.title}
+                  </h3>
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                     {post.excerpt}
                   </p>
                   <div className="mt-3 text-xs text-neutral-500">
-                    {post.author} · {post.date}
+                    {post.date}
                   </div>
                 </div>
               </a>
@@ -224,11 +246,25 @@ export default function BlogPage() {
 
           <div className="grid gap-6 md:grid-cols-3">
             {latestSites.map((site) => (
-              <div
+              <a
                 key={site.id}
-                className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
+                href={`/wholesale/${site.id}`}
+                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <h3 className="text-lg font-bold">{site.name}</h3>
+                <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
+                  <img
+                    src={
+                      site.imageUrl ||
+                      "https://via.placeholder.com/600x400?text=Wholesale"
+                    }
+                    alt={site.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+
+                <h3 className="line-clamp-2 text-lg font-bold leading-7">
+                  {site.name}
+                </h3>
                 <p className="mt-1 text-sm text-neutral-500">
                   {site.region} · {site.category}
                 </p>
@@ -244,19 +280,10 @@ export default function BlogPage() {
                   ))}
                 </div>
 
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                   {site.shortDescription}
                 </p>
-
-                <div className="mt-auto pt-4">
-                  <a
-                    href={`/wholesale/${site.id}`}
-                    className="block w-full rounded-xl border border-neutral-300 px-4 py-3 text-center text-sm hover:bg-neutral-100"
-                  >
-                    상세 보기
-                  </a>
-                </div>
-              </div>
+              </a>
             ))}
           </div>
         </section>
@@ -276,7 +303,7 @@ export default function BlogPage() {
             {randomTools.map((tool) => (
               <div
                 key={tool.id}
-                className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
+                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <h3 className="text-lg font-bold">{tool.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-neutral-600">

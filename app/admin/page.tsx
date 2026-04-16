@@ -44,15 +44,18 @@ export default function AdminPage() {
   };
 
   const emptyChannel = {
-    name: "",
-    imageUrl: "",
-    region: "",
-    tags: "",
-    shortDescription: "",
-    website: "",
-    commission: "",
-    settlementDate: "",
-  };
+  name: "",
+  imageUrl: "",
+  region: "",
+  category: "",
+  tags: "",
+  shortDescription: "",
+  website: "",
+  commission: "",
+  settlementDate: "",
+  commissionLink: "",
+  settlementLink: "",
+};
 
   const [site, setSite] = useState(emptySite);
   const [post, setPost] = useState(emptyPost);
@@ -294,14 +297,15 @@ export default function AdminPage() {
 
   const handleAddOrUpdateChannel = () => {
     if (
-      !channel.name ||
-      !channel.region ||
-      !channel.commission ||
-      !channel.shortDescription
-    ) {
-      alert("사이트명, 지역, 수수료, 한 줄 설명은 필수입니다.");
-      return;
-    }
+  !channel.name ||
+  !channel.region ||
+  !channel.category ||
+  !channel.commission ||
+  !channel.shortDescription
+) {
+  alert("사이트명, 지역, 카테고리, 수수료, 한 줄 설명은 필수입니다.");
+  return;
+}
 
     if (editingChannelId) {
       const updatedChannels = channels.map((item) =>
@@ -309,13 +313,16 @@ export default function AdminPage() {
           ? {
               ...item,
               name: channel.name,
-              imageUrl: channel.imageUrl,
-              region: channel.region,
-              tags: channel.tags.split(",").map((v) => v.trim()).filter(Boolean),
-              shortDescription: channel.shortDescription,
-              website: channel.website,
-              commission: channel.commission,
-              settlementDate: channel.settlementDate,
+imageUrl: channel.imageUrl,
+region: channel.region,
+category: channel.category,
+tags: channel.tags.split(",").map((v) => v.trim()).filter(Boolean),
+shortDescription: channel.shortDescription,
+website: channel.website,
+commission: channel.commission,
+settlementDate: channel.settlementDate,
+commissionLink: channel.commissionLink,
+settlementLink: channel.settlementLink,
             }
           : item
       );
@@ -339,16 +346,19 @@ export default function AdminPage() {
     }
 
     const newChannel = {
-      id: `channel-${Date.now()}`,
-      name: channel.name,
-      imageUrl: channel.imageUrl,
-      region: channel.region,
-      commission: channel.commission,
-      settlementDate: channel.settlementDate,
-      tags: channel.tags.split(",").map((v) => v.trim()).filter(Boolean),
-      shortDescription: channel.shortDescription,
-      website: channel.website,
-    };
+  id: `channel-${Date.now()}`,
+  name: channel.name,
+  imageUrl: channel.imageUrl,
+  region: channel.region,
+  category: channel.category,
+  commission: channel.commission,
+  settlementDate: channel.settlementDate,
+  commissionLink: channel.commissionLink,
+  settlementLink: channel.settlementLink,
+  tags: channel.tags.split(",").map((v) => v.trim()).filter(Boolean),
+  shortDescription: channel.shortDescription,
+  website: channel.website,
+};
 
     const updatedChannels = [newChannel, ...channels];
     setChannels(updatedChannels);
@@ -360,15 +370,18 @@ export default function AdminPage() {
   const handleEditChannel = (item: any) => {
     setEditingChannelId(item.id);
     setChannel({
-      name: item.name || "",
-      imageUrl: item.imageUrl || "",
-      region: item.region || "",
-      commission: item.commission || "",
-      settlementDate: item.settlementDate || "",
-      tags: Array.isArray(item.tags) ? item.tags.join(", ") : "",
-      shortDescription: item.shortDescription || "",
-      website: item.website || "",
-    });
+  name: item.name || "",
+  imageUrl: item.imageUrl || "",
+  region: item.region || "",
+  category: item.category || "",
+  commission: item.commission || "",
+  settlementDate: item.settlementDate || "",
+  commissionLink: item.commissionLink || "",
+  settlementLink: item.settlementLink || "",
+  tags: Array.isArray(item.tags) ? item.tags.join(", ") : "",
+  shortDescription: item.shortDescription || "",
+  website: item.website || "",
+});
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -576,6 +589,11 @@ export default function AdminPage() {
               value={channel.region}
               onChange={(v) => setChannel({ ...channel, region: v })}
             />
+            <Input
+               label="카테고리"
+               value={channel.category}
+                onChange={(v) => setChannel({ ...channel, category: v })}
+             />
             <Input
               label="수수료"
               value={channel.commission}
