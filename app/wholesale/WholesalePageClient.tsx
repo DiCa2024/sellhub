@@ -22,7 +22,7 @@ const CATEGORY_TAG_ITEMS = [
   "스포츠/레저",
 ];
 
-export default function WholesalePage() {
+export default function WholesalePageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -34,15 +34,27 @@ export default function WholesalePage() {
   const [selectedCategoryFromQuery, setSelectedCategoryFromQuery] = useState("");
 
   const handleCategoryQueryChange = (category: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams();
 
     if (category) {
       params.set("category", category);
-    } else {
-      params.delete("category");
     }
 
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+  };
+
+  const handleSearchSubmit = () => {
+    const params = new URLSearchParams();
+
+    if (searchTerm.trim()) {
+      params.set("query", searchTerm.trim());
+    }
+
+    if (selectedCategoryFromQuery) {
+      params.set("category", selectedCategoryFromQuery);
+    }
+
+    router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
   useEffect(() => {
@@ -102,23 +114,18 @@ export default function WholesalePage() {
         .join(" ")
         .toLowerCase();
 
-      const searchMatch =
-        keyword.length === 0 || searchTarget.includes(keyword);
+      const searchMatch = keyword.length === 0 || searchTarget.includes(keyword);
 
       const queryCategoryMatch =
         !selectedCategoryFromQuery ||
         site.category === selectedCategoryFromQuery ||
-        (Array.isArray(site.tags) &&
-          site.tags.includes(selectedCategoryFromQuery));
+        (Array.isArray(site.tags) && site.tags.includes(selectedCategoryFromQuery));
 
       return queryCategoryMatch && searchMatch;
     });
   }, [allSites, selectedCategoryFromQuery, searchTerm]);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredSites.length / ITEMS_PER_PAGE)
-  );
+  const totalPages = Math.max(1, Math.ceil(filteredSites.length / ITEMS_PER_PAGE));
 
   const pagedSites = filteredSites.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -154,12 +161,18 @@ export default function WholesalePage() {
                     setSearchTerm(e.target.value);
                     setCurrentPage(1);
                   }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleSearchSubmit();
+                    }
+                  }}
                   placeholder="도매처명, 카테고리, 특징으로 검색해보세요"
                   className="h-14 w-full rounded-2xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
                 />
 
                 <button
                   type="button"
+                  onClick={handleSearchSubmit}
                   className="h-14 rounded-2xl bg-neutral-900 px-6 text-sm font-medium text-white transition hover:opacity-90 md:min-w-[120px]"
                 >
                   검색
@@ -207,20 +220,22 @@ export default function WholesalePage() {
             </div>
           </div>
         </section>
-        {compareIds.length > 0 && (
-  <div className="mb-6 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-    <div className="text-sm text-neutral-700">
-      비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
-    </div>
 
-    <a
-      href="/wholesale/compare"
-      className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-    >
-      비교하러 가기
-    </a>
-  </div>
-)}
+        {compareIds.length > 0 && (
+          <div className="mb-6 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
+            <div className="text-sm text-neutral-700">
+              비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
+            </div>
+
+            <a
+              href="/wholesale/compare"
+              className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              비교하러 가기
+            </a>
+          </div>
+        )}
+
         <section>
           <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="text-sm text-neutral-600">
@@ -258,13 +273,17 @@ export default function WholesalePage() {
                       className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
                     >
                       <div className="mb-3 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
-    <img
-      src={site.imageUrl}
-      alt={site.name}
-      className="h-full w-full object-cover"
-    />
-  </div>
-                      <h2 className="text-lg font-bold text-neutral-900">
+                        <img
+                          src={
+                            site.imageUrl ||
+                            "https://via.placeholder.com/600x400?text=Wholesale"
+                          }
+                          alt={site.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+
+                      <h2 className="line-clamp-2 text-lg font-bold text-neutral-900">
                         {site.name}
                       </h2>
 
@@ -283,7 +302,7 @@ export default function WholesalePage() {
                         ))}
                       </div>
 
-                      <p className="mt-3 text-sm leading-6 text-neutral-600">
+                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                         {site.shortDescription}
                       </p>
 
