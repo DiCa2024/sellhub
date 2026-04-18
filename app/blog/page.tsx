@@ -40,8 +40,9 @@ export default function BlogPage() {
   }, [selectedCategory]);
 
   const featuredPost = filteredPosts[0];
-  const bottomPosts = filteredPosts.slice(1, 3);
-  const rightPosts = filteredPosts.slice(3, 8);
+  const leftBottomPosts = filteredPosts.slice(1, 3);
+  const rightTopPosts = filteredPosts.slice(3, 8);
+  const rightBottomPosts = filteredPosts.slice(8, 10);
 
   const totalPages = Math.max(
     1,
@@ -160,7 +161,7 @@ export default function BlogPage() {
               </a>
 
               <div className="mt-4 grid gap-4 md:grid-cols-2">
-                {bottomPosts.map((post) => (
+                {leftBottomPosts.map((post) => (
                   <a
                     key={post.id}
                     href={`/blog/${post.id}`}
@@ -190,18 +191,50 @@ export default function BlogPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              {rightPosts.map((post) => (
-                <a
-                  key={post.id}
-                  href={`/blog/${post.id}`}
-                  className="block rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <h3 className="line-clamp-2 text-sm font-bold leading-6 text-neutral-900">
-                    {post.title}
-                  </h3>
-                </a>
-              ))}
+            <div className="flex flex-col gap-4">
+              <div className="space-y-3">
+                {rightTopPosts.map((post) => (
+                  <a
+                    key={post.id}
+                    href={`/blog/${post.id}`}
+                    className="block rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <h3 className="line-clamp-2 text-sm font-bold leading-6 text-neutral-900">
+                      {post.title}
+                    </h3>
+                  </a>
+                ))}
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+                {rightBottomPosts.map((post) => (
+                  <a
+                    key={post.id}
+                    href={`/blog/${post.id}`}
+                    className="block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="h-32 w-full overflow-hidden bg-neutral-100">
+                      <img
+                        src={
+                          post.imageUrl ||
+                          "https://placehold.co/600x400?text=Blog"
+                        }
+                        alt={post.title}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
+                        }}
+                      />
+                    </div>
+
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-bold leading-6 text-neutral-900">
+                        {post.title}
+                      </h3>
+                    </div>
+                  </a>
+                ))}
+              </div>
             </div>
           </section>
         ) : (
