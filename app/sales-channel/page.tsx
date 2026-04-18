@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { salesChannels } from "../data/salesChannels";
 import { wholesaleSites } from "../data/wholesaleSites";
 import { blogPosts } from "../data/blogPosts";
 
@@ -9,11 +8,26 @@ const ITEMS_PER_PAGE = 20;
 
 const REGION_ITEMS = ["전체", "국내", "해외"];
 
+function createEmptyFeeTable() {
+  return {
+    fashion: "",
+    living: "",
+    beauty: "",
+    automotive: "",
+    digital: "",
+    interior: "",
+    stationery: "",
+    sports: "",
+    infants: "",
+    pet: "",
+  };
+}
+
 export default function SalesChannelPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRegion, setSelectedRegion] = useState("전체");
 
-  const [dynamicChannels, setDynamicChannels] = useState<any[]>([]);
+  const [channels, setChannels] = useState<any[]>([]);
   const [dynamicSites, setDynamicSites] = useState<any[]>([]);
   const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
 
@@ -28,22 +42,21 @@ export default function SalesChannelPage() {
       localStorage.getItem("compareSalesChannels") || "[]"
     );
 
-    setDynamicChannels(savedChannels);
+    setChannels(savedChannels);
     setDynamicSites(savedSites);
     setDynamicPosts(savedPosts);
     setCompareIds(savedCompare);
   }, []);
 
-  const allChannels = [...dynamicChannels, ...salesChannels];
-
   const filteredChannels = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
 
-    return allChannels.filter((channel) => {
+    return channels.filter((channel) => {
       const searchTarget = [
         channel.name,
         channel.category,
         channel.region,
+        channel.settlementDate,
       ]
         .join(" ")
         .toLowerCase();
@@ -68,7 +81,7 @@ export default function SalesChannelPage() {
 
       return searchMatch && regionMatch;
     });
-  }, [allChannels, searchTerm, selectedRegion]);
+  }, [channels, searchTerm, selectedRegion]);
 
   const totalPages = Math.max(
     1,
@@ -78,6 +91,10 @@ export default function SalesChannelPage() {
   const pagedChannels = filteredChannels.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
+  );
+
+  const compareChannels = channels.filter((channel) =>
+    compareIds.includes(channel.id)
   );
 
   const latestSites = [...dynamicSites, ...wholesaleSites].slice(0, 4);
@@ -137,10 +154,6 @@ export default function SalesChannelPage() {
     localStorage.setItem("compareSalesChannels", JSON.stringify(updated));
   };
 
-  const compareChannels = allChannels.filter((channel) =>
-    compareIds.includes(channel.id)
-  );
-
   const resetFilters = () => {
     setSearchTerm("");
     setSelectedRegion("전체");
@@ -150,7 +163,6 @@ export default function SalesChannelPage() {
   return (
     <main className="px-6 py-10">
       <div className="mx-auto max-w-7xl">
-        {/* 상단 소개 */}
         <section className="mb-10 overflow-hidden rounded-[28px] border border-neutral-200 bg-white shadow-sm">
           <div className="border-b border-neutral-200 bg-gradient-to-r from-neutral-50 to-white px-6 py-8 md:px-8">
             <div className="max-w-3xl">
@@ -173,7 +185,7 @@ export default function SalesChannelPage() {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="채널명, 카테고리 검색"
+                  placeholder="채널명, 카테고리, 정산일 검색"
                   className="h-14 w-full rounded-2xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
                 />
 
@@ -223,7 +235,6 @@ export default function SalesChannelPage() {
           </div>
         </section>
 
-        {/* 비교함 */}
         {compareIds.length > 0 && (
           <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
             <div className="mb-4 flex items-center justify-between">
@@ -251,7 +262,8 @@ export default function SalesChannelPage() {
                       {channel.name}
                     </div>
                     <div className="mt-1 text-xs text-neutral-500">
-                      수수료 {channel.commission || "-"} · 정산일 {channel.settlementDate || "-"}
+                      {channel.category || "-"} · {channel.region || "-"} · 정산일{" "}
+                      {channel.settlementDate || "-"}
                     </div>
                   </div>
 
@@ -267,7 +279,6 @@ export default function SalesChannelPage() {
           </div>
         )}
 
-        {/* 검색 결과 */}
         <section>
           <div className="mb-4 text-sm text-neutral-600">
             검색 결과 <span className="font-semibold">{filteredChannels.length}</span>개
@@ -282,6 +293,15 @@ export default function SalesChannelPage() {
               <div className="space-y-2">
                 {pagedChannels.map((channel) => {
                   const isSelected = compareIds.includes(channel.id);
+                  const feeTable = {
+                    ...createEmptyFeeTable(),
+                    ...(channel.feeTable || {}),
+                  };
+
+                  const feeSummary =
+                    Object.values(feeTable).find(
+                      (value) => String(value).trim() !== ""
+                    ) || "-";
 
                   return (
                     <div
@@ -316,6 +336,12 @@ export default function SalesChannelPage() {
 
                           <span className="mx-2 text-neutral-400">·</span>
                           <span>{channel.region || "-"}</span>
+
+                          <span className="mx-2 text-neutral-400">·</span>
+                          <span>수수료 {feeSummary}</span>
+
+                          <span className="mx-2 text-neutral-400">·</span>
+                          <span>정산일 {channel.settlementDate || "-"}</span>
                         </div>
                       </div>
 
@@ -352,7 +378,6 @@ export default function SalesChannelPage() {
           )}
         </section>
 
-        {/* 최신 도매 사이트 */}
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
@@ -388,7 +413,6 @@ export default function SalesChannelPage() {
           </div>
         </section>
 
-        {/* 블로그 */}
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">블로그</h2>
@@ -424,7 +448,6 @@ export default function SalesChannelPage() {
           </div>
         </section>
 
-        {/* Seller Tools */}
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Seller Tools</h2>

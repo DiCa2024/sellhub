@@ -13,7 +13,7 @@ const SALES_CHANNEL_FEE_CATEGORIES = [
   { key: "sports", label: "스포츠" },
   { key: "infants", label: "유아" },
   { key: "pet", label: "반려용품" },
-];
+] as const;
 
 function createEmptyFeeTable() {
   return {
@@ -36,8 +36,12 @@ export default function SalesChannelComparePage() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    const savedCompare = JSON.parse(localStorage.getItem("compareSalesChannels") || "[]");
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
+    const savedCompare = JSON.parse(
+      localStorage.getItem("compareSalesChannels") || "[]"
+    );
+    const savedChannels = JSON.parse(
+      localStorage.getItem("salesChannels") || "[]"
+    );
 
     setCompareIds(savedCompare);
     setChannels(savedChannels);
@@ -81,7 +85,7 @@ export default function SalesChannelComparePage() {
           <div>
             <h1 className="text-3xl font-bold">판매 채널 비교</h1>
             <p className="mt-2 text-sm text-neutral-600">
-              수수료표, 정산일, 공식 사이트를 중심으로 비교해 보세요.
+              카테고리별 수수료, 정산일, 공식 사이트를 비교해 보세요.
             </p>
           </div>
 
@@ -136,7 +140,10 @@ export default function SalesChannelComparePage() {
 
               {SALES_CHANNEL_FEE_CATEGORIES.map((item) => (
                 <>
-                  <CompareLabelCell key={`label-${item.key}`} label={`${item.label} 수수료`} />
+                  <CompareLabelCell
+                    key={`label-${item.key}`}
+                    label={`${item.label} 수수료`}
+                  />
                   {comparedChannels.map((channel) => {
                     const feeTable = {
                       ...createEmptyFeeTable(),
@@ -146,7 +153,7 @@ export default function SalesChannelComparePage() {
                     return (
                       <CompareValueCell
                         key={`${item.key}-${channel.id}`}
-                        value={feeTable[item.key as keyof typeof feeTable] || "-"}
+                        value={feeTable[item.key] || "-"}
                       />
                     );
                   })}
