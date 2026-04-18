@@ -438,8 +438,7 @@ export default function HomePage() {
   >
     <img
       src={
-        post.imageUrl ||
-        "https://via.placeholder.com/600x400?text=Blog"
+        post.imageUrl || "https://placehold.co/600x400?text=Blog"
       }
       alt={post.title}
       className="h-40 w-full object-cover transition hover:scale-105"

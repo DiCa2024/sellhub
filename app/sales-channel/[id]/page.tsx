@@ -326,8 +326,7 @@ export default function SalesChannelDetailPage() {
               <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
                 <img
                   src={
-                    post.imageUrl ||
-                    "https://via.placeholder.com/600x400?text=Blog"
+                    post.imageUrl || "https://placehold.co/600x400?text=Blog"
                   }
                   alt={post.title}
                   className="h-full w-full object-cover"

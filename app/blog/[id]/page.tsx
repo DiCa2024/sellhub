@@ -89,7 +89,7 @@ export default function BlogDetailPage() {
 
           <div className="px-8 pt-8 md:px-12">
             <img
-              src={post.imageUrl || "https://via.placeholder.com/1200x700?text=Blog"}
+              src={post.imageUrl || "https://placehold.co/1200x700?text=Blog"}
               alt={post.title}
               className="h-[260px] w-full rounded-2xl border object-cover md:h-[420px]"
             />
@@ -147,7 +147,7 @@ export default function BlogDetailPage() {
                 className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
               >
                 <img
-                  src={item.imageUrl || "https://via.placeholder.com/600x400?text=Blog"}
+                  src={item.imageUrl || "https://placehold.co/600x400?text=Blog"}
                   alt={item.title}
                   className="h-44 w-full rounded-xl object-cover"
                 />

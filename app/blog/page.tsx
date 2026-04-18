@@ -122,9 +122,8 @@ export default function BlogPage() {
               <div className="h-64 w-full overflow-hidden bg-neutral-100 md:h-80">
                 <img
                   src={
-                    featuredPost.imageUrl ||
-                    "https://via.placeholder.com/1200x700?text=Blog"
-                  }
+                    featuredPost.imageUrl || "https://placehold.co/1200x700?text=Blog"
+                      }
                   alt={featuredPost.title}
                   className="h-full w-full object-cover"
                 />
@@ -156,8 +155,7 @@ export default function BlogPage() {
                   <div className="h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
                     <img
                       src={
-                        post.imageUrl ||
-                        "https://via.placeholder.com/400x300?text=Blog"
+                        post.imageUrl || "https://placehold.co/400x300?text=Blog"
                       }
                       alt={post.title}
                       className="h-full w-full object-cover"
@@ -206,8 +204,7 @@ export default function BlogPage() {
                 <div className="h-40 w-full overflow-hidden rounded-xl bg-neutral-100 md:h-32 md:w-48">
                   <img
                     src={
-                      post.imageUrl ||
-                      "https://via.placeholder.com/600x400?text=Blog"
+                      post.imageUrl || "https://placehold.co/600x400?text=Blog"
                     }
                     alt={post.title}
                     className="h-full w-full object-cover"
@@ -254,8 +251,7 @@ export default function BlogPage() {
                 <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
                   <img
                     src={
-                      site.imageUrl ||
-                      "https://via.placeholder.com/600x400?text=Wholesale"
+                      site.imageUrl || "https://placehold.co/600x400?text=Wholesale"
                     }
                     alt={site.name}
                     className="h-full w-full object-cover"
