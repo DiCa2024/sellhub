@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { wholesaleSites } from "../data/wholesaleSites";
+import { blogPosts } from "../data/blogPosts";
 
-const ITEMS_PER_PAGE = 9;
+const ITEMS_PER_PAGE = 20;
 
 const CATEGORY_TAG_ITEMS = [
   "종합",
@@ -30,6 +31,8 @@ export default function WholesalePageClient() {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [dynamicSites, setDynamicSites] = useState<any[]>([]);
+  const [dynamicChannels, setDynamicChannels] = useState<any[]>([]);
+  const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategoryFromQuery, setSelectedCategoryFromQuery] = useState("");
 
@@ -59,10 +62,14 @@ export default function WholesalePageClient() {
 
   useEffect(() => {
     const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
-    setCompareIds(savedCompare);
-
     const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
+    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
+    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+
+    setCompareIds(savedCompare);
     setDynamicSites(savedSites);
+    setDynamicChannels(savedChannels);
+    setDynamicPosts(savedPosts);
   }, []);
 
   useEffect(() => {
@@ -75,6 +82,8 @@ export default function WholesalePageClient() {
   }, [searchParams]);
 
   const allSites = [...dynamicSites, ...wholesaleSites];
+  const latestChannels = dynamicChannels.slice(0, 4);
+  const latestPosts = [...dynamicPosts, ...blogPosts].slice(0, 4);
 
   const handleCompareToggle = (id: string) => {
     let updated: string[] = [];
@@ -82,13 +91,19 @@ export default function WholesalePageClient() {
     if (compareIds.includes(id)) {
       updated = compareIds.filter((item) => item !== id);
     } else {
-      if (compareIds.length >= 3) {
-        alert("비교는 최대 3개까지 담을 수 있어요.");
+      if (compareIds.length >= 10) {
+        alert("비교는 최대 10개까지 담을 수 있어요.");
         return;
       }
       updated = [...compareIds, id];
     }
 
+    setCompareIds(updated);
+    localStorage.setItem("compareSites", JSON.stringify(updated));
+  };
+
+  const handleRemoveCompare = (id: string) => {
+    const updated = compareIds.filter((item) => item !== id);
     setCompareIds(updated);
     localStorage.setItem("compareSites", JSON.stringify(updated));
   };
@@ -108,7 +123,6 @@ export default function WholesalePageClient() {
         site.name,
         site.region,
         site.category,
-        site.shortDescription,
         ...(site.tags || []),
       ]
         .join(" ")
@@ -131,6 +145,8 @@ export default function WholesalePageClient() {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
+
+  const compareSites = allSites.filter((site) => compareIds.includes(site.id));
 
   return (
     <main className="px-6 py-10">
@@ -222,17 +238,45 @@ export default function WholesalePageClient() {
         </section>
 
         {compareIds.length > 0 && (
-          <div className="mb-6 flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-4 py-4 shadow-sm">
-            <div className="text-sm text-neutral-700">
-              비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
+          <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm text-neutral-700">
+                비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
+                <span className="ml-1 text-neutral-500">(최대 10개)</span>
+              </div>
+
+              <a
+                href="/wholesale/compare"
+                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+              >
+                비교하러 가기
+              </a>
             </div>
 
-            <a
-              href="/wholesale/compare"
-              className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-            >
-              비교하러 가기
-            </a>
+            <div className="space-y-3">
+              {compareSites.map((site) => (
+                <div
+                  key={site.id}
+                  className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate text-sm font-semibold text-neutral-900">
+                      {site.name}
+                    </div>
+                    <div className="mt-1 text-xs text-neutral-500">
+                      {site.category} · {site.region}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleRemoveCompare(site.id)}
+                    className="rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
+                  >
+                    제거
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -263,69 +307,67 @@ export default function WholesalePageClient() {
             </div>
           ) : (
             <>
-              <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="space-y-4">
                 {pagedSites.map((site) => {
                   const isSelected = compareIds.includes(site.id);
 
                   return (
                     <div
                       key={site.id}
-                      className="flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition hover:shadow-md"
+                      className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white px-4 py-4 shadow-sm"
                     >
-                      <div className="mb-3 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
+                      <div className="h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
                         <img
                           src={
                             site.imageUrl ||
-                            "https://via.placeholder.com/600x400?text=Wholesale"
+                            "https://placehold.co/600x400?text=Wholesale"
                           }
                           alt={site.name}
                           className="h-full w-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = "https://placehold.co/600x400?text=Wholesale";
+                          }}
                         />
                       </div>
 
-                      <h2 className="line-clamp-2 text-lg font-bold text-neutral-900">
-                        {site.name}
-                      </h2>
+                      <div className="min-w-0 flex-1">
+                        <h2 className="truncate text-base font-bold text-neutral-900">
+                          {site.name}
+                        </h2>
+                        <p className="mt-1 text-sm text-neutral-500">
+                          {site.category} · {site.region}
+                        </p>
 
-                      <p className="mt-1 text-sm text-neutral-500">
-                        {site.region} · {site.category}
-                      </p>
-
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {(site.tags || []).slice(0, 5).map((tag: string) => (
-                          <span
-                            key={tag}
-                            className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {(site.tags || []).slice(0, 3).map((tag: string) => (
+                            <span
+                              key={tag}
+                              className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
-                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-                        {site.shortDescription}
-                      </p>
+                      <div className="flex shrink-0 gap-2">
+                        <a
+                          href={`/wholesale/${site.id}`}
+                          className="rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-700 transition hover:bg-neutral-100"
+                        >
+                          상세
+                        </a>
 
-                      <div className="mt-auto pt-4">
-                        <div className="flex gap-2">
-                          <a
-                            href={`/wholesale/${site.id}`}
-                            className="flex-1 rounded-xl border border-neutral-300 px-3 py-2 text-center text-sm text-neutral-700 transition hover:bg-neutral-100"
-                          >
-                            상세 보기
-                          </a>
-
-                          <button
-                            onClick={() => handleCompareToggle(site.id)}
-                            className={`flex-1 rounded-xl px-3 py-2 text-sm font-medium transition ${
-                              isSelected
-                                ? "bg-neutral-200 text-neutral-900"
-                                : "bg-neutral-900 text-white hover:opacity-90"
-                            }`}
-                          >
-                            비교 기능
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => handleCompareToggle(site.id)}
+                          className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
+                            isSelected
+                              ? "bg-neutral-200 text-neutral-900"
+                              : "bg-neutral-900 text-white hover:opacity-90"
+                          }`}
+                        >
+                          비교
+                        </button>
                       </div>
                     </div>
                   );
@@ -371,6 +413,90 @@ export default function WholesalePageClient() {
               </div>
             </>
           )}
+        </section>
+
+        <section className="mt-16">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold">판매 채널</h2>
+            <a
+              href="/sales-channel"
+              className="text-sm font-medium text-neutral-600 hover:text-black"
+            >
+              전체 보기 →
+            </a>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-4">
+            {latestChannels.map((item) => (
+              <a
+                key={item.id}
+                href={`/sales-channel/${item.id}`}
+                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
+              >
+                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
+                  <img
+                    src={
+                      item.imageUrl ||
+                      "https://placehold.co/600x400?text=Channel"
+                    }
+                    alt={item.name}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/600x400?text=Channel";
+                    }}
+                  />
+                </div>
+
+                <div className="pt-3">
+                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
+                    {item.name}
+                  </h3>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+
+        <section className="mt-16">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold">블로그</h2>
+            <a
+              href="/blog"
+              className="text-sm font-medium text-neutral-600 hover:text-black"
+            >
+              전체 보기 →
+            </a>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-4">
+            {latestPosts.map((post) => (
+              <a
+                key={post.id}
+                href={`/blog/${post.id}`}
+                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
+              >
+                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
+                  <img
+                    src={
+                      post.imageUrl ||
+                      "https://placehold.co/600x400?text=Blog"
+                    }
+                    alt={post.title}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
+                    }}
+                  />
+                </div>
+
+                <div className="pt-3">
+                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
+                    {post.title}
+                  </h3>
+                </div>
+              </a>
+            ))}
+          </div>
         </section>
       </div>
     </main>
