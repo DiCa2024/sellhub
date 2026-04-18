@@ -156,12 +156,12 @@ export default function BlogPage() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {rightTopPosts.map((post) => (
                   <a
                     key={post.id}
                     href={`/blog/${post.id}`}
-                    className="block bg-white px-1 py-1 transition hover:-translate-y-0.5"
+                    className="block rounded-xl border border-neutral-200 bg-white px-4 py-3"
                   >
                     <h3 className="line-clamp-2 text-sm font-bold leading-6 text-neutral-900">
                       {post.title}
@@ -175,7 +175,7 @@ export default function BlogPage() {
                   <a
                     key={post.id}
                     href={`/blog/${post.id}`}
-                    className="flex gap-4 bg-white transition hover:-translate-y-0.5"
+                    className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white px-3 py-3"
                   >
                     <div className="h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
                       <img
@@ -191,7 +191,7 @@ export default function BlogPage() {
                       />
                     </div>
 
-                    <div className="min-w-0 flex-1">
+                    <div className="flex min-w-0 flex-1 items-center">
                       <h3 className="line-clamp-3 text-sm font-bold leading-6 text-neutral-900">
                         {post.title}
                       </h3>
