@@ -4,20 +4,20 @@ import { useEffect, useMemo, useState } from "react";
 import { blogPosts } from "../data/blogPosts";
 import { wholesaleSites } from "../data/wholesaleSites";
 
-const POSTS_PER_PAGE = 5;
-
 export default function BlogPage() {
   const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [dynamicSites, setDynamicSites] = useState<any[]>([]);
+  const [channels, setChannels] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("전체");
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
     const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
+    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
 
     setDynamicPosts(savedPosts);
     setDynamicSites(savedSites);
+    setChannels(savedChannels);
   }, []);
 
   const allPosts = [...dynamicPosts, ...blogPosts];
@@ -35,26 +35,13 @@ export default function BlogPage() {
     return allPosts.filter((post) => post.category === selectedCategory);
   }, [allPosts, selectedCategory]);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory]);
-
   const featuredPost = filteredPosts[0];
   const leftBottomPosts = filteredPosts.slice(1, 3);
   const rightTopPosts = filteredPosts.slice(3, 8);
   const rightBottomPosts = filteredPosts.slice(8, 10);
 
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredPosts.length / POSTS_PER_PAGE)
-  );
-
-  const pagedPosts = filteredPosts.slice(
-    (currentPage - 1) * POSTS_PER_PAGE,
-    currentPage * POSTS_PER_PAGE
-  );
-
-  const latestSites = allSites.slice(0, 3);
+  const latestSites = allSites.slice(0, 4);
+  const latestChannels = channels.slice(0, 4);
 
   const sellerTools = [
     {
@@ -81,30 +68,7 @@ export default function BlogPage() {
       description: "소싱 메모, 체크리스트 정리",
       href: "/sellertool/memo-check-tool",
     },
-    {
-      id: "vat-calculator",
-      title: "부가가치세 계산기",
-      description: "공급가액과 합계금액 기준으로 부가세 계산",
-      href: "/sellertool/vat-calculator",
-    },
-    {
-      id: "comprehensive-income-tax",
-      title: "종합소득세 계산기",
-      description: "근로·사업·이자·배당·임대·기타소득 합산 참고 계산",
-      href: "/sellertool/comprehensive-income-tax",
-    },
-    {
-      id: "capital-gains-tax",
-      title: "양도소득세 계산기",
-      description: "취득가, 양도가, 필요경비, 세율 기준 참고 계산",
-      href: "/sellertool/capital-gains-tax",
-    },
   ];
-
-  const randomTools = useMemo(() => {
-    const shuffled = [...sellerTools].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 3);
-  }, []);
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
@@ -133,13 +97,13 @@ export default function BlogPage() {
         </div>
 
         {featuredPost ? (
-          <section className="mb-12 grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
+          <section className="mb-14 grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
             <div>
               <a
                 href={`/blog/${featuredPost.id}`}
-                className="block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
               >
-                <div className="h-64 w-full overflow-hidden bg-neutral-100 md:h-80">
+                <div className="h-64 w-full overflow-hidden rounded-2xl bg-neutral-100 md:h-80">
                   <img
                     src={
                       featuredPost.imageUrl ||
@@ -153,7 +117,7 @@ export default function BlogPage() {
                   />
                 </div>
 
-                <div className="p-5">
+                <div className="pt-4">
                   <h2 className="line-clamp-2 text-2xl font-bold leading-tight">
                     {featuredPost.title}
                   </h2>
@@ -165,9 +129,9 @@ export default function BlogPage() {
                   <a
                     key={post.id}
                     href={`/blog/${post.id}`}
-                    className="block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
                   >
-                    <div className="h-40 w-full overflow-hidden bg-neutral-100">
+                    <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                       <img
                         src={
                           post.imageUrl ||
@@ -181,7 +145,7 @@ export default function BlogPage() {
                       />
                     </div>
 
-                    <div className="p-4">
+                    <div className="pt-3">
                       <h3 className="line-clamp-2 text-base font-bold leading-6">
                         {post.title}
                       </h3>
@@ -197,7 +161,7 @@ export default function BlogPage() {
                   <a
                     key={post.id}
                     href={`/blog/${post.id}`}
-                    className="block rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="block bg-white px-1 py-1 transition hover:-translate-y-0.5"
                   >
                     <h3 className="line-clamp-2 text-sm font-bold leading-6 text-neutral-900">
                       {post.title}
@@ -206,29 +170,29 @@ export default function BlogPage() {
                 ))}
               </div>
 
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+              <div className="space-y-4">
                 {rightBottomPosts.map((post) => (
                   <a
                     key={post.id}
                     href={`/blog/${post.id}`}
-                    className="block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="flex gap-4 bg-white transition hover:-translate-y-0.5"
                   >
-                    <div className="h-32 w-full overflow-hidden bg-neutral-100">
+                    <div className="h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
                       <img
                         src={
                           post.imageUrl ||
-                          "https://placehold.co/600x400?text=Blog"
+                          "https://placehold.co/400x300?text=Blog"
                         }
                         alt={post.title}
                         className="h-full w-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
+                          e.currentTarget.src = "https://placehold.co/400x300?text=Blog";
                         }}
                       />
                     </div>
 
-                    <div className="p-4">
-                      <h3 className="line-clamp-2 text-sm font-bold leading-6 text-neutral-900">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="line-clamp-3 text-sm font-bold leading-6 text-neutral-900">
                         {post.title}
                       </h3>
                     </div>
@@ -238,95 +202,12 @@ export default function BlogPage() {
             </div>
           </section>
         ) : (
-          <section className="mb-12 rounded-2xl border bg-white p-10 text-center shadow-sm">
+          <section className="mb-12 p-10 text-center">
             <h2 className="text-2xl font-bold">등록된 블로그 글이 없습니다.</h2>
           </section>
         )}
 
-        <section className="mb-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">전체 글</h2>
-            <span className="text-sm text-neutral-500">
-              {filteredPosts.length}개
-            </span>
-          </div>
-
-          <div className="space-y-4">
-            {pagedPosts.map((post) => (
-              <a
-                key={post.id}
-                href={`/blog/${post.id}`}
-                className="flex flex-col gap-4 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:flex-row"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-xl bg-neutral-100 md:h-32 md:w-48">
-                  <img
-                    src={
-                      post.imageUrl ||
-                      "https://placehold.co/600x400?text=Blog"
-                    }
-                    alt={post.title}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
-                    }}
-                  />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="mb-2 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-                    {post.category}
-                  </div>
-                  <h3 className="line-clamp-2 text-xl font-bold leading-7">
-                    {post.title}
-                  </h3>
-                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-                    {post.excerpt}
-                  </p>
-                </div>
-              </a>
-            ))}
-          </div>
-
-          <div className="mt-8 flex items-center justify-center gap-2">
-            <button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
-            >
-              ←
-            </button>
-
-            {Array.from({ length: totalPages }).map((_, index) => {
-              const page = index + 1;
-
-              return (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={`rounded-lg px-3 py-2 text-sm ${
-                    currentPage === page
-                      ? "bg-black text-white"
-                      : "border hover:bg-neutral-100"
-                  }`}
-                >
-                  {page}
-                </button>
-              );
-            })}
-
-            <button
-              disabled={currentPage === totalPages}
-              onClick={() =>
-                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-              }
-              className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
-            >
-              →
-            </button>
-          </div>
-        </section>
-
-        <section className="mb-14">
+        <section className="mb-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
             <a
@@ -337,14 +218,14 @@ export default function BlogPage() {
             </a>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-4">
             {latestSites.map((site) => (
               <a
                 key={site.id}
                 href={`/wholesale/${site.id}`}
-                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
               >
-                <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
+                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
                     src={
                       site.imageUrl ||
@@ -358,27 +239,53 @@ export default function BlogPage() {
                   />
                 </div>
 
-                <h3 className="line-clamp-2 text-lg font-bold leading-7">
-                  {site.name}
-                </h3>
-                <p className="mt-1 text-sm text-neutral-500">
-                  {site.region} · {site.category}
-                </p>
+                <div className="pt-3">
+                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
+                    {site.name}
+                  </h3>
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
 
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {(site.tags || []).slice(0, 4).map((tag: string) => (
-                    <span
-                      key={tag}
-                      className="rounded bg-neutral-100 px-2 py-1 text-xs"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+        <section className="mb-16">
+          <div className="mb-6 flex items-center justify-between">
+            <h2 className="text-2xl font-bold">판매 채널</h2>
+            <a
+              href="/sales-channel"
+              className="text-sm font-medium text-neutral-600 hover:text-black"
+            >
+              전체 보기 →
+            </a>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-4">
+            {latestChannels.map((item) => (
+              <a
+                key={item.id}
+                href={`/sales-channel/${item.id}`}
+                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
+              >
+                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
+                  <img
+                    src={
+                      item.imageUrl ||
+                      "https://placehold.co/600x400?text=Channel"
+                    }
+                    alt={item.name}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/600x400?text=Channel";
+                    }}
+                  />
                 </div>
 
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-                  {site.shortDescription}
-                </p>
+                <div className="pt-3">
+                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
+                    {item.name}
+                  </h3>
+                </div>
               </a>
             ))}
           </div>
@@ -395,26 +302,18 @@ export default function BlogPage() {
             </a>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
-            {randomTools.map((tool) => (
-              <div
+          <div className="grid gap-6 md:grid-cols-4">
+            {sellerTools.map((tool) => (
+              <a
                 key={tool.id}
-                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                href={tool.href}
+                className="flex min-h-[150px] flex-col rounded-2xl bg-neutral-50 p-5 transition hover:-translate-y-0.5"
               >
-                <h3 className="text-lg font-bold">{tool.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
+                <h3 className="text-center text-lg font-bold">{tool.title}</h3>
+                <p className="mt-3 text-center text-sm leading-6 text-neutral-600">
                   {tool.description}
                 </p>
-
-                <div className="mt-auto pt-4">
-                  <a
-                    href={tool.href}
-                    className="block w-full rounded-xl bg-black px-4 py-3 text-center text-sm font-medium text-white hover:opacity-90"
-                  >
-                    도구 열기
-                  </a>
-                </div>
-              </div>
+              </a>
             ))}
           </div>
         </section>
