@@ -40,7 +40,8 @@ export default function BlogPage() {
   }, [selectedCategory]);
 
   const featuredPost = filteredPosts[0];
-  const listPosts = filteredPosts.slice(1);
+  const bottomPosts = filteredPosts.slice(1, 3);
+  const rightPosts = filteredPosts.slice(3, 8);
 
   const totalPages = Math.max(
     1,
@@ -131,76 +132,74 @@ export default function BlogPage() {
         </div>
 
         {featuredPost ? (
-          <section className="mb-12 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-            <a
-              href={`/blog/${featuredPost.id}`}
-              className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-            >
-              <div className="h-56 w-full overflow-hidden bg-neutral-100 md:h-72">
-                <img
-                  src={
-                    featuredPost.imageUrl ||
-                    "https://placehold.co/1200x700?text=Blog"
-                  }
-                  alt={featuredPost.title}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = "https://placehold.co/1200x700?text=Blog";
-                  }}
-                />
-              </div>
-
-              <div className="p-5">
-                <div className="mb-3 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-                  {featuredPost.category}
+          <section className="mb-12 grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
+            <div>
+              <a
+                href={`/blog/${featuredPost.id}`}
+                className="block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <div className="h-64 w-full overflow-hidden bg-neutral-100 md:h-80">
+                  <img
+                    src={
+                      featuredPost.imageUrl ||
+                      "https://placehold.co/1200x700?text=Blog"
+                    }
+                    alt={featuredPost.title}
+                    className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/1200x700?text=Blog";
+                    }}
+                  />
                 </div>
-                <h2 className="line-clamp-2 text-2xl font-bold leading-tight">
-                  {featuredPost.title}
-                </h2>
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-                  {featuredPost.excerpt}
-                </p>
-                <div className="mt-4 text-xs text-neutral-500">
-                  {featuredPost.date}
-                </div>
-              </div>
-            </a>
 
-            <div className="space-y-4">
-              {listPosts.slice(0, 3).map((post) => (
+                <div className="p-5">
+                  <h2 className="line-clamp-2 text-2xl font-bold leading-tight">
+                    {featuredPost.title}
+                  </h2>
+                </div>
+              </a>
+
+              <div className="mt-4 grid gap-4 md:grid-cols-2">
+                {bottomPosts.map((post) => (
+                  <a
+                    key={post.id}
+                    href={`/blog/${post.id}`}
+                    className="block overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  >
+                    <div className="h-40 w-full overflow-hidden bg-neutral-100">
+                      <img
+                        src={
+                          post.imageUrl ||
+                          "https://placehold.co/600x400?text=Blog"
+                        }
+                        alt={post.title}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
+                        }}
+                      />
+                    </div>
+
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-base font-bold leading-6">
+                        {post.title}
+                      </h3>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              {rightPosts.map((post) => (
                 <a
                   key={post.id}
                   href={`/blog/${post.id}`}
-                  className="flex gap-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  className="block rounded-2xl border border-neutral-200 bg-white px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <div className="h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
-                    <img
-                      src={
-                        post.imageUrl ||
-                        "https://placehold.co/400x300?text=Blog"
-                      }
-                      alt={post.title}
-                      className="h-full w-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src = "https://placehold.co/400x300?text=Blog";
-                      }}
-                    />
-                  </div>
-
-                  <div className="min-w-0 flex-1">
-                    <div className="mb-2 inline-flex rounded-full bg-neutral-100 px-2 py-1 text-xs font-medium text-neutral-700">
-                      {post.category}
-                    </div>
-                    <h3 className="line-clamp-2 text-base font-bold leading-6">
-                      {post.title}
-                    </h3>
-                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-neutral-600">
-                      {post.excerpt}
-                    </p>
-                    <div className="mt-2 text-xs text-neutral-500">
-                      {post.date}
-                    </div>
-                  </div>
+                  <h3 className="line-clamp-2 text-sm font-bold leading-6 text-neutral-900">
+                    {post.title}
+                  </h3>
                 </a>
               ))}
             </div>
@@ -250,9 +249,6 @@ export default function BlogPage() {
                   <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
                     {post.excerpt}
                   </p>
-                  <div className="mt-3 text-xs text-neutral-500">
-                    {post.date}
-                  </div>
                 </div>
               </a>
             ))}
