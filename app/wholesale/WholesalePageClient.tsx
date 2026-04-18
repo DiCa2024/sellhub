@@ -307,72 +307,65 @@ export default function WholesalePageClient() {
             </div>
           ) : (
             <>
-              <div className="space-y-4">
-                {pagedSites.map((site) => {
-                  const isSelected = compareIds.includes(site.id);
+      <div className="space-y-2">
+  {pagedSites.map((site) => {
+    const isSelected = compareIds.includes(site.id);
 
-                  return (
-                    <div
-                      key={site.id}
-                      className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white px-4 py-4 shadow-sm"
-                    >
-                      <div className="h-20 w-28 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
-                        <img
-                          src={
-                            site.imageUrl ||
-                            "https://placehold.co/600x400?text=Wholesale"
-                          }
-                          alt={site.name}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = "https://placehold.co/600x400?text=Wholesale";
-                          }}
-                        />
-                      </div>
+    return (
+      <div
+        key={site.id}
+        className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
+      >
+        {/* 왼쪽 영역 */}
+        <div className="flex items-center gap-4 min-w-0">
 
-                      <div className="min-w-0 flex-1">
-                        <h2 className="truncate text-base font-bold text-neutral-900">
-                          {site.name}
-                        </h2>
-                        <p className="mt-1 text-sm text-neutral-500">
-                          {site.category} · {site.region}
-                        </p>
+          {/* 썸네일 */}
+          <a href={`/wholesale/${site.id}`} className="shrink-0">
+            <div className="h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
+              <img
+                src={site.imageUrl || "https://placehold.co/400x300"}
+                alt={site.name}
+                className="h-full w-full object-cover"
+              />
+            </div>
+          </a>
 
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {(site.tags || []).slice(0, 3).map((tag: string) => (
-                            <span
-                              key={tag}
-                              className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
+          {/* 텍스트 (한 줄) */}
+          <div className="min-w-0 text-sm text-neutral-800 whitespace-nowrap overflow-hidden text-ellipsis">
+            <a
+              href={`/wholesale/${site.id}`}
+              className="font-semibold text-neutral-900 hover:underline"
+            >
+              {site.name}
+            </a>
 
-                      <div className="flex shrink-0 gap-2">
-                        <a
-                          href={`/wholesale/${site.id}`}
-                          className="rounded-xl border border-neutral-300 px-3 py-2 text-sm text-neutral-700 transition hover:bg-neutral-100"
-                        >
-                          상세
-                        </a>
+            <span className="mx-2 text-neutral-400">·</span>
+            <span>{site.category || "-"}</span>
 
-                        <button
-                          onClick={() => handleCompareToggle(site.id)}
-                          className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
-                            isSelected
-                              ? "bg-neutral-200 text-neutral-900"
-                              : "bg-neutral-900 text-white hover:opacity-90"
-                          }`}
-                        >
-                          비교
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+            <span className="mx-2 text-neutral-400">·</span>
+            <span>{site.region || "-"}</span>
+          </div>
+        </div>
+
+        {/* 비교 버튼 */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCompareToggle(site.id);
+          }}
+          className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium ${
+            isSelected
+              ? "bg-neutral-200 text-neutral-900"
+              : "bg-black text-white"
+          }`}
+        >
+          비교
+        </button>
+      </div>
+    );
+  })}
+</div>
+
 
               <div className="mt-8 flex items-center justify-center gap-2">
                 <button
