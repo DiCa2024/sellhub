@@ -126,7 +126,7 @@ export default function HomePage() {
                     handleSearch();
                   }
                 }}
-                placeholder="도매처 찾기"
+                placeholder="도매처찾기"
                 className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-neutral-900"
               />
 
