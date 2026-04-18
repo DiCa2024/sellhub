@@ -4,10 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { blogPosts } from "../data/blogPosts";
 import { wholesaleSites } from "../data/wholesaleSites";
 
+const POSTS_PER_PAGE = 5;
+
 export default function BlogPage() {
   const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [dynamicSites, setDynamicSites] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("전체");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
@@ -32,8 +35,22 @@ export default function BlogPage() {
     return allPosts.filter((post) => post.category === selectedCategory);
   }, [allPosts, selectedCategory]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory]);
+
   const featuredPost = filteredPosts[0];
   const listPosts = filteredPosts.slice(1);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredPosts.length / POSTS_PER_PAGE)
+  );
+
+  const pagedPosts = filteredPosts.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE
+  );
 
   const latestSites = allSites.slice(0, 3);
 
@@ -119,17 +136,21 @@ export default function BlogPage() {
               href={`/blog/${featuredPost.id}`}
               className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className="h-64 w-full overflow-hidden bg-neutral-100 md:h-80">
+              <div className="h-56 w-full overflow-hidden bg-neutral-100 md:h-72">
                 <img
                   src={
-                    featuredPost.imageUrl || "https://placehold.co/1200x700?text=Blog"
-                      }
+                    featuredPost.imageUrl ||
+                    "https://placehold.co/1200x700?text=Blog"
+                  }
                   alt={featuredPost.title}
                   className="h-full w-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "https://placehold.co/1200x700?text=Blog";
+                  }}
                 />
               </div>
 
-              <div className="p-6">
+              <div className="p-5">
                 <div className="mb-3 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
                   {featuredPost.category}
                 </div>
@@ -146,7 +167,7 @@ export default function BlogPage() {
             </a>
 
             <div className="space-y-4">
-              {listPosts.slice(0, 4).map((post) => (
+              {listPosts.slice(0, 3).map((post) => (
                 <a
                   key={post.id}
                   href={`/blog/${post.id}`}
@@ -155,10 +176,14 @@ export default function BlogPage() {
                   <div className="h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
                     <img
                       src={
-                        post.imageUrl || "https://placehold.co/400x300?text=Blog"
+                        post.imageUrl ||
+                        "https://placehold.co/400x300?text=Blog"
                       }
                       alt={post.title}
                       className="h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "https://placehold.co/400x300?text=Blog";
+                      }}
                     />
                   </div>
 
@@ -195,7 +220,7 @@ export default function BlogPage() {
           </div>
 
           <div className="space-y-4">
-            {filteredPosts.map((post) => (
+            {pagedPosts.map((post) => (
               <a
                 key={post.id}
                 href={`/blog/${post.id}`}
@@ -204,10 +229,14 @@ export default function BlogPage() {
                 <div className="h-40 w-full overflow-hidden rounded-xl bg-neutral-100 md:h-32 md:w-48">
                   <img
                     src={
-                      post.imageUrl || "https://placehold.co/600x400?text=Blog"
+                      post.imageUrl ||
+                      "https://placehold.co/600x400?text=Blog"
                     }
                     alt={post.title}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
+                    }}
                   />
                 </div>
 
@@ -227,6 +256,44 @@ export default function BlogPage() {
                 </div>
               </a>
             ))}
+          </div>
+
+          <div className="mt-8 flex items-center justify-center gap-2">
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
+            >
+              ←
+            </button>
+
+            {Array.from({ length: totalPages }).map((_, index) => {
+              const page = index + 1;
+
+              return (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`rounded-lg px-3 py-2 text-sm ${
+                    currentPage === page
+                      ? "bg-black text-white"
+                      : "border hover:bg-neutral-100"
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
+
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
+            >
+              →
+            </button>
           </div>
         </section>
 
@@ -251,10 +318,14 @@ export default function BlogPage() {
                 <div className="mb-4 h-40 w-full overflow-hidden rounded-xl bg-neutral-100">
                   <img
                     src={
-                      site.imageUrl || "https://placehold.co/600x400?text=Wholesale"
+                      site.imageUrl ||
+                      "https://placehold.co/600x400?text=Wholesale"
                     }
                     alt={site.name}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "https://placehold.co/600x400?text=Wholesale";
+                    }}
                   />
                 </div>
 
