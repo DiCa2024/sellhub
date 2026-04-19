@@ -31,9 +31,15 @@ export default function TopNav() {
 
   const handleLogout = () => {
   localStorage.removeItem("currentUser");
+
+  // ✅ 여기 추가 (딱 이 위치)
   localStorage.removeItem("compareSites");
   localStorage.removeItem("compareSalesChannels");
-  router.push("/");
+
+  setCurrentUser(null);
+  window.dispatchEvent(new Event("auth-changed"));
+  alert("로그아웃 되었습니다.");
+  window.location.href = "/";
 };
 
   const isAdmin = currentUser?.email === ADMIN_EMAIL;
