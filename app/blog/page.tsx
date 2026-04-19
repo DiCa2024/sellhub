@@ -26,16 +26,21 @@ export default function BlogPage() {
   const allSites = [...dynamicSites, ...wholesaleSites];
 
   const featuredPost = allPosts[0];
-  const leftBottomPosts = allPosts.slice(1, 3);
-  const rightTopPosts = allPosts.slice(1, 6);
-  const rightBottomPosts = allPosts.slice(6, 8);
+  const leftBottomPosts = allPosts.slice(1, 3);   // 1,2
+  const rightTopPosts = allPosts.slice(3, 8);     // 3~7 (5개)
+  const rightBottomPosts = allPosts.slice(8, 10); // 8,9
 
-  const pagedPosts = allPosts.slice(
-    (currentPage - 1) * POSTS_PER_PAGE,
-    currentPage * POSTS_PER_PAGE
-  );
+  const usedTopPostsCount = 10; // 위에서 0~9까지 사용
 
-  const totalPages = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE));
+const pagedPosts = allPosts.slice(
+  usedTopPostsCount + (currentPage - 1) * POSTS_PER_PAGE,
+  usedTopPostsCount + currentPage * POSTS_PER_PAGE
+);
+
+  const totalPages = Math.max(
+  1,
+  Math.ceil((allPosts.length - usedTopPostsCount) / POSTS_PER_PAGE)
+);
 
   const latestSites = allSites.slice(0, 4);
   const latestChannels = channels.slice(0, 4);
@@ -138,20 +143,53 @@ export default function BlogPage() {
             ))}
           </div>
 
-          <div className="mt-6 flex justify-center gap-2">
-            <button onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}>←</button>
-            {[...Array(totalPages)].map((_, i) => (
-              <button key={i} onClick={() => setCurrentPage(i + 1)}>
-                {i + 1}
-              </button>
-            ))}
-            <button onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}>→</button>
-          </div>
+         <div className="mt-6 flex justify-center gap-2">
+  <button
+    onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+    className="rounded-lg border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-100"
+  >
+    ←
+  </button>
+
+  {[...Array(totalPages)].map((_, i) => {
+    const pageNumber = i + 1;
+    const isActive = currentPage === pageNumber;
+
+    return (
+      <button
+        key={i}
+        onClick={() => setCurrentPage(pageNumber)}
+        className={`rounded-lg px-3 py-2 text-sm ${
+          isActive
+            ? "border border-black bg-black font-semibold text-white"
+            : "border border-neutral-300 bg-white hover:bg-neutral-100"
+        }`}
+      >
+        {pageNumber}
+      </button>
+    );
+  })}
+
+  <button
+    onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+    className="rounded-lg border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-100"
+  >
+    →
+  </button>
+</div> 
         </section>
 
         {/* 🔥 도매 */}
         <section className="mb-16">
-          <h2 className="mb-6 text-2xl font-bold">최신 도매 사이트</h2>
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
+    <a
+      href="/wholesale"
+      className="text-sm font-medium text-neutral-600 hover:text-black"
+    >
+      전체 보기 →
+    </a>
+  </div>
           <div className="grid gap-6 md:grid-cols-4">
             {latestSites.map((site) => (
               <a key={site.id} href={`/wholesale/${site.id}`}>
@@ -166,7 +204,15 @@ export default function BlogPage() {
 
         {/* 🔥 판매채널 */}
         <section className="mb-16">
-          <h2 className="mb-6 text-2xl font-bold">판매 채널</h2>
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">판매 채널</h2>
+    <a
+      href="/sales-channel"
+      className="text-sm font-medium text-neutral-600 hover:text-black"
+    >
+      전체 보기 →
+    </a>
+  </div>
           <div className="grid gap-6 md:grid-cols-4">
             {latestChannels.map((item) => (
               <a key={item.id} href={`/sales-channel/${item.id}`}>
@@ -180,8 +226,16 @@ export default function BlogPage() {
         </section>
 
         {/* 🔥 Seller Tools */}
-        <section>
-          <h2 className="mb-6 text-2xl font-bold">Seller Tools</h2>
+       <section>
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">Seller Tools</h2>
+    <a
+      href="/sellertool"
+      className="text-sm font-medium text-neutral-600 hover:text-black"
+    >
+      전체 보기 →
+    </a>
+  </div>
           <div className="grid gap-6 md:grid-cols-4">
             {sellerTools.map((tool) => (
               <a key={tool.id} href={tool.href} className="p-6 text-center bg-neutral-100 rounded-2xl">
