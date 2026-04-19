@@ -298,11 +298,11 @@ export default function SalesChannelPage() {
                     ...(channel.feeTable || {}),
                   };
 
-                  const feeSummary =
-                    Object.values(feeTable).find(
-                      (value) => String(value).trim() !== ""
-                    ) || "-";
-
+                  const feeSummary = String(
+                     Object.values(feeTable).find(
+                     (value) => String(value).trim() !== ""
+                                ) || "-"
+                      );
                   return (
                     <div
                       key={channel.id}
