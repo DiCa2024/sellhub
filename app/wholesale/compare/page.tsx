@@ -21,7 +21,8 @@ export default function WholesaleComparePage() {
   const [loaded, setLoaded] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedQuickFilter, setSelectedQuickFilter] = useState("");
+  const [selectedQuickFilters, setSelectedQuickFilters] = useState<string[]>([]);
+  const active = selectedQuickFilters.includes(item.key);
 
   useEffect(() => {
     const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
@@ -65,29 +66,46 @@ export default function WholesaleComparePage() {
 
       let matchQuickFilter = true;
 
-      if (selectedQuickFilter === "dropshipping-yes") {
-        matchQuickFilter = String(site.dropshipping || "").includes("가능");
-      } else if (selectedQuickFilter === "dropshipping-no") {
-        matchQuickFilter =
-          String(site.dropshipping || "").includes("불가") ||
-          String(site.dropshipping || "").includes("불가능");
-      } else if (selectedQuickFilter === "usage-free") {
-        matchQuickFilter = String(site.usageFee || "").includes("무료");
-      } else if (selectedQuickFilter === "usage-paid") {
-        matchQuickFilter =
-          !String(site.usageFee || "").includes("무료") &&
-          String(site.usageFee || "").trim() !== "" &&
-          String(site.usageFee || "").trim() !== "-";
-      } else if (selectedQuickFilter === "image-free") {
-        matchQuickFilter = String(site.imageProvided || "").includes("무료");
-      } else if (selectedQuickFilter === "image-paid") {
-        matchQuickFilter =
-          !String(site.imageProvided || "").includes("무료") &&
-          (
-            String(site.imageProvided || "").includes("유료") ||
-            String(site.imageProvided || "").includes("제공")
-          );
-      }
+     const matchQuickFilter = selectedQuickFilters.every((filter) => {
+  if (filter === "dropshipping-yes") {
+    return String(site.dropshipping || "").includes("가능");
+  }
+
+  if (filter === "dropshipping-no") {
+    return (
+      String(site.dropshipping || "").includes("불가") ||
+      String(site.dropshipping || "").includes("불가능")
+    );
+  }
+
+  if (filter === "usage-free") {
+    return String(site.usageFee || "").includes("무료");
+  }
+
+  if (filter === "usage-paid") {
+    return (
+      !String(site.usageFee || "").includes("무료") &&
+      String(site.usageFee || "").trim() !== "" &&
+      String(site.usageFee || "").trim() !== "-"
+    );
+  }
+
+  if (filter === "image-free") {
+    return String(site.imageProvided || "").includes("무료");
+  }
+
+  if (filter === "image-paid") {
+    return (
+      !String(site.imageProvided || "").includes("무료") &&
+      (
+        String(site.imageProvided || "").includes("유료") ||
+        String(site.imageProvided || "").includes("제공")
+      )
+    );
+  }
+
+  return true;
+});
 
       return matchSearch && matchQuickFilter;
     });
@@ -129,7 +147,7 @@ export default function WholesaleComparePage() {
 
   const resetFilters = () => {
     setSearchTerm("");
-    setSelectedQuickFilter("");
+    setSelectedQuickFilter([]); // 배열 초기화
   };
 
   const removeCompare = (id: string) => {
@@ -205,11 +223,15 @@ export default function WholesaleComparePage() {
                     return (
                       <button
                         key={item.key}
-                        onClick={() =>
-                          setSelectedQuickFilter(
-                            selectedQuickFilter === item.key ? "" : item.key
-                          )
-                        }
+                        onClick={() => {
+                        setSelectedQuickFilters((prev) => {
+                       if (prev.includes(item.key)) {
+                           return prev.filter((f) => f !== item.key);
+                          } else {
+                        return [...prev, item.key];
+                          }
+                           });
+                          }}
                         className={`rounded-full border px-4 py-2 text-sm transition ${
                           active
                             ? "border-neutral-900 bg-neutral-900 text-white"
