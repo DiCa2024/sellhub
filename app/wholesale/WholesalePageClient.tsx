@@ -43,6 +43,10 @@ export default function WholesalePageClient() {
       params.set("category", category);
     }
 
+    if (searchTerm.trim()) {
+      params.set("query", searchTerm.trim());
+    }
+
     router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
@@ -123,6 +127,9 @@ export default function WholesalePageClient() {
         site.name,
         site.region,
         site.category,
+        site.shortDescription,
+        site.dropshipping,
+        site.imageProvided,
         ...(site.tags || []),
       ]
         .join(" ")
@@ -307,65 +314,81 @@ export default function WholesalePageClient() {
             </div>
           ) : (
             <>
-      <div className="space-y-2">
-  {pagedSites.map((site) => {
-    const isSelected = compareIds.includes(site.id);
+              <div className="space-y-2">
+                {pagedSites.map((site) => {
+                  const isSelected = compareIds.includes(site.id);
+                  const moveUrl = site.website || "#";
 
-    return (
-      <div
-        key={site.id}
-        className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
-      >
-        {/* 왼쪽 영역 */}
-        <div className="flex items-center gap-4 min-w-0">
+                  return (
+                    <div
+                      key={site.id}
+                      className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
+                    >
+                      <div className="flex min-w-0 items-center gap-4">
+                        <a href={`/wholesale/${site.id}`} className="shrink-0">
+                          <div className="group h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
+                            <img
+                              src={
+                                site.imageUrl ||
+                                "https://placehold.co/400x300?text=Wholesale"
+                              }
+                              alt={site.name}
+                              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                              onError={(e) => {
+                                e.currentTarget.src =
+                                  "https://placehold.co/400x300?text=Wholesale";
+                              }}
+                            />
+                          </div>
+                        </a>
 
-          {/* 썸네일 */}
-          <a href={`/wholesale/${site.id}`} className="shrink-0">
-            <div className="h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
-              <img
-                src={site.imageUrl || "https://placehold.co/400x300"}
-                alt={site.name}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </a>
+                        <div className="min-w-0 whitespace-nowrap overflow-hidden text-ellipsis text-sm text-neutral-800">
+                          <a
+                            href={`/wholesale/${site.id}`}
+                            className="font-semibold text-neutral-900 hover:underline"
+                          >
+                            {site.name}
+                          </a>
 
-          {/* 텍스트 (한 줄) */}
-          <div className="min-w-0 text-sm text-neutral-800 whitespace-nowrap overflow-hidden text-ellipsis">
-            <a
-              href={`/wholesale/${site.id}`}
-              className="font-semibold text-neutral-900 hover:underline"
-            >
-              {site.name}
-            </a>
+                          <span className="mx-2 text-neutral-400">·</span>
+                          <span>{site.category || "-"}</span>
 
-            <span className="mx-2 text-neutral-400">·</span>
-            <span>{site.category || "-"}</span>
+                          <span className="mx-2 text-neutral-400">·</span>
+                          <span>{site.region || "-"}</span>
 
-            <span className="mx-2 text-neutral-400">·</span>
-            <span>{site.region || "-"}</span>
-          </div>
-        </div>
+                          <span className="mx-2 text-neutral-400">·</span>
+                          <span>위탁배송 {site.dropshipping || "-"}</span>
 
-        {/* 비교 버튼 */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleCompareToggle(site.id);
-          }}
-          className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium ${
-            isSelected
-              ? "bg-neutral-200 text-neutral-900"
-              : "bg-black text-white"
-          }`}
-        >
-          비교
-        </button>
-      </div>
-    );
-  })}
-</div>
+                          <span className="mx-2 text-neutral-400">·</span>
+                          <span>이미지 제공 {site.imageProvided || "-"}</span>
+                        </div>
+                      </div>
 
+                      <div className="ml-4 flex shrink-0 gap-2">
+                        <a
+                          href={moveUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="rounded-lg border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-100"
+                        >
+                          이동
+                        </a>
+
+                        <button
+                          onClick={() => handleCompareToggle(site.id)}
+                          className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                            isSelected
+                              ? "bg-neutral-200 text-neutral-900"
+                              : "bg-black text-white"
+                          }`}
+                        >
+                          비교
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
               <div className="mt-8 flex items-center justify-center gap-2">
                 <button
