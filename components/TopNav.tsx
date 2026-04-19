@@ -11,10 +11,10 @@ export default function TopNav() {
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   const refreshUser = () => {
-    const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-    setCurrentUser(savedUser);
-  };
-
+  const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
+  console.log("currentUser:", savedUser);
+  setCurrentUser(savedUser);
+};
   useEffect(() => {
     refreshUser();
   }, [pathname]);
