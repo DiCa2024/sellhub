@@ -23,7 +23,7 @@ export default function WholesaleComparePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedQuickFilters, setSelectedQuickFilters] = useState<string[]>([]);
   const active = selectedQuickFilters.includes(item.key);
-
+  
   useEffect(() => {
     const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
     const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
@@ -64,9 +64,7 @@ export default function WholesaleComparePage() {
       const matchSearch =
         keyword.length === 0 || searchTarget.includes(keyword);
 
-      let matchQuickFilter = true;
-
-     const matchQuickFilter = selectedQuickFilters.every((filter) => {
+const matchQuickFilter = selectedQuickFilters.every((filter) => {
   if (filter === "dropshipping-yes") {
     return String(site.dropshipping || "").includes("가능");
   }
