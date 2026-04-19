@@ -53,7 +53,6 @@ export default function BoardPage() {
 
   const latestSites = allSites.slice(0, 4);
   const latestBlogs = allBlogs.slice(0, 4);
-  const latestChannels = dynamicChannels.slice(0, 4);
 
   const sellerTools = [
     {
@@ -90,23 +89,22 @@ export default function BoardPage() {
           </div>
 
           {currentUser ? (
-  <a
-    href="/board/write"
-    className="inline-flex rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:opacity-90"
-  >
-    글쓰기
-  </a>
-) : (
-  <a
-    href="/login"
-    className="inline-flex rounded-xl border px-4 py-3 text-sm font-medium hover:bg-neutral-100"
-  >
-    로그인 후 글쓰기
-  </a>
-)}
+            <a
+              href="/board/write"
+              className="inline-flex rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:opacity-90"
+            >
+              글쓰기
+            </a>
+          ) : (
+            <a
+              href="/login"
+              className="inline-flex rounded-xl border px-4 py-3 text-sm font-medium hover:bg-neutral-100"
+            >
+              로그인 후 글쓰기
+            </a>
+          )}
         </div>
 
-        {/* 게시판 리스트 */}
         <div className="overflow-hidden rounded-2xl border bg-white">
           <div className="grid grid-cols-12 bg-neutral-100 p-3 text-sm font-medium">
             <div className="col-span-1">번호</div>
@@ -156,7 +154,6 @@ export default function BoardPage() {
           })}
         </div>
 
-        {/* 페이지네이션 */}
         <div className="mt-6 flex justify-center gap-2">
           <button onClick={() => setPage((p) => Math.max(p - 1, 1))}>←</button>
 
@@ -173,7 +170,6 @@ export default function BoardPage() {
           <button onClick={() => setPage((p) => Math.min(p + 1, totalPages))}>→</button>
         </div>
 
-        {/* 최신 도매 */}
         <section className="mt-14">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
@@ -194,16 +190,9 @@ export default function BoardPage() {
               >
                 <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={
-                      site.imageUrl ||
-                      "https://placehold.co/600x400?text=Wholesale"
-                    }
+                    src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
                     alt={site.name}
                     className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Wholesale";
-                    }}
                   />
                 </div>
 
@@ -217,10 +206,9 @@ export default function BoardPage() {
           </div>
         </section>
 
-        {/* 최신 블로그 */}
         <section className="mt-14">
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 블로그 글</h2>
+            <h2 className="text-2xl font-bold">최신 블로그</h2>
             <a
               href="/blog"
               className="text-sm font-medium text-neutral-600 hover:text-black"
@@ -238,16 +226,9 @@ export default function BoardPage() {
               >
                 <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={
-                      blog.imageUrl ||
-                      "https://placehold.co/600x400?text=Blog"
-                    }
+                    src={blog.imageUrl || "https://placehold.co/600x400?text=Blog"}
                     alt={blog.title}
                     className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Blog";
-                    }}
                   />
                 </div>
 
@@ -261,7 +242,6 @@ export default function BoardPage() {
           </div>
         </section>
 
-        {/* Seller Tools */}
         <section className="mt-14">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Seller Tools</h2>

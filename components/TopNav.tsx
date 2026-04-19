@@ -30,12 +30,11 @@ export default function TopNav() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    setCurrentUser(null);
-    window.dispatchEvent(new Event("auth-changed"));
-    alert("로그아웃 되었습니다.");
-    window.location.href = "/";
-  };
+  localStorage.removeItem("currentUser");
+  localStorage.removeItem("compareSites");
+  localStorage.removeItem("compareSalesChannels");
+  router.push("/");
+};
 
   const isAdmin = currentUser?.email === ADMIN_EMAIL;
 
@@ -100,12 +99,7 @@ export default function TopNav() {
                 마이페이지
               </Link>
 
-              <button
-                onClick={handleLogout}
-                className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
-              >
-                로그아웃
-              </button>
+              
             </>
           ) : (
             <>
