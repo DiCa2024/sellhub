@@ -22,7 +22,6 @@ export default function WholesaleComparePage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedQuickFilters, setSelectedQuickFilters] = useState<string[]>([]);
-  const active = selectedQuickFilters.includes(item.key);
   
   useEffect(() => {
     const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
@@ -44,70 +43,71 @@ export default function WholesaleComparePage() {
     return allSites.filter((site) => compareIds.includes(site.id));
   }, [allSites, compareIds]);
 
-  const filteredComparedSites = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
+const filteredComparedSites = useMemo(() => {
+  const keyword = searchTerm.trim().toLowerCase();
 
-    return comparedSites.filter((site) => {
-      const searchTarget = [
-        site.name,
-        site.category,
-        site.region,
-        site.dropshipping,
-        site.usageFee,
-        site.imageProvided,
-        site.shortDescription,
-        ...(site.tags || []),
-      ]
-        .join(" ")
-        .toLowerCase();
+  return comparedSites.filter((site) => {
+    const searchTarget = [
+      site.name,
+      site.category,
+      site.region,
+      site.dropshipping,
+      site.usageFee,
+      site.imageProvided,
+      site.shortDescription,
+      ...(site.tags || []),
+    ]
+      .join(" ")
+      .toLowerCase();
 
-      const matchSearch =
-        keyword.length === 0 || searchTarget.includes(keyword);
+    const matchSearch =
+      keyword.length === 0 || searchTarget.includes(keyword);
 
-const matchQuickFilter = selectedQuickFilters.every((filter) => {
-  if (filter === "dropshipping-yes") {
-    return String(site.dropshipping || "").includes("가능");
-  }
+    const matchQuickFilter = selectedQuickFilters.every((filter) => {
+      if (filter === "dropshipping-yes") {
+        return String(site.dropshipping || "").includes("가능");
+      }
 
-  if (filter === "dropshipping-no") {
-    return (
-      String(site.dropshipping || "").includes("불가") ||
-      String(site.dropshipping || "").includes("불가능")
-    );
-  }
+      if (filter === "dropshipping-no") {
+        return (
+          String(site.dropshipping || "").includes("불가") ||
+          String(site.dropshipping || "").includes("불가능")
+        );
+      }
 
-  if (filter === "usage-free") {
-    return String(site.usageFee || "").includes("무료");
-  }
+      if (filter === "usage-free") {
+        return String(site.usageFee || "").includes("무료");
+      }
 
-  if (filter === "usage-paid") {
-    return (
-      !String(site.usageFee || "").includes("무료") &&
-      String(site.usageFee || "").trim() !== "" &&
-      String(site.usageFee || "").trim() !== "-"
-    );
-  }
+      if (filter === "usage-paid") {
+        return (
+          !String(site.usageFee || "").includes("무료") &&
+          String(site.usageFee || "").trim() !== "" &&
+          String(site.usageFee || "").trim() !== "-"
+        );
+      }
 
-  if (filter === "image-free") {
-    return String(site.imageProvided || "").includes("무료");
-  }
+      if (filter === "image-free") {
+        return String(site.imageProvided || "").includes("무료");
+      }
 
-  if (filter === "image-paid") {
-    return (
-      !String(site.imageProvided || "").includes("무료") &&
-      (
-        String(site.imageProvided || "").includes("유료") ||
-        String(site.imageProvided || "").includes("제공")
-      )
-    );
-  }
+      if (filter === "image-paid") {
+        return (
+          !String(site.imageProvided || "").includes("무료") &&
+          (String(site.imageProvided || "").includes("유료") ||
+            String(site.imageProvided || "").includes("제공"))
+        );
+      }
 
-  return true;
-});
-
-      return matchSearch && matchQuickFilter;
+      return true;
     });
-  }, [comparedSites, searchTerm, selectedQuickFilter]);
+
+    return matchSearch && matchQuickFilter;
+  });
+}, [comparedSites, searchTerm, selectedQuickFilters]);
+
+
+
 
   const recommendedSites = allSites
     .filter((site) => !compareIds.includes(site.id))
@@ -144,9 +144,9 @@ const matchQuickFilter = selectedQuickFilters.every((filter) => {
   };
 
   const resetFilters = () => {
-    setSearchTerm("");
-    setSelectedQuickFilter([]); // 배열 초기화
-  };
+  setSearchTerm("");
+  setSelectedQuickFilters([]);
+};
 
   const removeCompare = (id: string) => {
     const updated = compareIds.filter((item) => item !== id);
@@ -215,31 +215,29 @@ const matchQuickFilter = selectedQuickFilters.every((filter) => {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  {QUICK_FILTERS.map((item) => {
-                    const active = selectedQuickFilter === item.key;
-
-                    return (
-                      <button
-                        key={item.key}
-                        onClick={() => {
-                        setSelectedQuickFilters((prev) => {
-                       if (prev.includes(item.key)) {
-                           return prev.filter((f) => f !== item.key);
-                          } else {
-                        return [...prev, item.key];
-                          }
-                           });
-                          }}
-                        className={`rounded-full border px-4 py-2 text-sm transition ${
-                          active
-                            ? "border-neutral-900 bg-neutral-900 text-white"
-                            : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-100"
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    );
-                  })}
+                {QUICK_FILTERS.map((item) => {
+  
+  return (
+    <button
+      key={item.key}
+      onClick={() => {
+        setSelectedQuickFilters((prev) => {
+          if (prev.includes(item.key)) {
+            return prev.filter((f) => f !== item.key);
+          }
+          return [...prev, item.key];
+        });
+      }}
+      className={`rounded-full border px-4 py-2 text-sm transition ${
+        active
+          ? "border-neutral-900 bg-neutral-900 text-white"
+          : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-100"
+      }`}
+    >
+      {item.label}
+    </button>
+  );
+})}
                 </div>
               </div>
             </div>
