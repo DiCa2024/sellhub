@@ -9,10 +9,13 @@ export default function BoardWritePage() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
     setCurrentUser(savedUser);
+    setLoaded(true);
 
     if (!savedUser) {
       alert("회원만 글을 작성할 수 있습니다.");
@@ -52,6 +55,34 @@ export default function BoardWritePage() {
 
   if (!currentUser) return null;
 
+  if (!loaded) {
+  return (
+    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
+      <div className="mx-auto max-w-3xl rounded-2xl border bg-white p-10 text-center shadow-sm">
+        불러오는 중...
+      </div>
+    </main>
+  );
+}
+
+if (!currentUser) {
+  return (
+    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
+      <div className="mx-auto max-w-3xl rounded-2xl border bg-white p-10 text-center shadow-sm">
+        <h1 className="text-2xl font-bold">회원만 글을 작성할 수 있습니다.</h1>
+        <p className="mt-3 text-sm text-neutral-600">
+          게시글 작성은 로그인한 회원만 가능합니다.
+        </p>
+        <a
+          href="/login"
+          className="mt-6 inline-flex rounded-xl bg-black px-4 py-3 text-sm text-white"
+        >
+          로그인하러 가기
+        </a>
+      </div>
+    </main>
+  );
+}
   return (
     <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-3xl rounded-2xl border bg-white p-8 shadow-sm">

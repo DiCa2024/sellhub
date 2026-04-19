@@ -19,22 +19,24 @@ export default function WholesaleComparePage() {
   const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [dynamicChannels, setDynamicChannels] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
-
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedQuickFilters, setSelectedQuickFilters] = useState<string[]>([]);
   
   useEffect(() => {
-    const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
+  const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
+  const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
+  const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+  const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
+  const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
 
-    setCompareIds(savedCompare);
-    setDynamicSites(savedSites);
-    setDynamicPosts(savedPosts);
-    setDynamicChannels(savedChannels);
-    setLoaded(true);
-  }, []);
+  setCompareIds(savedCompare);
+  setDynamicSites(savedSites);
+  setDynamicPosts(savedPosts);
+  setDynamicChannels(savedChannels);
+  setCurrentUser(savedUser);
+  setLoaded(true);
+}, []);
 
   const allSites = [...dynamicSites, ...wholesaleSites];
   const allBlogPosts = [...dynamicPosts, ...blogPosts];
@@ -161,6 +163,25 @@ const filteredComparedSites = useMemo(() => {
       </main>
     );
   }
+  if (!currentUser) {
+  return (
+    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
+      <div className="mx-auto max-w-3xl rounded-2xl border bg-white p-10 text-center shadow-sm">
+        <h1 className="text-2xl font-bold">회원 전용 기능입니다.</h1>
+        <p className="mt-3 text-sm text-neutral-600">
+          도매 사이트 비교 페이지는 로그인한 회원만 이용할 수 있습니다.
+        </p>
+        <a
+          href="/login"
+          className="mt-6 inline-flex rounded-xl bg-black px-4 py-3 text-sm text-white"
+        >
+          로그인하러 가기
+        </a>
+      </div>
+    </main>
+  );
+}
+
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">

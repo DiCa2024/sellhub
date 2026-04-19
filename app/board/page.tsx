@@ -89,12 +89,21 @@ export default function BoardPage() {
             </p>
           </div>
 
-          <a
-            href="/board/write"
-            className="inline-flex rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:opacity-90"
-          >
-            글쓰기
-          </a>
+          {currentUser ? (
+  <a
+    href="/board/write"
+    className="inline-flex rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:opacity-90"
+  >
+    글쓰기
+  </a>
+) : (
+  <a
+    href="/login"
+    className="inline-flex rounded-xl border px-4 py-3 text-sm font-medium hover:bg-neutral-100"
+  >
+    로그인 후 글쓰기
+  </a>
+)}
         </div>
 
         {/* 게시판 리스트 */}
