@@ -235,49 +235,52 @@ export default function SalesChannelPage() {
           </div>
         </section>
 
-        {compareIds.length > 0 && (
-          <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="text-sm text-neutral-700">
-                비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
-                <span className="ml-1 text-neutral-500">(최대 10개)</span>
-              </div>
+       {compareIds.length > 0 && (
+  <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+    <div className="mb-4 flex items-center justify-between">
+      <div className="text-sm text-neutral-700">
+        비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
+        <span className="ml-1 text-neutral-500">(최대 10개)</span>
+      </div>
 
-              <a
-                href="/sales-channel/compare"
-                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-              >
-                비교하러 가기
-              </a>
-            </div>
+      <a
+        href="/sales-channel/compare"
+        className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+      >
+        비교하러 가기
+      </a>
+    </div>
 
-            <div className="space-y-3">
-              {compareChannels.map((channel) => (
-                <div
-                  key={channel.id}
-                  className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold text-neutral-900">
-                      {channel.name}
-                    </div>
-                    <div className="mt-1 text-xs text-neutral-500">
-                      {channel.category || "-"} · {channel.region || "-"} · 정산일{" "}
-                      {channel.settlementDate || "-"}
-                    </div>
-                  </div>
+    <div className="grid gap-3 md:grid-cols-5">
+      {compareChannels.map((channel) => (
+        <div
+          key={channel.id}
+          className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
+        >
+          <div className="min-w-0">
+            <a
+              href={`/sales-channel/${channel.id}`}
+              className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
+            >
+              {channel.name}
+            </a>
 
-                  <button
-                    onClick={() => handleRemoveCompare(channel.id)}
-                    className="rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
-                  >
-                    제거
-                  </button>
-                </div>
-              ))}
+            <div className="mt-1 truncate text-xs text-neutral-500">
+              {channel.category || "-"} · {channel.region || "-"}
             </div>
           </div>
-        )}
+
+          <button
+            onClick={() => handleRemoveCompare(channel.id)}
+            className="ml-3 shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
+          >
+            제거
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
         <section>
           <div className="mb-4 text-sm text-neutral-600">

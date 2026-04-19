@@ -244,48 +244,52 @@ export default function WholesalePageClient() {
           </div>
         </section>
 
-        {compareIds.length > 0 && (
-          <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <div className="text-sm text-neutral-700">
-                비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
-                <span className="ml-1 text-neutral-500">(최대 10개)</span>
-              </div>
+       {compareIds.length > 0 && (
+  <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+    <div className="mb-4 flex items-center justify-between">
+      <div className="text-sm text-neutral-700">
+        비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
+        <span className="ml-1 text-neutral-500">(최대 10개)</span>
+      </div>
 
-              <a
-                href="/wholesale/compare"
-                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-              >
-                비교하러 가기
-              </a>
-            </div>
+      <a
+        href="/wholesale/compare"
+        className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+      >
+        비교하러 가기
+      </a>
+    </div>
 
-            <div className="space-y-3">
-              {compareSites.map((site) => (
-                <div
-                  key={site.id}
-                  className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
-                >
-                  <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold text-neutral-900">
-                      {site.name}
-                    </div>
-                    <div className="mt-1 text-xs text-neutral-500">
-                      {site.category} · {site.region}
-                    </div>
-                  </div>
+    <div className="grid gap-3 md:grid-cols-5">
+      {compareSites.map((site) => (
+        <div
+          key={site.id}
+          className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
+        >
+          <div className="min-w-0">
+            <a
+              href={`/wholesale/${site.id}`}
+              className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
+            >
+              {site.name}
+            </a>
 
-                  <button
-                    onClick={() => handleRemoveCompare(site.id)}
-                    className="rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
-                  >
-                    제거
-                  </button>
-                </div>
-              ))}
+            <div className="mt-1 truncate text-xs text-neutral-500">
+              {site.category || "-"} · {site.region || "-"}
             </div>
           </div>
-        )}
+
+          <button
+            onClick={() => handleRemoveCompare(site.id)}
+            className="ml-3 shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
+          >
+            제거
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
         <section>
           <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
