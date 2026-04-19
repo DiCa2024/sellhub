@@ -95,36 +95,41 @@ export default function TopNav() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3">
-          {currentUser ? (
-            <>
-              <Link
-                href="/mypage"
-                className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
-              >
-                마이페이지
-              </Link>
+     <div className="flex items-center gap-3">
+  {currentUser ? (
+    <>
+      <Link
+        href="/mypage"
+        className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
+      >
+        마이페이지
+      </Link>
 
-              
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
-              >
-                로그인
-              </Link>
+      <button
+        onClick={handleLogout}
+        className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
+      >
+        로그아웃
+      </button>
+    </>
+  ) : (
+    <>
+      <Link
+        href="/login"
+        className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"
+      >
+        로그인
+      </Link>
 
-              <Link
-                href="/signup"
-                className="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
-              >
-                회원가입
-              </Link>
-            </>
-          )}
-        </div>
+      <Link
+        href="/signup"
+        className="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white transition hover:opacity-90"
+      >
+        회원가입
+      </Link>
+    </>
+  )}
+</div>
       </div>
     </header>
   );
