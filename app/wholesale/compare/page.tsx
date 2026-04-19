@@ -216,7 +216,8 @@ const filteredComparedSites = useMemo(() => {
 
                 <div className="flex flex-wrap gap-2">
                 {QUICK_FILTERS.map((item) => {
-  
+  const active = selectedQuickFilters.includes(item.key);
+
   return (
     <button
       key={item.key}
