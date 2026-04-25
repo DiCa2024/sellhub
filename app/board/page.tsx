@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { wholesaleSites } from "../data/wholesaleSites";
-import { blogPosts } from "../data/blogPosts";
 
 const PAGE_SIZE = 10;
 const ADMIN_EMAIL = "admin@gmail.com";
@@ -13,22 +11,44 @@ export default function BoardPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [page, setPage] = useState(1);
 
-  const [dynamicSites, setDynamicSites] = useState<any[]>([]);
-  const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
-  const [dynamicChannels, setDynamicChannels] = useState<any[]>([]);
+  const [sites, setSites] = useState<any[]>([]);
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem("boardPosts") || "[]");
     const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedBlogPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
-
-    setPosts(savedPosts);
     setCurrentUser(savedUser);
-    setDynamicSites(savedSites);
-    setDynamicPosts(savedBlogPosts);
-    setDynamicChannels(savedChannels);
+  }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+
+        const [boardRes, siteRes, blogRes] = await Promise.all([
+          fetch("/api/board", { cache: "no-store" }),
+          fetch("/api/wholesale", { cache: "no-store" }),
+          fetch("/api/blog", { cache: "no-store" }),
+        ]);
+
+        const boardData = await boardRes.json();
+        const siteData = await siteRes.json();
+        const blogData = await blogRes.json();
+
+        setPosts(boardData.success ? boardData.data : []);
+        setSites(siteData.success ? siteData.data : []);
+        setBlogs(blogData.success ? blogData.data : []);
+      } catch (error) {
+        console.error("게시판 페이지 DB 데이터 로딩 오류:", error);
+        setPosts([]);
+        setSites([]);
+        setBlogs([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
   const sortedPosts = useMemo(() => {
@@ -37,22 +57,37 @@ export default function BoardPage() {
     return [...notice, ...normal];
   }, [posts]);
 
-  const totalPages = Math.ceil(sortedPosts.length / PAGE_SIZE);
-  const pagedPosts = sortedPosts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(sortedPosts.length / PAGE_SIZE));
 
-  const handleDelete = (id: string) => {
+  const pagedPosts = sortedPosts.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
+
+  const handleDelete = async (id: string | number) => {
     if (!confirm("삭제할까요?")) return;
 
-    const updated = posts.filter((p) => p.id !== id);
-    setPosts(updated);
-    localStorage.setItem("boardPosts", JSON.stringify(updated));
+    try {
+      const response = await fetch(`/api/board/${id}`, {
+        method: "DELETE",
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        alert(result.message || "삭제에 실패했습니다.");
+        return;
+      }
+
+      setPosts((prev) => prev.filter((p) => String(p.id) !== String(id)));
+    } catch (error) {
+      console.error("게시글 삭제 오류:", error);
+      alert("삭제 중 오류가 발생했습니다.");
+    }
   };
 
-  const allSites = [...dynamicSites, ...wholesaleSites];
-  const allBlogs = [...dynamicPosts, ...blogPosts];
-
-  const latestSites = allSites.slice(0, 4);
-  const latestBlogs = allBlogs.slice(0, 4);
+  const latestSites = sites.slice(0, 4);
+  const latestBlogs = blogs.slice(0, 4);
 
   const sellerTools = [
     {
@@ -114,60 +149,93 @@ export default function BoardPage() {
             <div className="col-span-1">조회</div>
           </div>
 
-          {pagedPosts.map((post, i) => {
-            const isNotice = post.author === ADMIN_EMAIL;
-            const isMine = currentUser?.email === post.author;
+          {isLoading ? (
+            <div className="p-10 text-center text-sm text-neutral-500">
+              게시글을 불러오는 중입니다.
+            </div>
+          ) : pagedPosts.length === 0 ? (
+            <div className="p-10 text-center text-sm text-neutral-500">
+              등록된 게시글이 없습니다.
+            </div>
+          ) : (
+            pagedPosts.map((post, i) => {
+              const isNotice = post.author === ADMIN_EMAIL;
+              const isMine = currentUser?.email === post.author;
 
-            return (
-              <div
-                key={post.id}
-                className="grid grid-cols-12 border-t p-3 text-sm hover:bg-neutral-50"
-              >
-                <div className="col-span-1">
-                  {isNotice ? "공지" : sortedPosts.length - ((page - 1) * PAGE_SIZE + i)}
+              return (
+                <div
+                  key={post.id}
+                  className="grid grid-cols-12 items-center border-t p-3 text-sm hover:bg-neutral-50"
+                >
+                  <div className="col-span-1">
+                    {isNotice
+                      ? "공지"
+                      : sortedPosts.length - ((page - 1) * PAGE_SIZE + i)}
+                  </div>
+
+                  <div className="col-span-6 flex gap-2">
+                    {isNotice && <span className="text-red-500">[공지]</span>}
+                    <Link href={`/board/${post.id}`} className="hover:underline">
+                      {post.title}
+                    </Link>
+                  </div>
+
+                  <div className="col-span-2">
+                    {post.nickname || post.author?.split("@")[0] || "-"}
+                  </div>
+
+                  <div className="col-span-2">
+                    {post.date ||
+                      post.createdAt?.slice(0, 10) ||
+                      "-"}
+                  </div>
+
+                  <div className="col-span-1">{post.views || 0}</div>
+
+                  {isMine && (
+                    <button
+                      onClick={() => handleDelete(post.id)}
+                      className="col-span-12 mt-2 w-fit text-xs text-red-500 md:col-span-1 md:mt-0"
+                    >
+                      삭제
+                    </button>
+                  )}
                 </div>
-
-                <div className="col-span-6 flex gap-2">
-                  {isNotice && <span className="text-red-500">[공지]</span>}
-                  <Link href={`/board/${post.id}`} className="hover:underline">
-                    {post.title}
-                  </Link>
-                </div>
-
-                <div className="col-span-2">
-                  {post.nickname || post.author?.split("@")[0]}
-                </div>
-
-                <div className="col-span-2">{post.date}</div>
-                <div className="col-span-1">{post.views || 0}</div>
-
-                {isMine && (
-                  <button
-                    onClick={() => handleDelete(post.id)}
-                    className="text-xs text-red-500"
-                  >
-                    삭제
-                  </button>
-                )}
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
         <div className="mt-6 flex justify-center gap-2">
-          <button onClick={() => setPage((p) => Math.max(p - 1, 1))}>←</button>
+          <button
+            disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(p - 1, 1))}
+            className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
+          >
+            ←
+          </button>
 
           {Array.from({ length: totalPages }).map((_, i) => (
             <button
               key={i}
               onClick={() => setPage(i + 1)}
-              className={page === i + 1 ? "font-bold" : ""}
+              className={`rounded-lg px-3 py-2 text-sm ${
+                page === i + 1
+                  ? "bg-black text-white"
+                  : "border hover:bg-neutral-100"
+              }`}
             >
               {i + 1}
             </button>
           ))}
 
-          <button onClick={() => setPage((p) => Math.min(p + 1, totalPages))}>→</button>
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+            className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
+          >
+            →
+          </button>
         </div>
 
         <section className="mt-14">
@@ -190,9 +258,16 @@ export default function BoardPage() {
               >
                 <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
+                    src={
+                      site.imageUrl ||
+                      "https://placehold.co/600x400?text=Wholesale"
+                    }
                     alt={site.name}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://placehold.co/600x400?text=Wholesale";
+                    }}
                   />
                 </div>
 
@@ -229,6 +304,10 @@ export default function BoardPage() {
                     src={blog.imageUrl || "https://placehold.co/600x400?text=Blog"}
                     alt={blog.title}
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src =
+                        "https://placehold.co/600x400?text=Blog";
+                    }}
                   />
                 </div>
 

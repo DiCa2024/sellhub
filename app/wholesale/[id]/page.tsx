@@ -8,6 +8,33 @@ type PageProps = {
   params: Promise<{ id: string }>;
 };
 
+const recommendedTools = [
+  {
+    id: "margin-calculator",
+    name: "마진 계산기",
+    imageUrl: "https://placehold.co/600x400?text=Margin+Calculator",
+    href: "/sellertool/margin-calculator",
+  },
+  {
+    id: "sales-price-calculator",
+    name: "판매가 계산기",
+    imageUrl: "https://placehold.co/600x400?text=Sales+Price",
+    href: "/sellertool/sales-price-calculator",
+  },
+  {
+    id: "commission-calculator",
+    name: "수수료 계산기",
+    imageUrl: "https://placehold.co/600x400?text=Commission",
+    href: "/sellertool/commission-calculator",
+  },
+  {
+    id: "memo-check-tool",
+    name: "메모 / 체크 도구",
+    imageUrl: "https://placehold.co/600x400?text=Memo+Tool",
+    href: "/sellertool/memo-check-tool",
+  },
+];
+
 export default async function WholesaleDetailPage({ params }: PageProps) {
   const { id } = await params;
   const numericId = Number(id);
@@ -21,137 +48,191 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
   if (!site) notFound();
 
   const tags = site.tags
-    ? site.tags.split(",").map((t) => t.trim()).filter(Boolean)
+    ? site.tags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
     : [];
 
-   const recommendedSites = await prisma.wholesaleSite.findMany({
-  take: 4,
-  where: {
-    NOT: { id: numericId },
-  },
-}); 
+  const recommendedChannels = await prisma.salesChannel.findMany({
+    take: 4,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const recommendedBlogs = await prisma.blog.findMany({
+    take: 4,
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
   return (
     <main className="min-h-screen bg-neutral-50">
       <ViewTracker id={site.id} />
 
       <section className="mx-auto max-w-5xl px-4 py-10">
-        {/* 뒤로가기 */}
         <Link href="/wholesale" className="text-sm text-neutral-500">
           ← 목록으로 돌아가기
         </Link>
 
-        {/* 상단 영역 */}
         <div className="mt-6 flex flex-col gap-6 md:flex-row">
-          
-          {/* 이미지 (작게) */}
           <a
-             href={site.website}
-             target="_blank"
-             rel="noreferrer"
-             className="relative w-full md:w-[300px] h-[200px] rounded-xl overflow-hidden bg-neutral-100 block"
-           >
-         <Image
-            src={site.imageUrl}
-            alt={site.name}
-            fill
-            className="object-contain hover:scale-105 transition"
-          />
+            href={site.website}
+            target="_blank"
+            rel="noreferrer"
+            className="relative block h-[200px] w-full overflow-hidden rounded-xl bg-neutral-100 md:w-[300px]"
+          >
+            <Image
+              src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
+              alt={site.name}
+              fill
+              className="object-contain transition hover:scale-105"
+            />
           </a>
 
-          {/* 기본 정보 */}
           <div className="flex-1">
-            <div className="flex gap-2 mb-2">
-              <span className="bg-black text-white text-xs px-2 py-1 rounded">
+            <div className="mb-2 flex gap-2">
+              <span className="rounded bg-black px-2 py-1 text-xs text-white">
                 {site.category}
               </span>
-              <span className="bg-gray-200 text-xs px-2 py-1 rounded">
+              <span className="rounded bg-gray-200 px-2 py-1 text-xs">
                 {site.region}
               </span>
             </div>
 
-            <a
-               href={site.website}
-               target="_blank"
-               rel="noreferrer"
-             >
-              <h1 className="text-2xl font-bold hover:underline cursor-pointer">
-              {site.name}
+            <a href={site.website} target="_blank" rel="noreferrer">
+              <h1 className="cursor-pointer text-2xl font-bold hover:underline">
+                {site.name}
               </h1>
             </a>
 
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="mt-2 text-sm text-gray-500">
               {site.shortDescription}
             </p>
 
-            <div className="mt-4 text-sm">
-              조회수: {site.views}
-            </div>
+            <div className="mt-4 text-sm">조회수: {site.views}</div>
           </div>
         </div>
 
-        {/* 상세 설명 */}
         <div className="mt-8">
-          <h2 className="font-semibold mb-2">사이트 설명</h2>
-          <p className="text-sm text-gray-600 leading-7">
+          <h2 className="mb-2 font-semibold">사이트 설명</h2>
+          <p className="text-sm leading-7 text-gray-600">
             {site.shortDescription}
           </p>
         </div>
 
-        {/* 정보 카드 */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
           <InfoCard title="이용 요금" value={site.usageFee} />
           <InfoCard title="위탁 배송" value={site.dropshipping} />
           <InfoCard title="사업자 필요" value={site.businessRequired} />
           <InfoCard title="이미지 제공" value={site.imageProvided} />
         </div>
 
-        {/* 공식 사이트 */}
         <div className="mt-6">
           <a
             href={site.website}
             target="_blank"
-            className="text-blue-600 text-sm"
+            rel="noreferrer"
+            className="text-sm text-blue-600"
           >
             공식 사이트 방문하기 →
           </a>
         </div>
 
-        {/* 태그 */}
         <div className="mt-6 flex flex-wrap gap-2">
           {tags.map((tag) => (
-            <span key={tag} className="text-xs bg-gray-100 px-2 py-1 rounded">
+            <span key={tag} className="rounded bg-gray-100 px-2 py-1 text-xs">
               #{tag}
             </span>
           ))}
         </div>
 
-        {/* 🔥 추천 영역 */}
-        <RecommendSection title="추천 판매 채널" items={recommendedSites} />
-        <RecommendSection title="추천 블로그" items={recommendedSites} />
-        <RecommendSection title="추천 판매 도구" items={recommendedSites} />
+        <RecommendSection
+          title="추천 판매 채널"
+          items={recommendedChannels}
+          basePath="/sales-channel"
+          nameKey="name"
+        />
+
+        <RecommendSection
+          title="추천 블로그"
+          items={recommendedBlogs}
+          basePath="/blog"
+          nameKey="title"
+        />
+
+        <RecommendToolSection title="추천 판매 도구" items={recommendedTools} />
       </section>
     </main>
   );
 }
 
-/* 정보 카드 */
 function InfoCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="border rounded-xl p-4 bg-white">
+    <div className="rounded-xl border bg-white p-4">
       <p className="text-xs text-gray-400">{title}</p>
-      <p className="text-sm font-semibold">{value}</p>
+      <p className="text-sm font-semibold">{value || "-"}</p>
     </div>
   );
 }
 
-/* 추천 영역 */
 function RecommendSection({
+  title,
+  items,
+  basePath,
+  nameKey,
+}: {
+  title: string;
+  items: any[];
+  basePath: string;
+  nameKey: "name" | "title";
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <section className="mt-16">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold">{title}</h2>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-4">
+        {items.map((item) => (
+          <Link key={item.id} href={`${basePath}/${item.id}`}>
+            <div className="cursor-pointer">
+              <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
+                <Image
+                  src={item.imageUrl || "https://placehold.co/600x400?text=Item"}
+                  alt={item[nameKey]}
+                  width={300}
+                  height={200}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              <h3 className="mt-2 text-center text-sm font-bold">
+                {item[nameKey]}
+              </h3>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function RecommendToolSection({
   title,
   items,
 }: {
   title: string;
-  items: any[];
+  items: {
+    id: string;
+    name: string;
+    imageUrl: string;
+    href: string;
+  }[];
 }) {
   return (
     <section className="mt-16">
@@ -161,10 +242,8 @@ function RecommendSection({
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
-          <Link key={item.id} href={`/wholesale/${item.id}`}>
+          <Link key={item.id} href={item.href}>
             <div className="cursor-pointer">
-              
-              {/* 이미지 */}
               <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
                 <Image
                   src={item.imageUrl}
@@ -175,11 +254,9 @@ function RecommendSection({
                 />
               </div>
 
-              {/* 이름 */}
-              <h3 className="mt-2 text-center font-bold text-sm">
+              <h3 className="mt-2 text-center text-sm font-bold">
                 {item.name}
               </h3>
-
             </div>
           </Link>
         ))}

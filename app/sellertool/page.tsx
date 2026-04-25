@@ -1,30 +1,47 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { wholesaleSites } from "../data/wholesaleSites";
-import { blogPosts } from "../data/blogPosts";
 
 export default function SellertoolPage() {
-  const [dynamicSites, setDynamicSites] = useState<any[]>([]);
-  const [dynamicChannels, setDynamicChannels] = useState<any[]>([]);
-  const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
+  const [sites, setSites] = useState<any[]>([]);
+  const [channels, setChannels] = useState<any[]>([]);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
 
-    setDynamicSites(savedSites);
-    setDynamicChannels(savedChannels);
-    setDynamicPosts(savedPosts);
+        const [siteRes, channelRes, blogRes] = await Promise.all([
+          fetch("/api/wholesale", { cache: "no-store" }),
+          fetch("/api/sales-channel", { cache: "no-store" }),
+          fetch("/api/blog", { cache: "no-store" }),
+        ]);
+
+        const siteData = await siteRes.json();
+        const channelData = await channelRes.json();
+        const blogData = await blogRes.json();
+
+        setSites(siteData.success ? siteData.data : []);
+        setChannels(channelData.success ? channelData.data : []);
+        setPosts(blogData.success ? blogData.data : []);
+      } catch (error) {
+        console.error("Seller Tools 페이지 DB 데이터 로딩 오류:", error);
+        setSites([]);
+        setChannels([]);
+        setPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
   }, []);
 
-  const allSites = [...dynamicSites, ...wholesaleSites];
-  const allPosts = [...dynamicPosts, ...blogPosts];
-
-  const latestSites = allSites.slice(0, 4);
-  const latestChannels = dynamicChannels.slice(0, 4);
-  const latestPosts = allPosts.slice(0, 4);
+  const latestSites = sites.slice(0, 4);
+  const latestChannels = channels.slice(0, 4);
+  const latestPosts = posts.slice(0, 4);
 
   const tools = [
     {
@@ -110,134 +127,142 @@ export default function SellertoolPage() {
           ))}
         </div>
 
-        <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 등록 도매 사이트</h2>
-            <a
-              href="/wholesale"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
+        {isLoading ? (
+          <div className="mt-14 rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
+            DB 데이터를 불러오는 중입니다.
           </div>
+        ) : (
+          <>
+            <section className="mt-14">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-bold">최신 등록 도매 사이트</h2>
+                <a
+                  href="/wholesale"
+                  className="text-sm font-medium text-neutral-600 hover:text-black"
+                >
+                  전체 보기 →
+                </a>
+              </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestSites.map((site) => (
-              <a
-                key={site.id}
-                href={`/wholesale/${site.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={
-                      site.imageUrl ||
-                      "https://placehold.co/600x400?text=Wholesale"
-                    }
-                    alt={site.name}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Wholesale";
-                    }}
-                  />
-                </div>
+              <div className="grid gap-6 md:grid-cols-4">
+                {latestSites.map((site) => (
+                  <a
+                    key={site.id}
+                    href={`/wholesale/${site.id}`}
+                    className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
+                  >
+                    <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
+                      <img
+                        src={
+                          site.imageUrl ||
+                          "https://placehold.co/600x400?text=Wholesale"
+                        }
+                        alt={site.name}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://placehold.co/600x400?text=Wholesale";
+                        }}
+                      />
+                    </div>
 
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {site.name}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+                    <div className="pt-3">
+                      <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
+                        {site.name}
+                      </h3>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
 
-        <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 판매 채널</h2>
-            <a
-              href="/sales-channel"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+            <section className="mt-14">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-bold">최신 판매 채널</h2>
+                <a
+                  href="/sales-channel"
+                  className="text-sm font-medium text-neutral-600 hover:text-black"
+                >
+                  전체 보기 →
+                </a>
+              </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestChannels.map((channel) => (
-              <a
-                key={channel.id}
-                href={`/sales-channel/${channel.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={
-                      channel.imageUrl ||
-                      "https://placehold.co/600x400?text=Channel"
-                    }
-                    alt={channel.name}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Channel";
-                    }}
-                  />
-                </div>
+              <div className="grid gap-6 md:grid-cols-4">
+                {latestChannels.map((channel) => (
+                  <a
+                    key={channel.id}
+                    href={`/sales-channel/${channel.id}`}
+                    className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
+                  >
+                    <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
+                      <img
+                        src={
+                          channel.imageUrl ||
+                          "https://placehold.co/600x400?text=Channel"
+                        }
+                        alt={channel.name}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://placehold.co/600x400?text=Channel";
+                        }}
+                      />
+                    </div>
 
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {channel.name}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+                    <div className="pt-3">
+                      <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
+                        {channel.name}
+                      </h3>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
 
-        <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 블로그 글</h2>
-            <a
-              href="/blog"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+            <section className="mt-14">
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-2xl font-bold">최신 블로그 글</h2>
+                <a
+                  href="/blog"
+                  className="text-sm font-medium text-neutral-600 hover:text-black"
+                >
+                  전체 보기 →
+                </a>
+              </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestPosts.map((post) => (
-              <a
-                key={post.id}
-                href={`/blog/${post.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={
-                      post.imageUrl ||
-                      "https://placehold.co/600x400?text=Blog"
-                    }
-                    alt={post.title}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Blog";
-                    }}
-                  />
-                </div>
+              <div className="grid gap-6 md:grid-cols-4">
+                {latestPosts.map((post) => (
+                  <a
+                    key={post.id}
+                    href={`/blog/${post.id}`}
+                    className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
+                  >
+                    <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
+                      <img
+                        src={
+                          post.imageUrl ||
+                          "https://placehold.co/600x400?text=Blog"
+                        }
+                        alt={post.title}
+                        className="h-full w-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://placehold.co/600x400?text=Blog";
+                        }}
+                      />
+                    </div>
 
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {post.title}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+                    <div className="pt-3">
+                      <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
+                        {post.title}
+                      </h3>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
       </div>
     </main>
   );

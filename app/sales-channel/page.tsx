@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { wholesaleSites } from "../data/wholesaleSites";
-import { blogPosts } from "../data/blogPosts";
 
 const ITEMS_PER_PAGE = 20;
-
 const REGION_ITEMS = ["전체", "국내", "해외"];
 
 function createEmptyFeeTable() {
@@ -28,43 +25,58 @@ export default function SalesChannelPage() {
   const [selectedRegion, setSelectedRegion] = useState("전체");
 
   const [channels, setChannels] = useState<any[]>([]);
-  const [dynamicSites, setDynamicSites] = useState<any[]>([]);
-  const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
+  const [dbSites, setDbSites] = useState<any[]>([]);
+  const [dbPosts, setDbPosts] = useState<any[]>([]);
 
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
 
- useEffect(() => {
-  const loadSalesChannelData = async () => {
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+  useEffect(() => {
     const savedCompare = JSON.parse(
       localStorage.getItem("compareSalesChannels") || "[]"
     );
+    setCompareIds(savedCompare.map((id: string | number) => String(id)));
+  }, []);
 
-    setDynamicSites(savedSites);
-    setDynamicPosts(savedPosts);
-    setCompareIds(savedCompare);
+  useEffect(() => {
+    const loadSalesChannelData = async () => {
+      try {
+        setIsLoading(true);
 
-    try {
-      const response = await fetch("/api/sales-channel");
-      const result = await response.json();
+        const [channelRes, siteRes, blogRes] = await Promise.all([
+          fetch("/api/sales-channel", { cache: "no-store" }),
+          fetch("/api/wholesale", { cache: "no-store" }),
+          fetch("/api/blog", { cache: "no-store" }),
+        ]);
 
-      if (result.success) {
+        const channelData = await channelRes.json();
+        const siteData = await siteRes.json();
+        const blogData = await blogRes.json();
+
         setChannels(
-          result.data.map((item: any) => ({
-            ...item,
-            id: String(item.id),
-          }))
+          channelData.success
+            ? channelData.data.map((item: any) => ({
+                ...item,
+                id: String(item.id),
+              }))
+            : []
         );
-      }
-    } catch (error) {
-      console.error("판매 채널 DB 목록 불러오기 오류:", error);
-    }
-  };
 
-  loadSalesChannelData();
-}, []);
+        setDbSites(siteData.success ? siteData.data : []);
+        setDbPosts(blogData.success ? blogData.data : []);
+      } catch (error) {
+        console.error("판매 채널 페이지 DB 데이터 로딩 오류:", error);
+        setChannels([]);
+        setDbSites([]);
+        setDbPosts([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSalesChannelData();
+  }, []);
 
   const filteredChannels = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -115,8 +127,8 @@ export default function SalesChannelPage() {
     compareIds.includes(channel.id)
   );
 
-  const latestSites = [...dynamicSites, ...wholesaleSites].slice(0, 4);
-  const latestPosts = [...dynamicPosts, ...blogPosts].slice(0, 4);
+  const latestSites = dbSites.slice(0, 4);
+  const latestPosts = dbPosts.slice(0, 4);
 
   const sellerTools = [
     {
@@ -253,59 +265,63 @@ export default function SalesChannelPage() {
           </div>
         </section>
 
-       {compareIds.length > 0 && (
-  <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-    <div className="mb-4 flex items-center justify-between">
-      <div className="text-sm text-neutral-700">
-        비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
-        <span className="ml-1 text-neutral-500">(최대 10개)</span>
-      </div>
+        {compareIds.length > 0 && (
+          <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm text-neutral-700">
+                비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
+                <span className="ml-1 text-neutral-500">(최대 10개)</span>
+              </div>
 
-      <a
-        href="/sales-channel/compare"
-        className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-      >
-        비교하러 가기
-      </a>
-    </div>
+              <a
+                href="/sales-channel/compare"
+                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+              >
+                비교하러 가기
+              </a>
+            </div>
 
-    <div className="grid gap-3 md:grid-cols-5">
-      {compareChannels.map((channel) => (
-        <div
-          key={channel.id}
-          className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
-        >
-          <div className="min-w-0">
-            <a
-              href={`/sales-channel/${channel.id}`}
-              className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
-            >
-              {channel.name}
-            </a>
+            <div className="grid gap-3 md:grid-cols-5">
+              {compareChannels.map((channel) => (
+                <div
+                  key={channel.id}
+                  className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <a
+                      href={`/sales-channel/${channel.id}`}
+                      className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
+                    >
+                      {channel.name}
+                    </a>
 
-            <div className="mt-1 truncate text-xs text-neutral-500">
-              {channel.category || "-"} · {channel.region || "-"}
+                    <div className="mt-1 truncate text-xs text-neutral-500">
+                      {channel.category || "-"} · {channel.region || "-"}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleRemoveCompare(channel.id)}
+                    className="ml-3 shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
+                  >
+                    제거
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
-
-          <button
-            onClick={() => handleRemoveCompare(channel.id)}
-            className="ml-3 shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
-          >
-            제거
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+        )}
 
         <section>
           <div className="mb-4 text-sm text-neutral-600">
             검색 결과 <span className="font-semibold">{filteredChannels.length}</span>개
           </div>
 
-          {pagedChannels.length === 0 ? (
+          {isLoading ? (
+            <div className="rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
+              판매 채널을 불러오는 중입니다.
+            </div>
+          ) : pagedChannels.length === 0 ? (
             <div className="rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
               조건에 맞는 판매 채널이 없습니다.
             </div>
@@ -320,10 +336,11 @@ export default function SalesChannelPage() {
                   };
 
                   const feeSummary = String(
-                     Object.values(feeTable).find(
-                     (value) => String(value).trim() !== ""
-                                ) || "-"
-                      );
+                    Object.values(feeTable).find(
+                      (value) => String(value).trim() !== ""
+                    ) || "-"
+                  );
+
                   return (
                     <div
                       key={channel.id}
@@ -333,7 +350,10 @@ export default function SalesChannelPage() {
                         <a href={`/sales-channel/${channel.id}`} className="shrink-0">
                           <div className="h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
                             <img
-                              src={channel.imageUrl || "https://placehold.co/400x300?text=Channel"}
+                              src={
+                                channel.imageUrl ||
+                                "https://placehold.co/400x300?text=Channel"
+                              }
                               alt={channel.name}
                               className="h-full w-full object-cover"
                               onError={(e) => {
@@ -419,7 +439,10 @@ export default function SalesChannelPage() {
               >
                 <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
+                    src={
+                      site.imageUrl ||
+                      "https://placehold.co/600x400?text=Wholesale"
+                    }
                     alt={site.name}
                     className="h-full w-full object-cover"
                     onError={(e) => {

@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { blogPosts } from "../data/blogPosts";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -47,9 +46,8 @@ export default function WholesalePageClient() {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [dbSites, setDbSites] = useState<WholesaleSiteItem[]>([]);
-  const [dynamicSites, setDynamicSites] = useState<WholesaleSiteItem[]>([]);
-  const [dynamicChannels, setDynamicChannels] = useState<any[]>([]);
-  const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
+  const [dbChannels, setDbChannels] = useState<any[]>([]);
+  const [dbPosts, setDbPosts] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategoryFromQuery, setSelectedCategoryFromQuery] = useState("");
   const [isLoadingSites, setIsLoadingSites] = useState(true);
@@ -57,13 +55,8 @@ export default function WholesalePageClient() {
   const handleCategoryQueryChange = (category: string) => {
     const params = new URLSearchParams();
 
-    if (category) {
-      params.set("category", category);
-    }
-
-    if (searchTerm.trim()) {
-      params.set("query", searchTerm.trim());
-    }
+    if (category) params.set("category", category);
+    if (searchTerm.trim()) params.set("query", searchTerm.trim());
 
     router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
   };
@@ -71,55 +64,46 @@ export default function WholesalePageClient() {
   const handleSearchSubmit = () => {
     const params = new URLSearchParams();
 
-    if (searchTerm.trim()) {
-      params.set("query", searchTerm.trim());
-    }
-
-    if (selectedCategoryFromQuery) {
-      params.set("category", selectedCategoryFromQuery);
-    }
+    if (searchTerm.trim()) params.set("query", searchTerm.trim());
+    if (selectedCategoryFromQuery) params.set("category", selectedCategoryFromQuery);
 
     router.push(`${pathname}${params.toString() ? `?${params.toString()}` : ""}`);
   };
 
   useEffect(() => {
     const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-
     setCompareIds(savedCompare.map((id: string | number) => String(id)));
-    setDynamicSites(savedSites);
-    setDynamicChannels(savedChannels);
-    setDynamicPosts(savedPosts);
   }, []);
 
   useEffect(() => {
-    const fetchWholesaleSites = async () => {
+    const fetchPageData = async () => {
       try {
         setIsLoadingSites(true);
 
-        const response = await fetch("/api/wholesale", {
-          cache: "no-store",
-        });
+        const [siteRes, channelRes, blogRes] = await Promise.all([
+          fetch("/api/wholesale", { cache: "no-store" }),
+          fetch("/api/sales-channel", { cache: "no-store" }),
+          fetch("/api/blog", { cache: "no-store" }),
+        ]);
 
-        const result = await response.json();
+        const siteData = await siteRes.json();
+        const channelData = await channelRes.json();
+        const blogData = await blogRes.json();
 
-        if (result.success) {
-          setDbSites(result.data);
-        } else {
-          console.error("도매 사이트 조회 실패:", result.error);
-          setDbSites([]);
-        }
+        setDbSites(siteData.success ? siteData.data : []);
+        setDbChannels(channelData.success ? channelData.data : []);
+        setDbPosts(blogData.success ? blogData.data : []);
       } catch (error) {
-        console.error("도매 사이트 API 오류:", error);
+        console.error("페이지 데이터 로딩 오류:", error);
         setDbSites([]);
+        setDbChannels([]);
+        setDbPosts([]);
       } finally {
         setIsLoadingSites(false);
       }
     };
 
-    fetchWholesaleSites();
+    fetchPageData();
   }, []);
 
   useEffect(() => {
@@ -131,9 +115,9 @@ export default function WholesalePageClient() {
     setCurrentPage(1);
   }, [searchParams]);
 
-  const allSites = [...dynamicSites, ...dbSites];
-  const latestChannels = dynamicChannels.slice(0, 4);
-  const latestPosts = [...dynamicPosts, ...blogPosts].slice(0, 4);
+  const allSites = dbSites;
+  const latestChannels = dbChannels.slice(0, 4);
+  const latestPosts = dbPosts.slice(0, 4);
 
   const getTagArray = (tags: string | string[] | undefined) => {
     if (!tags) return [];
@@ -247,9 +231,7 @@ export default function WholesalePageClient() {
                     setCurrentPage(1);
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      handleSearchSubmit();
-                    }
+                    if (e.key === "Enter") handleSearchSubmit();
                   }}
                   placeholder="도매처명, 카테고리, 특징으로 검색해보세요"
                   className="h-14 w-full rounded-2xl border border-neutral-300 bg-white px-4 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
@@ -361,9 +343,7 @@ export default function WholesalePageClient() {
 
             {(searchTerm.trim() || selectedCategoryFromQuery) && (
               <div className="flex flex-wrap gap-2">
-                {searchTerm.trim() && (
-                  <ActiveChip label={`검색: ${searchTerm.trim()}`} />
-                )}
+                {searchTerm.trim() && <ActiveChip label={`검색: ${searchTerm.trim()}`} />}
                 {selectedCategoryFromQuery && (
                   <ActiveChip label={`카테고리: ${selectedCategoryFromQuery}`} />
                 )}
@@ -374,9 +354,7 @@ export default function WholesalePageClient() {
           {isLoadingSites ? (
             <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
               <h2 className="text-2xl font-bold">도매 사이트를 불러오는 중이에요</h2>
-              <p className="mt-3 text-sm text-neutral-600">
-                잠시만 기다려 주세요.
-              </p>
+              <p className="mt-3 text-sm text-neutral-600">잠시만 기다려 주세요.</p>
             </div>
           ) : pagedSites.length === 0 ? (
             <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
@@ -524,10 +502,7 @@ export default function WholesalePageClient() {
               >
                 <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={
-                      item.imageUrl ||
-                      "https://placehold.co/600x400?text=Channel"
-                    }
+                    src={item.imageUrl || "https://placehold.co/600x400?text=Channel"}
                     alt={item.name}
                     className="h-full w-full object-cover"
                     onError={(e) => {
@@ -566,10 +541,7 @@ export default function WholesalePageClient() {
               >
                 <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={
-                      post.imageUrl ||
-                      "https://placehold.co/600x400?text=Blog"
-                    }
+                    src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
                     alt={post.title}
                     className="h-full w-full object-cover"
                     onError={(e) => {

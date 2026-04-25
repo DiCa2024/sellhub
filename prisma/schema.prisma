@@ -64,3 +64,13 @@ model BlogComment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+model BoardPost {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  author    String
+  nickname  String?
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

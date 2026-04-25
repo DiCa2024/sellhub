@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { blogPosts } from "./data/blogPosts";
+
 
 type WholesaleSiteItem = {
   id: number | string;
@@ -28,7 +28,6 @@ export default function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dbSites, setDbSites] = useState<WholesaleSiteItem[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [viewMap, setViewMap] = useState<Record<string, number>>({});
   const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [channels, setChannels] = useState<any[]>([]);
   const [isLoadingSites, setIsLoadingSites] = useState(true);
@@ -39,47 +38,32 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    const savedViewMap = JSON.parse(localStorage.getItem("siteViews") || "{}");
-    setViewMap(savedViewMap);
-  }, []);
+  const loadHomeData = async () => {
+    try {
+      // 도매
+      const siteRes = await fetch("/api/wholesale");
+      const siteData = await siteRes.json();
+      if (siteData.success) setDbSites(siteData.data);
 
-  useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-    setDynamicPosts(savedPosts);
-  }, []);
+      // 판매 채널
+      const channelRes = await fetch("/api/sales-channel");
+      const channelData = await channelRes.json();
+      if (channelData.success) setChannels(channelData.data);
 
-  useEffect(() => {
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
-    setChannels(savedChannels);
-  }, []);
+      // 블로그
+      const blogRes = await fetch("/api/blog");
+      const blogData = await blogRes.json();
+      if (blogData.success) setDynamicPosts(blogData.data);
 
-  useEffect(() => {
-    const fetchWholesaleSites = async () => {
-      try {
-        setIsLoadingSites(true);
+    } catch (error) {
+      console.error("홈 데이터 로딩 오류:", error);
+    } finally {
+      setIsLoadingSites(false);
+    }
+  };
 
-        const response = await fetch("/api/wholesale", {
-          cache: "no-store",
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-          setDbSites(result.data);
-        } else {
-          console.error("홈 도매 사이트 조회 실패:", result.error);
-          setDbSites([]);
-        }
-      } catch (error) {
-        console.error("홈 도매 사이트 API 오류:", error);
-        setDbSites([]);
-      } finally {
-        setIsLoadingSites(false);
-      }
-    };
-
-    fetchWholesaleSites();
-  }, []);
+  loadHomeData();
+}, []);
 
   const getTagArray = (tags: string | string[] | undefined) => {
     if (!tags) return [];
@@ -107,27 +91,17 @@ export default function HomePage() {
     return Number.isNaN(onlyNumber) ? 0 : onlyNumber;
   }
 
-  const popularSites = useMemo(() => {
-    return [...allSites]
-      .map((site) => {
-        let numericViews = 0;
+   const popularSites = useMemo(() => {
+  return [...allSites]
+    .map((site) => ({
+      ...site,
+      numericViews: parseViewCount(site.views || 0),
+    }))
+    .sort((a, b) => b.numericViews - a.numericViews)
+    .slice(0, 6);
+}, [allSites]);
 
-        if (viewMap[String(site.id)] !== undefined) {
-          numericViews = Number(viewMap[String(site.id)]);
-        } else {
-          numericViews = parseViewCount(site.views || 0);
-        }
-
-        return {
-          ...site,
-          numericViews,
-        };
-      })
-      .sort((a, b) => b.numericViews - a.numericViews)
-      .slice(0, 6);
-  }, [allSites, viewMap]);
-
-  const allPosts = [...dynamicPosts, ...blogPosts];
+       const allPosts = [...dynamicPosts];
   const latestPosts = allPosts.slice(0, 6);
 
   const handleSearch = () => {
@@ -240,7 +214,7 @@ export default function HomePage() {
                 >
                   <a
                     href={`/wholesale/${site.id}`}
-                    className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
+                    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
                   >
                     <img
                       src={
@@ -323,7 +297,7 @@ export default function HomePage() {
                 >
                   <a
                     href={`/wholesale/${site.id}`}
-                    className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
+                   className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
                   >
                     <img
                       src={
@@ -412,7 +386,7 @@ export default function HomePage() {
               >
                 <a
                   href={`/sales-channel/${item.id}`}
-                  className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
+                  className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
                 >
                   <img
                     src={
@@ -496,7 +470,7 @@ export default function HomePage() {
               >
                 <a
                   href={`/blog/${post.id}`}
-                  className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
+                 className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
                 >
                   <img
                     src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
