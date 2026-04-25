@@ -120,16 +120,39 @@ export default function AdminPage() {
   const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedChannels = JSON.parse(
-      localStorage.getItem("salesChannels") || "[]"
-    );
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
+  const loadAdminData = async () => {
+    try {
+      // 🔥 도매 사이트 DB에서 가져오기
+      const wholesaleRes = await fetch("/api/wholesale");
+      const wholesaleData = await wholesaleRes.json();
 
-    setSites(savedSites);
-    setChannels(savedChannels);
-    setPosts(savedPosts);
-  }, []);
+      if (wholesaleData.success) {
+        setSites(wholesaleData.data);
+      }
+
+      // 🔥 판매 채널
+      const salesRes = await fetch("/api/sales-channel");
+      const salesData = await salesRes.json();
+
+      if (salesData.success) {
+        setChannels(salesData.data);
+      }
+
+      // 블로그는 아직 localStorage 유지
+     const blogRes = await fetch("/api/blog");
+     const blogData = await blogRes.json();
+
+      if (blogData.success) {
+         setPosts(blogData.data);
+         } 
+
+    } catch (error) {
+      console.error("관리자 데이터 로딩 오류:", error);
+    }
+  };
+
+  loadAdminData();
+}, []);
 
   const resetWholesaleForm = () => {
     setWholesaleForm(emptyWholesaleForm);
@@ -146,64 +169,104 @@ export default function AdminPage() {
     setEditingBlogId(null);
   };
 
-  const saveWholesale = () => {
-    if (
-      !wholesaleForm.name.trim() ||
-      !wholesaleForm.category.trim() ||
-      !wholesaleForm.region.trim() ||
-      !wholesaleForm.shortDescription.trim()
-    ) {
-      alert("도매 사이트는 사이트명, 카테고리, 지역, 설명이 필수입니다.");
-      return;
-    }
-
-    const payload = {
-      category: wholesaleForm.category.trim(),
-      name: wholesaleForm.name.trim(),
-      region: wholesaleForm.region.trim(),
-      imageUrl: wholesaleForm.imageUrl.trim(),
+const saveWholesale = async () => {
+  if (editingWholesaleId) {
+  const res = await fetch(`/api/wholesale/${editingWholesaleId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      category: wholesaleForm.category,
+      name: wholesaleForm.name,
+      region: wholesaleForm.region,
+      imageUrl: wholesaleForm.imageUrl,
       tags: wholesaleForm.tags
         .split(",")
         .map((v) => v.trim())
         .filter(Boolean),
-      website: wholesaleForm.website.trim(),
-      dropshipping: wholesaleForm.dropshipping.trim(),
-      businessRequired: wholesaleForm.businessRequired.trim(),
-      usageFee: wholesaleForm.usageFee.trim(),
-      imageProvided: wholesaleForm.imageProvided.trim(),
-      shortDescription: wholesaleForm.shortDescription.trim(),
-      views: "0",
-    };
+      website: wholesaleForm.website,
+      dropshipping: wholesaleForm.dropshipping,
+      businessRequired: wholesaleForm.businessRequired,
+      usageFee: wholesaleForm.usageFee,
+      imageProvided: wholesaleForm.imageProvided,
+      shortDescription: wholesaleForm.shortDescription,
+    }),
+  });
 
-    let updated: any[] = [];
+  const result = await res.json();
 
-    if (editingWholesaleId) {
-      updated = sites.map((item: any) =>
-        item.id === editingWholesaleId
-          ? { ...item, ...payload, id: editingWholesaleId }
-          : item
-      );
-      alert("도매 사이트가 수정되었습니다.");
-    } else {
-      const duplicated = sites.some(
-        (item: any) =>
-          String(item.name || "").trim().toLowerCase() ===
-          payload.name.toLowerCase()
-      );
+  if (!result.success) {
+    alert("수정 실패");
+    return;
+  }
 
-      if (duplicated) {
-        alert("같은 이름의 도매 사이트가 이미 있습니다.");
-        return;
-      }
+  alert("수정 완료");
 
-      updated = [{ id: `site-${Date.now()}`, ...payload }, ...sites];
-      alert("도매 사이트가 등록되었습니다.");
+  const refreshed = await fetch("/api/wholesale");
+  const data = await refreshed.json();
+  setSites(data.data);
+
+  resetWholesaleForm();
+  return;
+}
+  if (
+    !wholesaleForm.name.trim() ||
+    !wholesaleForm.category.trim() ||
+    !wholesaleForm.region.trim() ||
+    !wholesaleForm.shortDescription.trim()
+  ) {
+    alert("도매 사이트는 사이트명, 카테고리, 지역, 설명이 필수입니다.");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/wholesale", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        category: wholesaleForm.category.trim(),
+        name: wholesaleForm.name.trim(),
+        region: wholesaleForm.region.trim(),
+        imageUrl: wholesaleForm.imageUrl.trim(),
+        tags: wholesaleForm.tags
+          .split(",")
+          .map((v) => v.trim())
+          .filter(Boolean),
+        website: wholesaleForm.website.trim(),
+        dropshipping: wholesaleForm.dropshipping.trim(),
+        businessRequired: wholesaleForm.businessRequired.trim(),
+        usageFee: wholesaleForm.usageFee.trim(),
+        imageProvided: wholesaleForm.imageProvided.trim(),
+        shortDescription: wholesaleForm.shortDescription.trim(),
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      alert(result.message || "도매 사이트 등록 실패");
+      return;
     }
 
-    setSites(updated);
-    localStorage.setItem("sites", JSON.stringify(updated));
+    alert("도매 사이트가 DB에 등록되었습니다.");
+
+    // 🔥 최신 데이터 다시 불러오기
+    const refreshed = await fetch("/api/wholesale");
+    const data = await refreshed.json();
+
+    if (data.success) {
+      setSites(data.data);
+    }
+
     resetWholesaleForm();
-  };
+  } catch (error) {
+    console.error("도매사이트 등록 오류:", error);
+    alert("도매사이트 등록 중 오류 발생");
+  }
+};
 
   const editWholesale = (item: any) => {
     setActiveTab("wholesale");
@@ -223,16 +286,33 @@ export default function AdminPage() {
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+  const deleteWholesale = async (id: string) => {
+  if (!confirm("삭제할까요?")) return;
 
-  const deleteWholesale = (id: string) => {
-    if (!confirm("이 도매 사이트를 삭제할까요?")) return;
-    const updated = sites.filter((item: any) => item.id !== id);
-    setSites(updated);
-    localStorage.setItem("sites", JSON.stringify(updated));
-    if (editingWholesaleId === id) resetWholesaleForm();
-  };
+  try {
+    const res = await fetch(`/api/wholesale/${id}`, {
+      method: "DELETE",
+    });
 
-  const saveSalesChannel = () => {
+    const result = await res.json();
+
+    if (!result.success) {
+      alert("삭제 실패");
+      return;
+    }
+
+    alert("삭제 완료");
+
+    setSites((prev) =>
+      prev.filter((item) => item.id !== Number(id))
+    );
+  } catch (error) {
+    console.error(error);
+    alert("삭제 오류");
+  }
+};
+  
+  const saveSalesChannel = async () => {
     const hasFee = Object.values(salesForm.feeTable).some(
       (v) => String(v).trim() !== ""
     );
@@ -249,51 +329,79 @@ export default function AdminPage() {
       );
       return;
     }
-
-    const payload = {
-      name: salesForm.name.trim(),
-      imageUrl: salesForm.imageUrl.trim(),
-      region: salesForm.region.trim(),
-      category: salesForm.category.trim(),
-      settlementDate: salesForm.settlementDate.trim(),
-      website: salesForm.website.trim(),
-      shortDescription: salesForm.shortDescription.trim(),
-      feeTable: salesForm.feeTable,
-    };
-
-    let updated: any[] = [];
-
+    
     if (editingSalesId) {
-      updated = channels.map((item: any) =>
-        item.id === editingSalesId
-          ? { ...item, ...payload, id: editingSalesId }
-          : item
-      );
-      alert("판매 채널이 수정되었습니다.");
-    } else {
-      const duplicated = channels.some(
-        (item: any) =>
-          String(item.name || "").trim().toLowerCase() ===
-          payload.name.toLowerCase()
-      );
+  const response = await fetch(`/api/sales-channel/${editingSalesId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: salesForm.name,
+      imageUrl: salesForm.imageUrl,
+      region: salesForm.region,
+      category: salesForm.category,
+      settlementDate: salesForm.settlementDate,
+      website: salesForm.website,
+      shortDescription: salesForm.shortDescription,
+      feeTable: salesForm.feeTable,
+    }),
+  });
 
-      if (duplicated) {
-        alert("같은 이름의 판매 채널이 이미 있습니다.");
+  const result = await response.json();
+
+  if (!result.success) {
+    alert("수정 실패");
+    return;
+  }
+
+  alert("수정 완료");
+
+  // 다시 불러오기
+  const refreshed = await fetch("/api/sales-channel");
+  const data = await refreshed.json();
+  setChannels(data.data);
+
+  resetSalesForm();
+  return;
+}
+    try {
+      const response = await fetch("/api/sales-channel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: salesForm.name.trim(),
+          imageUrl: salesForm.imageUrl.trim(),
+          region: salesForm.region.trim(),
+          category: salesForm.category.trim(),
+          settlementDate: salesForm.settlementDate.trim(),
+          website: salesForm.website.trim(),
+          shortDescription: salesForm.shortDescription.trim(),
+          feeTable: salesForm.feeTable,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        alert(result.message || "판매 채널 등록에 실패했습니다.");
         return;
       }
 
-      updated = [{ id: `channel-${Date.now()}`, ...payload }, ...channels];
-      alert("판매 채널이 등록되었습니다.");
+      setChannels([result.data, ...channels]);
+      alert("판매 채널이 DB에 등록되었습니다.");
+      resetSalesForm();
+    } catch (error) {
+      console.error("판매 채널 등록 오류:", error);
+      alert("판매 채널 등록 중 오류가 발생했습니다.");
     }
-
-    setChannels(updated);
-    localStorage.setItem("salesChannels", JSON.stringify(updated));
-    resetSalesForm();
   };
 
   const editSalesChannel = (item: any) => {
     setActiveTab("sales");
-    setEditingSalesId(item.id);
+    setEditingSalesId(String(item.id));
     setSalesForm({
       name: item.name || "",
       imageUrl: item.imageUrl || "",
@@ -310,64 +418,110 @@ export default function AdminPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const deleteSalesChannel = (id: string) => {
-    if (!confirm("이 판매 채널을 삭제할까요?")) return;
-    const updated = channels.filter((item: any) => item.id !== id);
-    setChannels(updated);
-    localStorage.setItem("salesChannels", JSON.stringify(updated));
-    if (editingSalesId === id) resetSalesForm();
-  };
+  const deleteSalesChannel = async (id: string) => {
+  if (!confirm("삭제할까요?")) return;
 
-  const saveBlogPost = () => {
-    if (
-      !blogForm.title.trim() ||
-      !blogForm.category.trim() ||
-      !blogForm.excerpt.trim() ||
-      !blogForm.content.trim()
-    ) {
-      alert("블로그는 제목, 카테고리, 요약, 본문이 필수입니다.");
+  try {
+    const res = await fetch(`/api/sales-channel/${id}`, {
+      method: "DELETE",
+    });
+
+    const result = await res.json();
+
+    if (!result.success) {
+      alert("삭제 실패");
       return;
     }
 
-    const payload = {
-      title: blogForm.title.trim(),
-      category: blogForm.category.trim(),
-      excerpt: blogForm.excerpt.trim(),
-      content: blogForm.content.trim(),
-      imageUrl: blogForm.imageUrl.trim(),
-      date: new Date().toISOString().slice(0, 10),
-      views: 0,
-    };
+    alert("삭제 완료");
 
-    let updated: any[] = [];
+    setChannels((prev) => prev.filter((item) => item.id !== Number(id)));
+  } catch (error) {
+    console.error(error);
+    alert("삭제 오류");
+  }
+};
 
-    if (editingBlogId) {
-      updated = posts.map((item: any) =>
-        item.id === editingBlogId
-          ? { ...item, ...payload, id: editingBlogId }
-          : item
-      );
-      alert("블로그 글이 수정되었습니다.");
-    } else {
-      const duplicated = posts.some(
-        (item: any) =>
-          String(item.title || "").trim().toLowerCase() ===
-          payload.title.toLowerCase()
-      );
+const saveBlogPost = async () => {
 
-      if (duplicated) {
-        alert("같은 제목의 블로그 글이 이미 있습니다.");
-        return;
-      }
+  if (editingBlogId) {
+  const res = await fetch(`/api/blog/${editingBlogId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title: blogForm.title,
+      category: blogForm.category,
+      excerpt: blogForm.excerpt,
+      content: blogForm.content,
+      imageUrl: blogForm.imageUrl,
+    }),
+  });
 
-      updated = [{ id: `post-${Date.now()}`, ...payload }, ...posts];
-      alert("블로그 글이 등록되었습니다.");
+  const result = await res.json();
+
+  if (!result.success) {
+    alert("수정 실패");
+    return;
+  }
+
+  alert("수정 완료");
+
+  const refreshed = await fetch("/api/blog");
+  const data = await refreshed.json();
+  setPosts(data.data);
+
+  resetBlogForm();
+  return;
+}
+  if (
+    !blogForm.title.trim() ||
+    !blogForm.category.trim() ||
+    !blogForm.excerpt.trim() ||
+    !blogForm.content.trim()
+  ) {
+    alert("블로그는 제목, 카테고리, 요약, 본문이 필수입니다.");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/blog", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: blogForm.title.trim(),
+        category: blogForm.category.trim(),
+        excerpt: blogForm.excerpt.trim(),
+        content: blogForm.content.trim(),
+        imageUrl: blogForm.imageUrl.trim(),
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      alert(result.message || "블로그 등록 실패");
+      return;
     }
 
-    setPosts(updated);
-    localStorage.setItem("posts", JSON.stringify(updated));
+    alert("블로그가 DB에 등록되었습니다.");
+
+    const refreshed = await fetch("/api/blog");
+    const data = await refreshed.json();
+
+    if (data.success) {
+      setPosts(data.data);
+    }
+
     resetBlogForm();
-  };
+  } catch (error) {
+    console.error("블로그 등록 오류:", error);
+    alert("블로그 등록 중 오류 발생");
+  }
+};
 
   const editBlogPost = (item: any) => {
     setActiveTab("blog");
@@ -382,13 +536,31 @@ export default function AdminPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const deleteBlogPost = (id: string) => {
-    if (!confirm("이 블로그 글을 삭제할까요?")) return;
-    const updated = posts.filter((item: any) => item.id !== id);
-    setPosts(updated);
-    localStorage.setItem("posts", JSON.stringify(updated));
-    if (editingBlogId === id) resetBlogForm();
-  };
+ const deleteBlogPost = async (id: string) => {
+  if (!confirm("삭제할까요?")) return;
+
+  try {
+    const res = await fetch(`/api/blog/${id}`, {
+      method: "DELETE",
+    });
+
+    const result = await res.json();
+
+    if (!result.success) {
+      alert("삭제 실패");
+      return;
+    }
+
+    alert("삭제 완료");
+
+    setPosts((prev) =>
+      prev.filter((item) => item.id !== Number(id))
+    );
+  } catch (error) {
+    console.error(error);
+    alert("삭제 오류");
+  }
+};
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
@@ -717,7 +889,7 @@ export default function AdminPage() {
                             수정
                           </button>
                           <button
-                            onClick={() => deleteSalesChannel(item.id)}
+                            onClick={() => deleteSalesChannel(String(item.id))}
                             className="rounded-lg border px-3 py-2 text-xs hover:bg-neutral-100"
                           >
                             삭제

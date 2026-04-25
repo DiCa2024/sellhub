@@ -1,306 +1,189 @@
-"use client";
+import Image from "next/image";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { prisma } from "@/lib/prisma";
+import ViewTracker from "./ViewTracker";
 
-import { useEffect, useMemo, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { wholesaleSites } from "../../data/wholesaleSites";
-
-const CATEGORY_FILTERS = [
-  "종합",
-  "리빙",
-  "식품",
-  "자동차",
-  "디지털/가전",
-  "아동/문구",
-  "반려/펫",
-  "헬스케어",
-  "뷰티",
-  "스포츠/레저",
-];
-
-type DynamicWholesaleSite = {
-  id: string;
-  category?: string;
-  name: string;
-  imageUrl?: string;
-  tags?: string[];
-  website?: string;
-  dropshipping?: string;
-  businessRequired?: string;
-  usageFee?: string;
-  imageProvided?: string;
-  shortDescription?: string;
-  views?: string;
+type PageProps = {
+  params: Promise<{ id: string }>;
 };
 
-export default function WholesaleDetailPage() {
-  const params = useParams();
-  const id = String(params.id);
-  const router = useRouter();
+export default async function WholesaleDetailPage({ params }: PageProps) {
+  const { id } = await params;
+  const numericId = Number(id);
 
-  const [dynamicSites, setDynamicSites] = useState<DynamicWholesaleSite[]>([]);
-  const [loaded, setLoaded] = useState(false);
-  const [viewUpdated, setViewUpdated] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [displayViews, setDisplayViews] = useState("0");
+  if (Number.isNaN(numericId)) notFound();
 
-  const allSites = useMemo(() => {
-    return [...dynamicSites, ...wholesaleSites];
-  }, [dynamicSites]);
+  const site = await prisma.wholesaleSite.findUnique({
+    where: { id: numericId },
+  });
 
-  const site = allSites.find((item) => item.id === id);
+  if (!site) notFound();
 
-  const handleSearchSubmit = () => {
-    const keyword = searchTerm.trim();
-    if (!keyword) {
-      router.push("/wholesale");
-      return;
-    }
+  const tags = site.tags
+    ? site.tags.split(",").map((t) => t.trim()).filter(Boolean)
+    : [];
 
-    router.push(`/wholesale?query=${encodeURIComponent(keyword)}`);
-  };
-
-  const handleCategoryMove = (category: string) => {
-    router.push(`/wholesale?category=${encodeURIComponent(category)}`);
-  };
-
-  useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("sites") || "[]");
-    setDynamicSites(saved);
-    setLoaded(true);
-  }, []);
-
-  useEffect(() => {
-    if (!loaded || !site) return;
-
-    const storedViewMap = JSON.parse(localStorage.getItem("siteViews") || "{}");
-
-    if (storedViewMap[id] !== undefined) {
-      setDisplayViews(String(storedViewMap[id]));
-    } else {
-      setDisplayViews(site.views || "0");
-    }
-  }, [loaded, site, id, viewUpdated]);
-
-  useEffect(() => {
-    if (!loaded || !site || viewUpdated) return;
-
-    const storedViewMap = JSON.parse(localStorage.getItem("siteViews") || "{}");
-    const nextViews = (storedViewMap[id] || parseViewCount(site.views || "0")) + 1;
-    storedViewMap[id] = nextViews;
-    localStorage.setItem("siteViews", JSON.stringify(storedViewMap));
-    setViewUpdated(true);
-  }, [loaded, site, id, viewUpdated]);
-
-  useEffect(() => {
-    const storedLikeMap = JSON.parse(localStorage.getItem("siteLikes") || "{}");
-    const storedLikedIds = JSON.parse(localStorage.getItem("likedSiteIds") || "[]");
-
-    setLikeCount(storedLikeMap[id] || 0);
-    setLiked(storedLikedIds.includes(id));
-  }, [id]);
-
-  const handleLikeToggle = () => {
-    const storedLikeMap = JSON.parse(localStorage.getItem("siteLikes") || "{}");
-    const storedLikedIds = JSON.parse(localStorage.getItem("likedSiteIds") || "[]");
-
-    const updatedLikeMap = { ...storedLikeMap };
-    let updatedLikedIds = [...storedLikedIds];
-
-    if (liked) {
-      updatedLikeMap[id] = Math.max((updatedLikeMap[id] || 1) - 1, 0);
-      updatedLikedIds = updatedLikedIds.filter((item) => item !== id);
-      setLikeCount(updatedLikeMap[id]);
-      setLiked(false);
-    } else {
-      updatedLikeMap[id] = (updatedLikeMap[id] || 0) + 1;
-      if (!updatedLikedIds.includes(id)) {
-        updatedLikedIds.push(id);
-      }
-      setLikeCount(updatedLikeMap[id]);
-      setLiked(true);
-    }
-
-    localStorage.setItem("siteLikes", JSON.stringify(updatedLikeMap));
-    localStorage.setItem("likedSiteIds", JSON.stringify(updatedLikedIds));
-  };
-
-  if (!loaded) {
-    return (
-      <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
-        <div className="mx-auto max-w-7xl rounded-2xl border bg-white p-8 shadow-sm">
-          <p className="text-neutral-600">불러오는 중...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (!site) {
-    return (
-      <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
-        <div className="mx-auto max-w-7xl rounded-2xl border bg-white p-8 shadow-sm">
-          <h1 className="text-3xl font-bold">도매 사이트를 찾을 수 없습니다.</h1>
-          <p className="mt-3 text-neutral-600">
-            등록된 사이트가 아니거나 아직 불러오지 못했습니다.
-          </p>
-          <a
-            href="/wholesale"
-            className="mt-6 inline-flex rounded-xl bg-black px-4 py-3 text-sm text-white"
-          >
-            도매 사이트 리스트로 돌아가기
-          </a>
-        </div>
-      </main>
-    );
-  }
+   const recommendedSites = await prisma.wholesaleSite.findMany({
+  take: 4,
+  where: {
+    NOT: { id: numericId },
+  },
+}); 
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10 text-neutral-900">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex gap-3">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSearchSubmit();
-              }
-            }}
-            placeholder="도매처 찾기"
-            className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-4 text-sm outline-none focus:border-black"
-          />
+    <main className="min-h-screen bg-neutral-50">
+      <ViewTracker id={site.id} />
 
-          <button
-            onClick={handleSearchSubmit}
-            className="shrink-0 rounded-2xl bg-black px-5 py-4 text-sm text-white"
-          >
-            검색
-          </button>
+      <section className="mx-auto max-w-5xl px-4 py-10">
+        {/* 뒤로가기 */}
+        <Link href="/wholesale" className="text-sm text-neutral-500">
+          ← 목록으로 돌아가기
+        </Link>
+
+        {/* 상단 영역 */}
+        <div className="mt-6 flex flex-col gap-6 md:flex-row">
+          
+          {/* 이미지 (작게) */}
+          <a
+             href={site.website}
+             target="_blank"
+             rel="noreferrer"
+             className="relative w-full md:w-[300px] h-[200px] rounded-xl overflow-hidden bg-neutral-100 block"
+           >
+         <Image
+            src={site.imageUrl}
+            alt={site.name}
+            fill
+            className="object-contain hover:scale-105 transition"
+          />
+          </a>
+
+          {/* 기본 정보 */}
+          <div className="flex-1">
+            <div className="flex gap-2 mb-2">
+              <span className="bg-black text-white text-xs px-2 py-1 rounded">
+                {site.category}
+              </span>
+              <span className="bg-gray-200 text-xs px-2 py-1 rounded">
+                {site.region}
+              </span>
+            </div>
+
+            <a
+               href={site.website}
+               target="_blank"
+               rel="noreferrer"
+             >
+              <h1 className="text-2xl font-bold hover:underline cursor-pointer">
+              {site.name}
+              </h1>
+            </a>
+
+            <p className="text-sm text-gray-500 mt-2">
+              {site.shortDescription}
+            </p>
+
+            <div className="mt-4 text-sm">
+              조회수: {site.views}
+            </div>
+          </div>
         </div>
 
-        <div className="mb-8 flex flex-wrap gap-3">
-          {CATEGORY_FILTERS.map((item) => (
-            <button
-              key={item}
-              onClick={() => handleCategoryMove(item)}
-              className="rounded-full bg-neutral-100 px-4 py-2 text-sm transition hover:bg-neutral-200"
-            >
-              {item}
-            </button>
+        {/* 상세 설명 */}
+        <div className="mt-8">
+          <h2 className="font-semibold mb-2">사이트 설명</h2>
+          <p className="text-sm text-gray-600 leading-7">
+            {site.shortDescription}
+          </p>
+        </div>
+
+        {/* 정보 카드 */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <InfoCard title="이용 요금" value={site.usageFee} />
+          <InfoCard title="위탁 배송" value={site.dropshipping} />
+          <InfoCard title="사업자 필요" value={site.businessRequired} />
+          <InfoCard title="이미지 제공" value={site.imageProvided} />
+        </div>
+
+        {/* 공식 사이트 */}
+        <div className="mt-6">
+          <a
+            href={site.website}
+            target="_blank"
+            className="text-blue-600 text-sm"
+          >
+            공식 사이트 방문하기 →
+          </a>
+        </div>
+
+        {/* 태그 */}
+        <div className="mt-6 flex flex-wrap gap-2">
+          {tags.map((tag) => (
+            <span key={tag} className="text-xs bg-gray-100 px-2 py-1 rounded">
+              #{tag}
+            </span>
           ))}
         </div>
 
-        <a
-          href="/wholesale"
-          className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
-        >
-          ← 도매 사이트 리스트로 돌아가기
-        </a>
-
-        <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-          <div>
-            <div className="mb-6 overflow-hidden rounded-3xl border border-neutral-200 bg-white">
-              <div className="mb-6 w-full overflow-hidden rounded-2xl bg-neutral-100">
-  <img
-    src={site.imageUrl || "https://via.placeholder.com/1200x675?text=Wholesale"}
-    alt={site.name}
-    className="h-64 w-full object-cover"
-  />
-</div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-4xl font-bold tracking-tight">{site.name}</h1>
-              {site.category && (
-                <span className="rounded-full bg-neutral-100 px-3 py-1 text-sm font-medium text-neutral-600">
-                  {site.category}
-                </span>
-              )}
-            </div>
-
-            <p className="mt-6 max-w-3xl text-base leading-8 text-neutral-700">
-              {site.shortDescription || "설명이 아직 등록되지 않았습니다."}
-            </p>
-
-            {Array.isArray(site.tags) && site.tags.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {site.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm text-neutral-600"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-[28px] border border-neutral-200 bg-white p-6 shadow-sm">
-            <div className="text-base font-bold text-neutral-800">핵심 정보</div>
-
-            <div className="mt-5 space-y-4 text-sm text-neutral-700">
-  <InfoRow
-    label="위탁 가능 여부"
-    value={("dropshipping" in site ? site.dropshipping : "") || "-"}
-  />
-  <InfoRow
-    label="사업자 필요 여부"
-    value={("businessRequired" in site ? site.businessRequired : "") || "-"}
-  />
-  <InfoRow
-    label="이용료"
-    value={("usageFee" in site ? site.usageFee : "") || "-"}
-  />
-  <InfoRow
-    label="이미지 제공 여부"
-    value={("imageProvided" in site ? site.imageProvided : "") || "-"}
-  />
-  <InfoRow label="조회수" value={displayViews} />
-</div>
-
-            <div className="mt-6 flex items-center gap-3">
-              <button
-                onClick={handleLikeToggle}
-                className="rounded-xl border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
-              >
-                ♡ 좋아요
-              </button>
-              <span className="text-sm text-neutral-600">좋아요 {likeCount}</span>
-            </div>
-
-            {site.website && (
-              <a
-                href={site.website}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-black px-5 py-4 text-sm font-semibold text-white"
-              >
-                공식 사이트 방문하기
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
+        {/* 🔥 추천 영역 */}
+        <RecommendSection title="추천 판매 채널" items={recommendedSites} />
+        <RecommendSection title="추천 블로그" items={recommendedSites} />
+        <RecommendSection title="추천 판매 도구" items={recommendedSites} />
+      </section>
     </main>
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+/* 정보 카드 */
+function InfoCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <span>{label}</span>
-      <span className="text-right font-semibold">{value}</span>
+    <div className="border rounded-xl p-4 bg-white">
+      <p className="text-xs text-gray-400">{title}</p>
+      <p className="text-sm font-semibold">{value}</p>
     </div>
   );
 }
 
-function parseViewCount(value: string) {
-  if (!value) return 0;
-  const onlyNumber = Number(String(value).replace(/,/g, ""));
-  return Number.isNaN(onlyNumber) ? 0 : onlyNumber;
+/* 추천 영역 */
+function RecommendSection({
+  title,
+  items,
+}: {
+  title: string;
+  items: any[];
+}) {
+  return (
+    <section className="mt-16">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold">{title}</h2>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-4">
+        {items.map((item) => (
+          <Link key={item.id} href={`/wholesale/${item.id}`}>
+            <div className="cursor-pointer">
+              
+              {/* 이미지 */}
+              <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
+                <Image
+                  src={item.imageUrl}
+                  alt={item.name}
+                  width={300}
+                  height={200}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+
+              {/* 이름 */}
+              <h3 className="mt-2 text-center font-bold text-sm">
+                {item.name}
+              </h3>
+
+            </div>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
 }

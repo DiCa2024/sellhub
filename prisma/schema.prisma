@@ -1,159 +1,66 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  HQ
-  USER
-}
-
-enum BrandStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum InquiryStatus {
-  PENDING
-  CONTACTED
-  IN_PROGRESS
-  CLOSED
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  role      Role
-  createdAt DateTime @default(now())
-  sessions  Session[]
-  brands    Brand[]  @relation("HQBrands")
-  inquiries Inquiry[]
-  likes Like[]
-  bookmarks Bookmark[]
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-}
-
-model Brand {
-  id        String   @id @default(cuid())
-  name      String
-  slug      String?  @unique
-  country   String
-  category  String
-  oneLiner  String
-  budget    String
-  tags      String
-  summary   String
-  imageUrl  String?
-
-  description String?
-  logoUrl     String?
-  thumbnailUrl String?
-
-  introTitle           String?
-  introDescription     String?
-  competitivenessTitle String?
-  competitivenessBody  String?
-  targetCustomer       String?
-  operationSupport     String?
-  startupProcess       String?
-  recommendedLocation  String?
-  cautionNote          String?
-
-  contactEmail         String?
-  contactPhone         String?
-  headquartersName     String?
-  monthlyRevenue       String?
-  storeCount           Int?
-  foundingYear         Int?
-  budgetMin            Int?
-  budgetMax            Int?
-
-  storesSeoul          Int?
-  storesGyeonggi       Int?
-  storesIncheon        Int?
-  storesBusan          Int?
-  storesGwangju        Int?
-  storesDaegu          Int?
-
-  isPublished Boolean @default(true)
-
-  ownerId String?
-  owner   User? @relation("HQBrands", fields: [ownerId], references: [id])
-
-  createdAt DateTime @default(now())
-
-  views       Int      @default(0)
-  status      BrandStatus @default(PENDING)
-
-  inquiries Inquiry[]
-  likes     Like[]
-  bookmarks Bookmark[]
-}
-
-model Inquiry {
+model TestConnection {
   id        Int      @id @default(autoincrement())
-
-  message   String
-  name      String?
-  email     String?
-  brandName String?
-
-  isMember      Boolean       @default(false)
-  guestPhone    String?
-  guestPassword String?
-  status        InquiryStatus @default(PENDING)
-
-  userId        String?
-  user          User?  @relation(fields: [userId], references: [id])
-
-  brandId       String?
-  brand         Brand? @relation(fields: [brandId], references: [id])
-
+  title     String
   createdAt DateTime @default(now())
 }
-model Like {
-  id        String   @id @default(cuid())
-  userId    String
-  brandId   String
-  createdAt DateTime @default(now())
 
-  user  User  @relation(fields: [userId], references: [id])
-  brand Brand @relation(fields: [brandId], references: [id])
-
-  @@unique([userId, brandId])
+model WholesaleSite {
+  id               Int      @id @default(autoincrement())
+  category         String
+  name             String
+  region           String
+  imageUrl         String
+  tags             String
+  website          String
+  dropshipping     String
+  businessRequired String
+  usageFee         String
+  imageProvided    String
+  shortDescription String
+  views            Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
-model Bookmark {
-  id        String   @id @default(cuid())
-  userId    String
-  brandId   String
-  createdAt DateTime @default(now())
+model SalesChannel {
+  id               Int      @id @default(autoincrement())
+  name             String
+  category         String
+  region           String
+  imageUrl         String
+  website          String
+  settlementDate   String
+  shortDescription String
+  feeTable         Json
 
-  user  User  @relation(fields: [userId], references: [id])
-  brand Brand @relation(fields: [brandId], references: [id])
-
-  @@unique([userId, brandId])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
-model ContactPost {
-  id           String   @id @default(cuid())
-  title        String
-  author       String
-  content      String
-  views        Int      @default(0)
-  commentCount Int      @default(0)
-  createdAt    DateTime @default(now())
+model Blog {
+  id        Int      @id @default(autoincrement())
+  title     String
+  category  String
+  excerpt   String
+  content   String
+  imageUrl  String
+  views     Int      @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model BlogComment {
+  id        Int      @id @default(autoincrement())
+  blogId    Int
+  name      String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

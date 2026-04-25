@@ -21,27 +21,58 @@ export default function BlogDetailPage() {
   const [showAllComments, setShowAllComments] = useState(false);
 
   useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
-    const savedComments = JSON.parse(localStorage.getItem(`blogComments-${id}`) || "[]");
+  const loadData = async () => {
+    try {
+      // 🔥 블로그 DB
+      const blogRes = await fetch(`/api/blog/${id}`);
+      const blogData = await blogRes.json();
 
-    setDynamicPosts(savedPosts);
-    setDynamicSites(savedSites);
-    setChannels(savedChannels);
-    setComments(savedComments);
-    setLoaded(true);
-  }, [id]);
+      if (blogData.success) {
+          setDynamicPosts([blogData.data]);
+        }
+
+      // 🔥 도매 DB
+      const siteRes = await fetch("/api/wholesale");
+      const siteData = await siteRes.json();
+
+      if (siteData.success) {
+        setDynamicSites(siteData.data);
+      }
+
+      // 🔥 판매 채널 DB
+      const channelRes = await fetch("/api/sales-channel");
+      const channelData = await channelRes.json();
+
+      if (channelData.success) {
+        setChannels(channelData.data);
+      }
+
+      // 댓글은 localStorage 유지
+      const commentRes = await fetch(`/api/blog/${id}/comments`);
+      const commentData = await commentRes.json();
+
+       if (commentData.success) {
+         setComments(commentData.data);
+      }
+
+      setLoaded(true);
+    } catch (error) {
+      console.error("데이터 로딩 오류:", error);
+    }
+  };
+
+  loadData();
+}, [id]);
 
   const allPosts = useMemo(() => {
-    return [...dynamicPosts, ...blogPosts];
-  }, [dynamicPosts]);
+  return [...dynamicPosts];
+}, [dynamicPosts]);
 
   const allSites = useMemo(() => {
     return [...dynamicSites, ...wholesaleSites];
   }, [dynamicSites]);
 
-  const post = allPosts.find((item) => item.id === id);
+  const post = allPosts.find((item) => String(item.id) === String(id));
 
   const latestPosts = useMemo(() => {
     return allPosts.filter((item) => item.id !== id).slice(0, 7);
@@ -84,25 +115,41 @@ export default function BlogDetailPage() {
       href: "/sellertool/memo-check-tool",
     },
   ];
+  
+  const handleAddComment = async () => {
+  if (!commentName.trim() || !commentText.trim()) {
+    alert("이름과 댓글 내용을 입력해 주세요.");
+    return;
+  }
 
-  const handleAddComment = () => {
-    if (!commentName.trim() || !commentText.trim()) {
-      alert("이름과 댓글 내용을 입력해 주세요.");
+  try {
+    const response = await fetch(`/api/blog/${id}/comments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: commentName.trim(),
+        text: commentText.trim(),
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      alert(result.message || "댓글 등록 실패");
       return;
     }
 
-    const newComment = {
-      id: `comment-${Date.now()}`,
-      name: commentName.trim(),
-      text: commentText.trim(),
-    };
-
-    const updatedComments = [newComment, ...comments];
-    setComments(updatedComments);
-    localStorage.setItem(`blogComments-${id}`, JSON.stringify(updatedComments));
+    setComments([result.data, ...comments]);
     setCommentName("");
     setCommentText("");
-  };
+  } catch (error) {
+    console.error("댓글 등록 오류:", error);
+    alert("댓글 등록 중 오류가 발생했습니다.");
+  }
+};
+  
 
   if (!loaded) {
     return (
@@ -146,8 +193,12 @@ export default function BlogDetailPage() {
         <section className="mt-6 grid gap-10 lg:grid-cols-[1.65fr_0.75fr]">
           <div>
             <h1 className="text-3xl font-bold leading-tight md:text-5xl">
-              {post.title}
-            </h1>
+             {post.title}
+           </h1>
+
+           <div className="mt-2 text-sm text-neutral-500">
+            조회수 {post.views ?? 0}
+           </div>
 
             <div className="mt-5 border-b border-neutral-200" />
 

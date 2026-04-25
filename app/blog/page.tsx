@@ -16,16 +16,40 @@ export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("전체");
 
   useEffect(() => {
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
+  const loadData = async () => {
+    try {
+      // 🔥 블로그 DB
+      const blogRes = await fetch("/api/blog");
+      const blogData = await blogRes.json();
 
-    setDynamicPosts(savedPosts);
-    setDynamicSites(savedSites);
-    setChannels(savedChannels);
-  }, []);
+      if (blogData.success) {
+        setDynamicPosts(blogData.data);
+      }
 
-  const allPosts = [...dynamicPosts, ...blogPosts];
+      // 🔥 도매 사이트 DB
+      const siteRes = await fetch("/api/wholesale");
+      const siteData = await siteRes.json();
+
+      if (siteData.success) {
+        setDynamicSites(siteData.data);
+      }
+
+      // 🔥 판매 채널 DB
+      const channelRes = await fetch("/api/sales-channel");
+      const channelData = await channelRes.json();
+
+      if (channelData.success) {
+        setChannels(channelData.data);
+      }
+    } catch (error) {
+      console.error("데이터 로딩 오류:", error);
+    }
+  };
+
+  loadData();
+}, []);
+
+  const allPosts = [...dynamicPosts];
   const allSites = [...dynamicSites, ...wholesaleSites];
   const allChannels = [...channels];
 

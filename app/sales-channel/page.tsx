@@ -34,19 +34,37 @@ export default function SalesChannelPage() {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
+ useEffect(() => {
+  const loadSalesChannelData = async () => {
     const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
     const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
     const savedCompare = JSON.parse(
       localStorage.getItem("compareSalesChannels") || "[]"
     );
 
-    setChannels(savedChannels);
     setDynamicSites(savedSites);
     setDynamicPosts(savedPosts);
     setCompareIds(savedCompare);
-  }, []);
+
+    try {
+      const response = await fetch("/api/sales-channel");
+      const result = await response.json();
+
+      if (result.success) {
+        setChannels(
+          result.data.map((item: any) => ({
+            ...item,
+            id: String(item.id),
+          }))
+        );
+      }
+    } catch (error) {
+      console.error("판매 채널 DB 목록 불러오기 오류:", error);
+    }
+  };
+
+  loadSalesChannelData();
+}, []);
 
   const filteredChannels = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();

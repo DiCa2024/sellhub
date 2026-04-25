@@ -1,24 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { wholesaleSites } from "./data/wholesaleSites";
 import { blogPosts } from "./data/blogPosts";
+
+type WholesaleSiteItem = {
+  id: number | string;
+  category: string;
+  name: string;
+  region: string;
+  imageUrl: string;
+  tags: string | string[];
+  website: string;
+  dropshipping: string;
+  businessRequired: string;
+  usageFee: string;
+  imageProvided: string;
+  shortDescription: string;
+  createdAt?: string;
+  updatedAt?: string;
+  views?: string | number;
+};
 
 export default function HomePage() {
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [dynamicSites, setDynamicSites] = useState<any[]>([]);
+  const [dbSites, setDbSites] = useState<WholesaleSiteItem[]>([]);
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [viewMap, setViewMap] = useState<Record<string, number>>({});
   const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [channels, setChannels] = useState<any[]>([]);
-
-  useEffect(() => {
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    setDynamicSites(savedSites);
-  }, []);
+  const [isLoadingSites, setIsLoadingSites] = useState(true);
 
   useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
@@ -40,11 +53,50 @@ export default function HomePage() {
     setChannels(savedChannels);
   }, []);
 
-  const allSites = [...dynamicSites, ...wholesaleSites];
+  useEffect(() => {
+    const fetchWholesaleSites = async () => {
+      try {
+        setIsLoadingSites(true);
+
+        const response = await fetch("/api/wholesale", {
+          cache: "no-store",
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          setDbSites(result.data);
+        } else {
+          console.error("홈 도매 사이트 조회 실패:", result.error);
+          setDbSites([]);
+        }
+      } catch (error) {
+        console.error("홈 도매 사이트 API 오류:", error);
+        setDbSites([]);
+      } finally {
+        setIsLoadingSites(false);
+      }
+    };
+
+    fetchWholesaleSites();
+  }, []);
+
+  const getTagArray = (tags: string | string[] | undefined) => {
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags;
+    return tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  };
+
+  const allSites = dbSites;
   const latestSites = allSites.slice(0, 6);
 
-  function parseViewCount(value: string) {
+  function parseViewCount(value: string | number) {
     if (!value) return 0;
+
+    if (typeof value === "number") return value;
 
     if (String(value).toLowerCase().includes("k")) {
       const num = parseFloat(String(value).toLowerCase().replace("k", ""));
@@ -55,25 +107,25 @@ export default function HomePage() {
     return Number.isNaN(onlyNumber) ? 0 : onlyNumber;
   }
 
-  const popularSites = [...allSites]
-    .map((site) => {
-      let numericViews = 0;
+  const popularSites = useMemo(() => {
+    return [...allSites]
+      .map((site) => {
+        let numericViews = 0;
 
-      if (dynamicSites.some((item) => item.id === site.id)) {
-        numericViews = parseViewCount(site.views || "0");
-      } else if (viewMap[site.id] !== undefined) {
-        numericViews = Number(viewMap[site.id]);
-      } else {
-        numericViews = parseViewCount(site.views || "0");
-      }
+        if (viewMap[String(site.id)] !== undefined) {
+          numericViews = Number(viewMap[String(site.id)]);
+        } else {
+          numericViews = parseViewCount(site.views || 0);
+        }
 
-      return {
-        ...site,
-        numericViews,
-      };
-    })
-    .sort((a, b) => b.numericViews - a.numericViews)
-    .slice(0, 6);
+        return {
+          ...site,
+          numericViews,
+        };
+      })
+      .sort((a, b) => b.numericViews - a.numericViews)
+      .slice(0, 6);
+  }, [allSites, viewMap]);
 
   const allPosts = [...dynamicPosts, ...blogPosts];
   const latestPosts = allPosts.slice(0, 6);
@@ -174,69 +226,76 @@ export default function HomePage() {
             </a>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {latestSites.map((site) => (
-              <div
-  key={site.id}
-  className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
->
-  <a
-    href={`/wholesale/${site.id}`}
-    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
-  >
-    <img
-      src={
-        site.imageUrl ||
-        "https://via.placeholder.com/600x400?text=Wholesale"
-      }
-      alt={site.name}
-      className="h-40 w-full object-cover transition hover:scale-105"
-    />
-  </a>
+          {isLoadingSites ? (
+            <div className="rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
+              <h3 className="text-xl font-bold">도매 사이트를 불러오는 중이에요</h3>
+              <p className="mt-2 text-sm text-neutral-600">잠시만 기다려 주세요.</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestSites.map((site) => (
+                <div
+                  key={site.id}
+                  className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <a
+                    href={`/wholesale/${site.id}`}
+                    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                  >
+                    <img
+                      src={
+                        site.imageUrl ||
+                        "https://via.placeholder.com/600x400?text=Wholesale"
+                      }
+                      alt={site.name}
+                      className="h-40 w-full object-cover transition hover:scale-105"
+                    />
+                  </a>
 
-  <h3 className="line-clamp-2 text-lg font-bold leading-7">{site.name}</h3>
+                  <h3 className="line-clamp-2 text-lg font-bold leading-7">{site.name}</h3>
 
-  <p className="mt-1 text-sm text-neutral-500">
-    {site.region} · {site.category}
-  </p>
+                  <p className="mt-1 text-sm text-neutral-500">
+                    {site.region} · {site.category}
+                  </p>
 
-  <div className="mt-3 flex flex-wrap gap-2">
-    {(site.tags || []).slice(0, 3).map((tag: string) => (
-      <span
-        key={tag}
-        className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
-      >
-        {tag}
-      </span>
-    ))}
-  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {getTagArray(site.tags).slice(0, 3).map((tag: string) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
 
-  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-    {site.shortDescription || site.description}
-  </p>
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
+                    {site.shortDescription}
+                  </p>
 
-  <div className="mt-auto pt-5">
-    <div className="flex gap-2">
-      <a
-        href={`/wholesale/${site.id}`}
-        className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
-      >
-        상세 보기
-      </a>
+                  <div className="mt-auto pt-5">
+                    <div className="flex gap-2">
+                      <a
+                        href={`/wholesale/${site.id}`}
+                        className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
+                      >
+                        상세 보기
+                      </a>
 
-      <a
-        href={site.website}
-        target="_blank"
-        rel="noreferrer"
-        className="flex-1 rounded-xl bg-neutral-900 px-3 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
-      >
-        사이트 이동
-      </a>
-    </div>
-  </div>
-</div>
-            ))}
-          </div>
+                      <a
+                        href={site.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-1 rounded-xl bg-neutral-900 px-3 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
+                      >
+                        사이트 이동
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="mx-auto max-w-7xl px-6 py-14">
@@ -250,77 +309,82 @@ export default function HomePage() {
             </a>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {popularSites.map((site) => (
-             <div
-  key={site.id}
-  className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
->
-  <a
-    href={`/wholesale/${site.id}`}
-    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
-  >
-    <img
-      src={
-        site.imageUrl ||
-        "https://via.placeholder.com/600x400?text=Wholesale"
-      }
-      alt={site.name}
-      className="h-40 w-full object-cover transition hover:scale-105"
-    />
-  </a>
+          {isLoadingSites ? (
+            <div className="rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
+              <h3 className="text-xl font-bold">인기 도매 사이트를 계산하는 중이에요</h3>
+              <p className="mt-2 text-sm text-neutral-600">잠시만 기다려 주세요.</p>
+            </div>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {popularSites.map((site) => (
+                <div
+                  key={site.id}
+                  className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                >
+                  <a
+                    href={`/wholesale/${site.id}`}
+                    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                  >
+                    <img
+                      src={
+                        site.imageUrl ||
+                        "https://via.placeholder.com/600x400?text=Wholesale"
+                      }
+                      alt={site.name}
+                      className="h-40 w-full object-cover transition hover:scale-105"
+                    />
+                  </a>
 
-  <div className="mb-3 inline-flex w-fit rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white">
-    인기
-  </div>
+                  <div className="mb-3 inline-flex w-fit rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white">
+                    인기
+                  </div>
 
-  <p className="text-xs text-neutral-500">
-    조회수 {site.numericViews}
-  </p>
+                  <p className="text-xs text-neutral-500">조회수 {site.numericViews}</p>
 
-  <h3 className="mt-2 line-clamp-2 text-lg font-bold leading-7">
-    {site.name}
-  </h3>
+                  <h3 className="mt-2 line-clamp-2 text-lg font-bold leading-7">
+                    {site.name}
+                  </h3>
 
-  <p className="mt-1 text-sm text-neutral-500">
-    {site.region} · {site.category}
-  </p>
+                  <p className="mt-1 text-sm text-neutral-500">
+                    {site.region} · {site.category}
+                  </p>
 
-  <div className="mt-3 flex flex-wrap gap-2">
-    {(site.tags || []).slice(0, 3).map((tag: string) => (
-      <span
-        key={tag}
-        className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
-      >
-        {tag}
-      </span>
-    ))}
-  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {getTagArray(site.tags).slice(0, 3).map((tag: string) => (
+                      <span
+                        key={tag}
+                        className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
 
-  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-    {site.shortDescription || site.description}
-  </p>
+                  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
+                    {site.shortDescription}
+                  </p>
 
-  <div className="mt-auto pt-5">
-    <div className="flex gap-2">
-      <a
-        href={`/wholesale/${site.id}`}
-        className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
-      >
-        상세 보기
-      </a>
+                  <div className="mt-auto pt-5">
+                    <div className="flex gap-2">
+                      <a
+                        href={`/wholesale/${site.id}`}
+                        className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
+                      >
+                        상세 보기
+                      </a>
 
-      <button
-        onClick={() => handleQuickSearch(site.name)}
-        className="flex-1 rounded-xl bg-neutral-900 px-3 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
-      >
-        관련 검색
-      </button>
-    </div>
-  </div>
-</div>
-            ))}
-          </div>
+                      <button
+                        onClick={() => handleQuickSearch(site.name)}
+                        className="flex-1 rounded-xl bg-neutral-900 px-3 py-2.5 text-sm font-medium text-white transition hover:opacity-90"
+                      >
+                        관련 검색
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="mx-auto max-w-7xl px-6 py-14">
@@ -342,75 +406,73 @@ export default function HomePage() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {channels.slice(0, 6).map((item) => (
-           <div
-  key={item.id}
-  className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
->
-  <a
-    href={`/sales-channel/${item.id}`}
-    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
-  >
-    <img
-      src={
-        item.imageUrl ||
-        "https://via.placeholder.com/600x400?text=Sales+Channel"
-      }
-      alt={item.name}
-      className="h-40 w-full object-cover transition hover:scale-105"
-    />
-  </a>
+              <div
+                key={item.id}
+                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <a
+                  href={`/sales-channel/${item.id}`}
+                  className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                >
+                  <img
+                    src={
+                      item.imageUrl ||
+                      "https://via.placeholder.com/600x400?text=Sales+Channel"
+                    }
+                    alt={item.name}
+                    className="h-40 w-full object-cover transition hover:scale-105"
+                  />
+                </a>
 
-  <h3 className="line-clamp-2 text-lg font-bold leading-7">{item.name}</h3>
+                <h3 className="line-clamp-2 text-lg font-bold leading-7">{item.name}</h3>
 
-  <p className="mt-1 text-sm text-neutral-500">{item.region}</p>
+                <p className="mt-1 text-sm text-neutral-500">{item.region}</p>
 
-  <div className="mt-3 flex flex-wrap gap-2">
-    {(item.tags || []).slice(0, 4).map((tag: string) => (
-      <span
-        key={tag}
-        className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
-      >
-        {tag}
-      </span>
-    ))}
-  </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(item.tags || []).slice(0, 4).map((tag: string) => (
+                    <span
+                      key={tag}
+                      className="rounded-full bg-neutral-100 px-2.5 py-1 text-xs text-neutral-700"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
 
-  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-    {item.shortDescription}
-  </p>
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
+                  {item.shortDescription}
+                </p>
 
-  <div className="mt-auto pt-5">
-    <div className="flex gap-2">
-      <a
-        href={`/sales-channel/${item.id}`}
-        className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
-      >
-        상세 보기
-      </a>
+                <div className="mt-auto pt-5">
+                  <div className="flex gap-2">
+                    <a
+                      href={`/sales-channel/${item.id}`}
+                      className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
+                    >
+                      상세 보기
+                    </a>
 
-      {item.website ? (
-        <a
-          href={item.website}
-          target="_blank"
-          rel="noreferrer"
-          className="flex-1 rounded-xl bg-neutral-900 px-3 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
-        >
-          채널 이동
-        </a>
-      ) : (
-        <div className="flex-1 rounded-xl bg-neutral-200 px-3 py-2.5 text-center text-sm font-medium text-neutral-500">
-          링크 없음
-        </div>
-      )}
-    </div>
+                    {item.website ? (
+                      <a
+                        href={item.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-1 rounded-xl bg-neutral-900 px-3 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
+                      >
+                        채널 이동
+                      </a>
+                    ) : (
+                      <div className="flex-1 rounded-xl bg-neutral-200 px-3 py-2.5 text-center text-sm font-medium text-neutral-500">
+                        링크 없음
+                      </div>
+                    )}
+                  </div>
 
-    {item.commission && (
-      <p className="mt-3 text-xs text-neutral-500">
-        수수료 {item.commission}
-      </p>
-    )}
-  </div>
-</div>
+                  {item.commission && (
+                    <p className="mt-3 text-xs text-neutral-500">수수료 {item.commission}</p>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
         </section>
@@ -428,48 +490,44 @@ export default function HomePage() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {latestPosts.map((post) => (
-          <div
-  key={post.id}
-  className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
->
-  <a
-    href={`/blog/${post.id}`}
-    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
-  >
-    <img
-      src={
-        post.imageUrl || "https://placehold.co/600x400?text=Blog"
-      }
-      alt={post.title}
-      className="h-40 w-full object-cover transition hover:scale-105"
-    />
-  </a>
+              <div
+                key={post.id}
+                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              >
+                <a
+                  href={`/blog/${post.id}`}
+                  className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                >
+                  <img
+                    src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
+                    alt={post.title}
+                    className="h-40 w-full object-cover transition hover:scale-105"
+                  />
+                </a>
 
-  <div className="mb-3 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-    {post.category}
-  </div>
+                <div className="mb-3 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
+                  {post.category}
+                </div>
 
-  <h3 className="line-clamp-2 text-lg font-bold leading-7">
-    {post.title}
-  </h3>
+                <h3 className="line-clamp-2 text-lg font-bold leading-7">
+                  {post.title}
+                </h3>
 
-  <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-    {post.excerpt}
-  </p>
+                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
+                  {post.excerpt}
+                </p>
 
-  <div className="mt-4 text-xs text-neutral-500">
-    {post.date}
-  </div>
+                <div className="mt-4 text-xs text-neutral-500">{post.date}</div>
 
-  <div className="mt-auto pt-5">
-    <a
-      href={`/blog/${post.id}`}
-      className="inline-flex rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-100"
-    >
-      글 보기
-    </a>
-  </div>
-</div>
+                <div className="mt-auto pt-5">
+                  <a
+                    href={`/blog/${post.id}`}
+                    className="inline-flex rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-100"
+                  >
+                    글 보기
+                  </a>
+                </div>
+              </div>
             ))}
           </div>
         </section>

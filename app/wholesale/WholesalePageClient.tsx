@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { wholesaleSites } from "../data/wholesaleSites";
 import { blogPosts } from "../data/blogPosts";
 
 const ITEMS_PER_PAGE = 20;
@@ -23,6 +22,23 @@ const CATEGORY_TAG_ITEMS = [
   "스포츠/레저",
 ];
 
+type WholesaleSiteItem = {
+  id: number | string;
+  category: string;
+  name: string;
+  region: string;
+  imageUrl: string;
+  tags: string | string[];
+  website: string;
+  dropshipping: string;
+  businessRequired: string;
+  usageFee: string;
+  imageProvided: string;
+  shortDescription: string;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
 export default function WholesalePageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -30,11 +46,13 @@ export default function WholesalePageClient() {
 
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [dynamicSites, setDynamicSites] = useState<any[]>([]);
+  const [dbSites, setDbSites] = useState<WholesaleSiteItem[]>([]);
+  const [dynamicSites, setDynamicSites] = useState<WholesaleSiteItem[]>([]);
   const [dynamicChannels, setDynamicChannels] = useState<any[]>([]);
   const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategoryFromQuery, setSelectedCategoryFromQuery] = useState("");
+  const [isLoadingSites, setIsLoadingSites] = useState(true);
 
   const handleCategoryQueryChange = (category: string) => {
     const params = new URLSearchParams();
@@ -70,10 +88,38 @@ export default function WholesalePageClient() {
     const savedChannels = JSON.parse(localStorage.getItem("salesChannels") || "[]");
     const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
 
-    setCompareIds(savedCompare);
+    setCompareIds(savedCompare.map((id: string | number) => String(id)));
     setDynamicSites(savedSites);
     setDynamicChannels(savedChannels);
     setDynamicPosts(savedPosts);
+  }, []);
+
+  useEffect(() => {
+    const fetchWholesaleSites = async () => {
+      try {
+        setIsLoadingSites(true);
+
+        const response = await fetch("/api/wholesale", {
+          cache: "no-store",
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          setDbSites(result.data);
+        } else {
+          console.error("도매 사이트 조회 실패:", result.error);
+          setDbSites([]);
+        }
+      } catch (error) {
+        console.error("도매 사이트 API 오류:", error);
+        setDbSites([]);
+      } finally {
+        setIsLoadingSites(false);
+      }
+    };
+
+    fetchWholesaleSites();
   }, []);
 
   useEffect(() => {
@@ -85,29 +131,41 @@ export default function WholesalePageClient() {
     setCurrentPage(1);
   }, [searchParams]);
 
-  const allSites = [...dynamicSites, ...wholesaleSites];
+  const allSites = [...dynamicSites, ...dbSites];
   const latestChannels = dynamicChannels.slice(0, 4);
   const latestPosts = [...dynamicPosts, ...blogPosts].slice(0, 4);
 
-  const handleCompareToggle = (id: string) => {
+  const getTagArray = (tags: string | string[] | undefined) => {
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags;
+    return tags
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  };
+
+  const handleCompareToggle = (id: string | number) => {
+    const stringId = String(id);
     let updated: string[] = [];
 
-    if (compareIds.includes(id)) {
-      updated = compareIds.filter((item) => item !== id);
+    if (compareIds.includes(stringId)) {
+      updated = compareIds.filter((item) => item !== stringId);
     } else {
       if (compareIds.length >= 10) {
         alert("비교는 최대 10개까지 담을 수 있어요.");
         return;
       }
-      updated = [...compareIds, id];
+      updated = [...compareIds, stringId];
     }
 
     setCompareIds(updated);
     localStorage.setItem("compareSites", JSON.stringify(updated));
   };
 
-  const handleRemoveCompare = (id: string) => {
-    const updated = compareIds.filter((item) => item !== id);
+  const handleRemoveCompare = (id: string | number) => {
+    const stringId = String(id);
+    const updated = compareIds.filter((item) => item !== stringId);
+
     setCompareIds(updated);
     localStorage.setItem("compareSites", JSON.stringify(updated));
   };
@@ -123,6 +181,8 @@ export default function WholesalePageClient() {
     const keyword = searchTerm.trim().toLowerCase();
 
     return allSites.filter((site) => {
+      const tagArray = getTagArray(site.tags);
+
       const searchTarget = [
         site.name,
         site.region,
@@ -130,7 +190,7 @@ export default function WholesalePageClient() {
         site.shortDescription,
         site.dropshipping,
         site.imageProvided,
-        ...(site.tags || []),
+        ...tagArray,
       ]
         .join(" ")
         .toLowerCase();
@@ -140,7 +200,7 @@ export default function WholesalePageClient() {
       const queryCategoryMatch =
         !selectedCategoryFromQuery ||
         site.category === selectedCategoryFromQuery ||
-        (Array.isArray(site.tags) && site.tags.includes(selectedCategoryFromQuery));
+        tagArray.includes(selectedCategoryFromQuery);
 
       return queryCategoryMatch && searchMatch;
     });
@@ -153,7 +213,9 @@ export default function WholesalePageClient() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const compareSites = allSites.filter((site) => compareIds.includes(site.id));
+  const compareSites = allSites.filter((site) =>
+    compareIds.includes(String(site.id))
+  );
 
   return (
     <main className="px-6 py-10">
@@ -244,52 +306,52 @@ export default function WholesalePageClient() {
           </div>
         </section>
 
-       {compareIds.length > 0 && (
-  <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-    <div className="mb-4 flex items-center justify-between">
-      <div className="text-sm text-neutral-700">
-        비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
-        <span className="ml-1 text-neutral-500">(최대 10개)</span>
-      </div>
+        {compareIds.length > 0 && (
+          <div className="mb-8 rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <div className="text-sm text-neutral-700">
+                비교함에 <span className="font-semibold">{compareIds.length}</span>개 담겼어요.
+                <span className="ml-1 text-neutral-500">(최대 10개)</span>
+              </div>
 
-      <a
-        href="/wholesale/compare"
-        className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-      >
-        비교하러 가기
-      </a>
-    </div>
+              <a
+                href="/wholesale/compare"
+                className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+              >
+                비교하러 가기
+              </a>
+            </div>
 
-    <div className="grid gap-3 md:grid-cols-5">
-      {compareSites.map((site) => (
-        <div
-          key={site.id}
-          className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
-        >
-          <div className="min-w-0">
-            <a
-              href={`/wholesale/${site.id}`}
-              className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
-            >
-              {site.name}
-            </a>
+            <div className="grid gap-3 md:grid-cols-5">
+              {compareSites.map((site) => (
+                <div
+                  key={site.id}
+                  className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
+                >
+                  <div className="min-w-0">
+                    <a
+                      href={`/wholesale/${site.id}`}
+                      className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
+                    >
+                      {site.name}
+                    </a>
 
-            <div className="mt-1 truncate text-xs text-neutral-500">
-              {site.category || "-"} · {site.region || "-"}
+                    <div className="mt-1 truncate text-xs text-neutral-500">
+                      {site.category || "-"} · {site.region || "-"}
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleRemoveCompare(site.id)}
+                    className="ml-3 shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
+                  >
+                    제거
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
-
-          <button
-            onClick={() => handleRemoveCompare(site.id)}
-            className="ml-3 shrink-0 rounded-lg border border-neutral-300 px-3 py-2 text-xs hover:bg-neutral-100"
-          >
-            제거
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+        )}
 
         <section>
           <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -309,7 +371,14 @@ export default function WholesalePageClient() {
             )}
           </div>
 
-          {pagedSites.length === 0 ? (
+          {isLoadingSites ? (
+            <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
+              <h2 className="text-2xl font-bold">도매 사이트를 불러오는 중이에요</h2>
+              <p className="mt-3 text-sm text-neutral-600">
+                잠시만 기다려 주세요.
+              </p>
+            </div>
+          ) : pagedSites.length === 0 ? (
             <div className="rounded-2xl border bg-white p-10 text-center shadow-sm">
               <h2 className="text-2xl font-bold">조건에 맞는 도매 사이트가 없어요</h2>
               <p className="mt-3 text-sm text-neutral-600">
@@ -320,7 +389,7 @@ export default function WholesalePageClient() {
             <>
               <div className="space-y-2">
                 {pagedSites.map((site) => {
-                  const isSelected = compareIds.includes(site.id);
+                  const isSelected = compareIds.includes(String(site.id));
                   const moveUrl = site.website || "#";
 
                   return (
