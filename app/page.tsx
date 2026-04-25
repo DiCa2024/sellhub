@@ -240,7 +240,7 @@ export default function HomePage() {
                 >
                   <a
                     href={`/wholesale/${site.id}`}
-                    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                    className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
                   >
                     <img
                       src={
@@ -248,7 +248,7 @@ export default function HomePage() {
                         "https://via.placeholder.com/600x400?text=Wholesale"
                       }
                       alt={site.name}
-                      className="h-40 w-full object-cover transition hover:scale-105"
+                      className="h-32 w-full object-contain bg-white p-2 transition hover:scale-105"
                     />
                   </a>
 
@@ -323,7 +323,7 @@ export default function HomePage() {
                 >
                   <a
                     href={`/wholesale/${site.id}`}
-                    className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                    className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
                   >
                     <img
                       src={
@@ -331,7 +331,7 @@ export default function HomePage() {
                         "https://via.placeholder.com/600x400?text=Wholesale"
                       }
                       alt={site.name}
-                      className="h-40 w-full object-cover transition hover:scale-105"
+                      className="h-32 w-full object-contain bg-white p-2 transition hover:scale-105"
                     />
                   </a>
 
@@ -412,7 +412,7 @@ export default function HomePage() {
               >
                 <a
                   href={`/sales-channel/${item.id}`}
-                  className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                  className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
                 >
                   <img
                     src={
@@ -420,7 +420,7 @@ export default function HomePage() {
                       "https://via.placeholder.com/600x400?text=Sales+Channel"
                     }
                     alt={item.name}
-                    className="h-40 w-full object-cover transition hover:scale-105"
+                    className="h-32 w-full object-contain bg-white p-2 transition hover:scale-105"
                   />
                 </a>
 
@@ -496,12 +496,12 @@ export default function HomePage() {
               >
                 <a
                   href={`/blog/${post.id}`}
-                  className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
+                  className="mb-4 flex h-32 items-center justify-center overflow-hidden rounded-2xl bg-neutral-100"
                 >
                   <img
                     src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
                     alt={post.title}
-                    className="h-40 w-full object-cover transition hover:scale-105"
+                    className="h-32 w-full object-contain bg-white p-2 transition hover:scale-105"
                   />
                 </a>
 
