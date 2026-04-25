@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 // 🔹 수정 (PATCH)
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
@@ -40,9 +40,9 @@ export async function PATCH(
 }
 
 // 🔹 삭제 (DELETE)
-export async function DELETE(
+ export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
