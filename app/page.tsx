@@ -37,29 +37,38 @@ export default function HomePage() {
     setCurrentUser(savedUser);
   }, []);
 
-  useEffect(() => {
+ useEffect(() => {
   const loadHomeData = async () => {
+    setIsLoadingSites(true);
+
     try {
-      // 도매
-      const siteRes = await fetch("/api/wholesale");
+      const siteRes = await fetch("/api/wholesale", { cache: "no-store" });
       const siteData = await siteRes.json();
-      if (siteData.success) setDbSites(siteData.data);
-
-      // 판매 채널
-      const channelRes = await fetch("/api/sales-channel");
-      const channelData = await channelRes.json();
-      if (channelData.success) setChannels(channelData.data);
-
-      // 블로그
-      const blogRes = await fetch("/api/blog");
-      const blogData = await blogRes.json();
-      if (blogData.success) setDynamicPosts(blogData.data);
-
+      setDbSites(siteData.success ? siteData.data : []);
     } catch (error) {
-      console.error("홈 데이터 로딩 오류:", error);
-    } finally {
-      setIsLoadingSites(false);
+      console.error("도매 데이터 로딩 오류:", error);
+      setDbSites([]);
     }
+
+    try {
+      const channelRes = await fetch("/api/sales-channel", { cache: "no-store" });
+      const channelData = await channelRes.json();
+      setChannels(channelData.success ? channelData.data : []);
+    } catch (error) {
+      console.error("판매 채널 데이터 로딩 오류:", error);
+      setChannels([]);
+    }
+
+    try {
+      const blogRes = await fetch("/api/blog", { cache: "no-store" });
+      const blogData = await blogRes.json();
+      setDynamicPosts(blogData.success ? blogData.data : []);
+    } catch (error) {
+      console.error("블로그 데이터 로딩 오류:", error);
+      setDynamicPosts([]);
+    }
+
+    setIsLoadingSites(false);
   };
 
   loadHomeData();

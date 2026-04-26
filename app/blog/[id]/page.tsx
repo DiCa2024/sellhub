@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { blogPosts } from "../../data/blogPosts";
 import { wholesaleSites } from "../../data/wholesaleSites";
+import ViewTracker from "./ViewTracker";
 
 export default function BlogDetailPage() {
   const params = useParams();
@@ -24,12 +25,12 @@ export default function BlogDetailPage() {
   const loadData = async () => {
     try {
       // 🔥 블로그 DB
-      const blogRes = await fetch(`/api/blog/${id}`);
+      const blogRes = await fetch("/api/blog", { cache: "no-store" });
       const blogData = await blogRes.json();
 
-      if (blogData.success) {
-          setDynamicPosts([blogData.data]);
-        }
+       if (blogData.success) {
+           setDynamicPosts(blogData.data);
+         }
 
       // 🔥 도매 DB
       const siteRes = await fetch("/api/wholesale");
@@ -154,7 +155,7 @@ export default function BlogDetailPage() {
   if (!loaded) {
     return (
       <main className="min-h-[calc(100vh-80px)] bg-white px-6 py-10">
-        <div className="mx-auto max-w-7xl">
+                <div className="mx-auto max-w-7xl">
           <p className="text-neutral-600">불러오는 중...</p>
         </div>
       </main>
@@ -182,6 +183,7 @@ export default function BlogDetailPage() {
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-white px-6 py-10 text-neutral-900">
+       <ViewTracker id={post.id} />
       <div className="mx-auto max-w-7xl">
         <a
           href="/blog"

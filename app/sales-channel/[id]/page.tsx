@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import ViewTracker from "./ViewTracker";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -109,6 +110,7 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-neutral-50">
+      <ViewTracker id={channel.id} />
       <section className="mx-auto max-w-5xl px-4 py-10">
         <Link href="/sales-channel" className="text-sm text-neutral-500">
           ← 판매 채널 목록으로 돌아가기
