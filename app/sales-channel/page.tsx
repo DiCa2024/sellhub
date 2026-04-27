@@ -2,25 +2,9 @@ import { prisma } from "@/lib/prisma";
 import SalesChannelPageClient from "./SalesChannelPageClient";
 
 export default async function SalesChannelPage() {
-  const [channels, sites, posts] = await Promise.all([
-    prisma.salesChannel.findMany({
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.wholesaleSite.findMany({
-      take: 4,
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.blog.findMany({
-      take: 4,
-      orderBy: { createdAt: "desc" },
-    }),
-  ]);
+  const channels = await prisma.salesChannel.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 
-  return (
-    <SalesChannelPageClient
-      initialChannels={channels}
-      initialSites={sites}
-      initialPosts={posts}
-    />
-  );
+  return <SalesChannelPageClient initialChannels={channels} />;
 }
