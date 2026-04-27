@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import WholesalePageClient from "./WholesalePageClient";
 
@@ -8,14 +9,12 @@ export default async function WholesalePage() {
         createdAt: "desc",
       },
     }),
-
     prisma.salesChannel.findMany({
       take: 4,
       orderBy: {
         createdAt: "desc",
       },
     }),
-
     prisma.blog.findMany({
       take: 4,
       orderBy: {
@@ -25,10 +24,12 @@ export default async function WholesalePage() {
   ]);
 
   return (
-    <WholesalePageClient
-      initialSites={sites}
-      initialChannels={channels}
-      initialPosts={posts}
-    />
+    <Suspense fallback={<div className="px-6 py-10">불러오는 중...</div>}>
+      <WholesalePageClient
+        initialSites={sites}
+        initialChannels={channels}
+        initialPosts={posts}
+      />
+    </Suspense>
   );
 }
