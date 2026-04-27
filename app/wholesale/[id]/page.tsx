@@ -41,11 +41,27 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
 
   if (Number.isNaN(numericId)) notFound();
 
-  const site = await prisma.wholesaleSite.findUnique({
+ const [site, recommendedChannels, recommendedBlogs] = await Promise.all([
+  prisma.wholesaleSite.findUnique({
     where: { id: numericId },
-  });
+  }),
 
-  if (!site) notFound();
+  prisma.salesChannel.findMany({
+    take: 4,
+    orderBy: {
+      createdAt: "desc",
+    },
+  }),
+
+  prisma.blog.findMany({
+    take: 4,
+    orderBy: {
+      createdAt: "desc",
+    },
+  }),
+]);
+
+if (!site) notFound();
 
   const tags = site.tags
     ? site.tags
@@ -53,20 +69,6 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
         .map((t) => t.trim())
         .filter(Boolean)
     : [];
-
-  const recommendedChannels = await prisma.salesChannel.findMany({
-    take: 4,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  const recommendedBlogs = await prisma.blog.findMany({
-    take: 4,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
 
   return (
     <main className="min-h-screen bg-neutral-50">
@@ -207,7 +209,7 @@ function RecommendSection({
                   alt={item[nameKey]}
                   width={300}
                   height={200}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain bg-white p-2"
                 />
               </div>
 
@@ -250,7 +252,7 @@ function RecommendToolSection({
                   alt={item.name}
                   width={300}
                   height={200}
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain bg-white p-2"
                 />
               </div>
 
