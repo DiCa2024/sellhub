@@ -34,8 +34,9 @@ type WholesaleSiteItem = {
   usageFee: string;
   imageProvided: string;
   shortDescription: string;
-  createdAt?: string;
-  updatedAt?: string;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+  views?: number;
 };
 
 export default function WholesalePageClient({
