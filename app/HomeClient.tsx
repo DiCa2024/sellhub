@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -138,12 +139,12 @@ export default function HomeClient({
               </p>
             </div>
 
-            <a
+            <Link
               href="/sales-channel"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -211,12 +212,12 @@ export default function HomeClient({
         <section className="mx-auto max-w-7xl px-6 py-14">
           <div className="mb-8 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최신 블로그 글</h2>
-            <a
+            <Link
               href="/blog"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -264,12 +265,12 @@ export default function HomeClient({
         <section className="mx-auto max-w-7xl px-6 py-14">
           <div className="mb-8 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Seller Tools</h2>
-            <a
+            <Link
               href="/sellertool"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 도구 보기 →
-            </a>
+            </Link>
           </div>
 
           <p className="mb-6 max-w-3xl text-sm leading-6 text-neutral-600">
