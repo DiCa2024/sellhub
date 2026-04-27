@@ -23,6 +23,12 @@ export default function HomeClient({
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
+  router.prefetch("/wholesale");
+  router.prefetch("/sales-channel");
+  router.prefetch("/blog");
+}, []);
+
+  useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
     setCurrentUser(savedUser);
   }, []);
@@ -43,7 +49,7 @@ export default function HomeClient({
     if (keyword) {
       router.push(`/wholesale?query=${encodeURIComponent(keyword)}`);
     } else {
-      router.push("/wholesale");
+      router.prefetch("/wholesale");
     }
   };
 
@@ -153,7 +159,7 @@ export default function HomeClient({
                 key={item.id}
                 className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <a
+                <Link
                   href={`/sales-channel/${item.id}`}
                   className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
                 >
@@ -165,7 +171,7 @@ export default function HomeClient({
                     alt={item.name}
                     className="h-32 w-full bg-white object-contain p-2 transition hover:scale-105"
                   />
-                </a>
+                </Link>
 
                 <h3 className="line-clamp-2 text-lg font-bold leading-7">
                   {item.name}
@@ -181,12 +187,12 @@ export default function HomeClient({
 
                 <div className="mt-auto pt-5">
                   <div className="flex gap-2">
-                    <a
+                    <Link
                       href={`/sales-channel/${item.id}`}
                       className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
                     >
                       상세 보기
-                    </a>
+                    </Link>
 
                     {item.website ? (
                       <a
@@ -226,7 +232,7 @@ export default function HomeClient({
                 key={post.id}
                 className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <a
+                <Link
                   href={`/blog/${post.id}`}
                   className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
                 >
@@ -235,7 +241,7 @@ export default function HomeClient({
                     alt={post.title}
                     className="h-32 w-full bg-white object-contain p-2 transition hover:scale-105"
                   />
-                </a>
+                </Link>
 
                 <div className="mb-3 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
                   {post.category}
@@ -250,12 +256,12 @@ export default function HomeClient({
                 </p>
 
                 <div className="mt-auto pt-5">
-                  <a
+                  <Link
                     href={`/blog/${post.id}`}
                     className="inline-flex rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-100"
                   >
                     글 보기
-                  </a>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -356,7 +362,7 @@ function WholesaleSection({
             key={site.id}
             className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <a
+            <Link
               href={`/wholesale/${site.id}`}
               className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
             >
@@ -365,7 +371,7 @@ function WholesaleSection({
                 alt={site.name}
                 className="h-32 w-full bg-white object-contain p-2 transition hover:scale-105"
               />
-            </a>
+            </Link>
 
             {popular && (
               <div className="mb-3 inline-flex w-fit rounded-full bg-neutral-900 px-3 py-1 text-xs font-medium text-white">
@@ -402,12 +408,12 @@ function WholesaleSection({
 
             <div className="mt-auto pt-5">
               <div className="flex gap-2">
-                <a
+                <Link
                   href={`/wholesale/${site.id}`}
                   className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
                 >
                   상세 보기
-                </a>
+                </Link>
 
                 <a
                   href={site.website}

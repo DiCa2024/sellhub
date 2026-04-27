@@ -277,12 +277,12 @@ export default function WholesalePageClient({
                 <span className="ml-1 text-neutral-500">(최대 10개)</span>
               </div>
 
-              <a
+              <Link
                 href="/wholesale/compare"
                 className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
                 비교하러 가기
-              </a>
+              </Link>
             </div>
 
             <div className="grid gap-3 md:grid-cols-5">
@@ -292,12 +292,12 @@ export default function WholesalePageClient({
                   className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
                 >
                   <div className="min-w-0">
-                    <a
+                    <Link
                       href={`/wholesale/${site.id}`}
                       className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
                     >
                       {site.name}
-                    </a>
+                    </Link>
 
                     <div className="mt-1 truncate text-xs text-neutral-500">
                       {site.category || "-"} · {site.region || "-"}
@@ -375,12 +375,12 @@ export default function WholesalePageClient({
                         </a>
 
                         <div className="min-w-0 whitespace-nowrap overflow-hidden text-ellipsis text-sm text-neutral-800">
-                          <a
+                          <Link
                             href={`/wholesale/${site.id}`}
                             className="font-semibold text-neutral-900 hover:underline"
                           >
                             {site.name}
-                          </a>
+                          </Link>
 
                           <span className="mx-2 text-neutral-400">·</span>
                           <span>{site.category || "-"}</span>
@@ -466,12 +466,12 @@ export default function WholesalePageClient({
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">판매 채널</h2>
-            <a
+            <Link
               href="/sales-channel"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
@@ -505,12 +505,12 @@ export default function WholesalePageClient({
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">블로그</h2>
-            <a
+            <Link
               href="/blog"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
