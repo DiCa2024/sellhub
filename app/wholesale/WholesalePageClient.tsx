@@ -466,12 +466,12 @@ export default function WholesalePageClient({
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">판매 채널</h2>
-            <Link
+            <a
               href="/sales-channel"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </Link>
+            </a>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
@@ -505,12 +505,12 @@ export default function WholesalePageClient({
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">블로그</h2>
-            <Link
+            <a
               href="/blog"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </Link>
+            </a>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
