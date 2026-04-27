@@ -12,12 +12,17 @@ const nextConfig: NextConfig = {
         hostname: "via.placeholder.com",
       },
       {
-         protocol: "https",
-         hostname: "ai.esmplus.com",
+        protocol: "https",
+        hostname: "ai.esmplus.com",
       },
       {
-         protocol: "https",
-          hostname: "placehold.co",
+        protocol: "https",
+        hostname: "placehold.co",
+      },
+      {
+        protocol: "https",
+        hostname: "icdopicpjpslxgsopbts.supabase.co",
+        pathname: "/storage/v1/object/public/**",
       },
     ],
   },

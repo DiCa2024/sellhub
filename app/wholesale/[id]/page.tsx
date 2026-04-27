@@ -86,12 +86,14 @@ if (!site) notFound();
             rel="noreferrer"
             className="relative block h-[200px] w-full overflow-hidden rounded-xl bg-neutral-100 md:w-[300px]"
           >
-            <Image
-              src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
+           <Image
+              src={site.imageUrl || "https://placehold.co/1200x800?text=Wholesale"}
               alt={site.name}
-              fill
-              className="object-contain transition hover:scale-105"
-            />
+             fill
+              sizes="(max-width: 768px) 100vw, 300px"
+               priority
+               className="object-contain bg-white p-4 transition hover:scale-105"
+              /> 
           </a>
 
           <div className="flex-1">
@@ -201,17 +203,17 @@ function RecommendSection({
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
-          <Link key={item.id} href={`${basePath}/${item.id}`}>
+          <Link key={item.id} href={`${basePath}/${item.id}`} prefetch>
             <div className="cursor-pointer">
-              <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
-                <Image
-                  src={item.imageUrl || "https://placehold.co/600x400?text=Item"}
-                  alt={item[nameKey]}
-                  width={300}
-                  height={200}
-                  className="h-full w-full object-contain bg-white p-2"
-                />
-              </div>
+              <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-neutral-100">
+  <Image
+    src={item.imageUrl || "https://placehold.co/1200x800?text=Item"}
+    alt={item[nameKey]}
+    fill
+    sizes="(max-width: 768px) 50vw, 25vw"
+    className="object-contain bg-white p-3"
+  />
+</div>
 
               <h3 className="mt-2 text-center text-sm font-bold">
                 {item[nameKey]}
@@ -244,17 +246,17 @@ function RecommendToolSection({
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
-          <Link key={item.id} href={item.href}>
+          <Link key={item.id} href={item.href} prefetch>
             <div className="cursor-pointer">
-              <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
-                <Image
-                  src={item.imageUrl}
-                  alt={item.name}
-                  width={300}
-                  height={200}
-                  className="h-full w-full object-contain bg-white p-2"
-                />
-              </div>
+              <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-neutral-100">
+  <Image
+    src={item.imageUrl}
+    alt={item.name}
+    fill
+    sizes="(max-width: 768px) 50vw, 25vw"
+    className="object-contain bg-white p-3"
+  />
+</div>
 
               <h3 className="mt-2 text-center text-sm font-bold">
                 {item.name}
