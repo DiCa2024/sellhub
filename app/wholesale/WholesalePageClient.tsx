@@ -38,19 +38,29 @@ type WholesaleSiteItem = {
   updatedAt?: string;
 };
 
-export default function WholesalePageClient() {
+export default function WholesalePageClient({
+  initialSites,
+  initialChannels,
+  initialPosts,
+}: {
+  initialSites: WholesaleSiteItem[];
+  initialChannels: any[];
+  initialPosts: any[];
+}) {
+
+
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
 
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [dbSites, setDbSites] = useState<WholesaleSiteItem[]>([]);
-  const [dbChannels, setDbChannels] = useState<any[]>([]);
-  const [dbPosts, setDbPosts] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategoryFromQuery, setSelectedCategoryFromQuery] = useState("");
-  const [isLoadingSites, setIsLoadingSites] = useState(true);
+  const [dbSites] = useState<WholesaleSiteItem[]>(initialSites);
+  const [dbChannels] = useState<any[]>(initialChannels);
+  const [dbPosts] = useState<any[]>(initialPosts);
+  const [isLoadingSites] = useState(false);
 
   const handleCategoryQueryChange = (category: string) => {
     const params = new URLSearchParams();
@@ -75,37 +85,7 @@ export default function WholesalePageClient() {
     setCompareIds(savedCompare.map((id: string | number) => String(id)));
   }, []);
 
-  useEffect(() => {
-    const fetchPageData = async () => {
-      try {
-        setIsLoadingSites(true);
-
-        const [siteRes, channelRes, blogRes] = await Promise.all([
-          fetch("/api/wholesale", { cache: "no-store" }),
-          fetch("/api/sales-channel", { cache: "no-store" }),
-          fetch("/api/blog", { cache: "no-store" }),
-        ]);
-
-        const siteData = await siteRes.json();
-        const channelData = await channelRes.json();
-        const blogData = await blogRes.json();
-
-        setDbSites(siteData.success ? siteData.data : []);
-        setDbChannels(channelData.success ? channelData.data : []);
-        setDbPosts(blogData.success ? blogData.data : []);
-      } catch (error) {
-        console.error("페이지 데이터 로딩 오류:", error);
-        setDbSites([]);
-        setDbChannels([]);
-        setDbPosts([]);
-      } finally {
-        setIsLoadingSites(false);
-      }
-    };
-
-    fetchPageData();
-  }, []);
-
+  
   useEffect(() => {
     const query = searchParams.get("query") || "";
     const category = searchParams.get("category") || "";
