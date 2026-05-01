@@ -149,20 +149,20 @@ export default function BlogPageClient({
                 href={`/blog/${featuredPost.id}`}
                 className="group block overflow-hidden rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <div className="h-[320px] overflow-hidden rounded-2xl bg-neutral-100 md:h-[430px]">
-                  <img
-                    src={
-                      featuredPost.imageUrl ||
-                      "https://placehold.co/1200x700?text=Blog"
-                    }
-                    alt={featuredPost.title}
-                    className="h-full w-full object-cover transition group-hover:scale-105"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/1200x700?text=Blog";
-                    }}
-                  />
-                </div>
+                <div className="aspect-[3/2] w-full overflow-hidden rounded-2xl bg-white group">
+  <img
+    src={
+      featuredPost.imageUrl ||
+      "https://placehold.co/600x400?text=Blog"
+    }
+    alt={featuredPost.title}
+    className="h-full w-full object-contain bg-white transition duration-300 group-hover:scale-105"
+    onError={(e) => {
+      e.currentTarget.src =
+        "https://placehold.co/600x400?text=Blog";
+    }}
+  />
+</div>
 
                 <div className="mt-5">
                   <div className="mb-3 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
@@ -229,7 +229,7 @@ export default function BlogPageClient({
                             "https://placehold.co/400x300?text=Blog"
                           }
                           alt={post.title}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-contain bg-white"
                           onError={(e) => {
                             e.currentTarget.src =
                               "https://placehold.co/400x300?text=Blog";
@@ -331,7 +331,7 @@ function BlogSmallCard({ post }: { post: any }) {
         <img
           src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
           alt={post.title}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain bg-white"
           onError={(e) => {
             e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
           }}
@@ -354,7 +354,7 @@ function BlogCard({ post }: { post: any }) {
         <img
           src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
           alt={post.title}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-contain bg-white"
           onError={(e) => {
             e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
           }}

@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
         hostname: "icdopicpjpslxgsopbts.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+       {
+         protocol: "https",
+         hostname: "logo.clearbit.com",
+       },
     ],
   },
 };

@@ -12,7 +12,8 @@ export default function SellertoolPageClient({
   const latestSites = initialSites.slice(0, 4);
   const latestChannels = initialChannels.slice(0, 4);
   const latestPosts = initialPosts.slice(0, 4);
-
+  const latestBlogs = initialPosts.slice(0, 4);
+  
   const tools = [
     {
       id: "margin-calculator",
@@ -97,134 +98,107 @@ export default function SellertoolPageClient({
           ))}
         </div>
 
-        <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 등록 도매 사이트</h2>
-            <a
-              href="/wholesale"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+        <section className="mt-16">
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
+    <a href="/wholesale" className="text-sm font-medium text-neutral-600 hover:text-black">
+      전체 보기 →
+    </a>
+  </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestSites.map((site) => (
-              <a
-                key={site.id}
-                href={`/wholesale/${site.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={
-                      site.imageUrl ||
-                      "https://placehold.co/600x400?text=Wholesale"
-                    }
-                    alt={site.name}
-                    className="h-full w-full object-contain bg-white p-2"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Wholesale";
-                    }}
-                  />
-                </div>
+  <div className="grid gap-6 md:grid-cols-4">
+    {latestSites.map((site) => (
+      <a
+        key={site.id}
+        href={`/wholesale/${site.id}`}
+        className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div className="aspect-[3/2] overflow-hidden rounded-2xl bg-white">
+          <img
+            src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
+            alt={site.name}
+            className="h-full w-full object-contain bg-white p-2"
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/600x400?text=Wholesale";
+            }}
+          />
+        </div>
 
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {site.name}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+        <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
+          {site.name}
+        </h3>
+      </a>
+    ))}
+  </div>
+</section>
 
-        <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 판매 채널</h2>
-            <a
-              href="/sales-channel"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+        <section className="mt-16">
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">판매 채널</h2>
+    <a href="/sales-channel" className="text-sm font-medium text-neutral-600 hover:text-black">
+      전체 보기 →
+    </a>
+  </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestChannels.map((channel) => (
-              <a
-                key={channel.id}
-                href={`/sales-channel/${channel.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={
-                      channel.imageUrl ||
-                      "https://placehold.co/600x400?text=Channel"
-                    }
-                    alt={channel.name}
-                    className="h-full w-full object-contain bg-white p-2"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Channel";
-                    }}
-                  />
-                </div>
+  <div className="grid gap-6 md:grid-cols-4">
+    {latestChannels.map((channel) => (
+      <a
+        key={channel.id}
+        href={`/sales-channel/${channel.id}`}
+        className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div className="aspect-[3/2] overflow-hidden rounded-2xl bg-white">
+          <img
+            src={channel.imageUrl || "https://placehold.co/600x400?text=Channel"}
+            alt={channel.name}
+            className="h-full w-full object-contain bg-white p-2"
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/600x400?text=Channel";
+            }}
+          />
+        </div>
 
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {channel.name}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+        <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
+          {channel.name}
+        </h3>
+      </a>
+    ))}
+  </div>
+</section>
+<section className="mt-16">
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">블로그</h2>
+    <a href="/blog" className="text-sm font-medium text-neutral-600 hover:text-black">
+      전체 보기 →
+    </a>
+  </div>
 
-        <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 블로그 글</h2>
-            <a
-              href="/blog"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+  <div className="grid gap-6 md:grid-cols-4">
+    {latestBlogs.map((blog) => (
+      <a
+        key={blog.id}
+        href={`/blog/${blog.id}`}
+        className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div className="aspect-[3/2] overflow-hidden rounded-2xl bg-white">
+          <img
+            src={blog.imageUrl || "https://placehold.co/600x400?text=Blog"}
+            alt={blog.title}
+            className="h-full w-full object-contain bg-white p-2"
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
+            }}
+          />
+        </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestPosts.map((post) => (
-              <a
-                key={post.id}
-                href={`/blog/${post.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={
-                      post.imageUrl ||
-                      "https://placehold.co/600x400?text=Blog"
-                    }
-                    alt={post.title}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Blog";
-                    }}
-                  />
-                </div>
-
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {post.title}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+        <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
+          {blog.title}
+        </h3>
+      </a>
+    ))}
+  </div>
+</section>
+    
       </div>
     </main>
   );

@@ -4,33 +4,70 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ViewTracker from "./ViewTracker";
 
+export async function generateMetadata({ params }: any) {
+  const { id } = await params;
+
+  const site = await prisma.wholesaleSite.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+
+  if (!site) {
+    return {
+      title: "도매 사이트 정보 | sellhub",
+      description: "도매 사이트 정보를 확인하고 비교해보세요.",
+    };
+  }
+
+  return {
+    title: `${site.name} | 도매 사이트 분석`,
+    description: site.shortDescription,
+    openGraph: {
+      title: `${site.name} | 도매 사이트 분석`,
+      description: site.shortDescription,
+      images: [
+        {
+          url: site.imageUrl,
+          width: 1200,
+          height: 800,
+        },
+      ],
+    },
+  };
+}
+
 type PageProps = {
   params: Promise<{ id: string }>;
 };
+
+export const revalidate = 60;
+
+const PLACEHOLDER = "https://placehold.co/1200x800?text=Image";
 
 const recommendedTools = [
   {
     id: "margin-calculator",
     name: "마진 계산기",
-    imageUrl: "https://placehold.co/600x400?text=Margin+Calculator",
+    imageUrl: "https://placehold.co/1200x800?text=Margin+Calculator",
     href: "/sellertool/margin-calculator",
   },
   {
     id: "sales-price-calculator",
     name: "판매가 계산기",
-    imageUrl: "https://placehold.co/600x400?text=Sales+Price",
+    imageUrl: "https://placehold.co/1200x800?text=Sales+Price",
     href: "/sellertool/sales-price-calculator",
   },
   {
     id: "commission-calculator",
     name: "수수료 계산기",
-    imageUrl: "https://placehold.co/600x400?text=Commission",
+    imageUrl: "https://placehold.co/1200x800?text=Commission",
     href: "/sellertool/commission-calculator",
   },
   {
     id: "memo-check-tool",
     name: "메모 / 체크 도구",
-    imageUrl: "https://placehold.co/600x400?text=Memo+Tool",
+    imageUrl: "https://placehold.co/1200x800?text=Memo+Tool",
     href: "/sellertool/memo-check-tool",
   },
 ];
@@ -39,34 +76,38 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
   const { id } = await params;
   const numericId = Number(id);
 
-  if (Number.isNaN(numericId)) notFound();
+  if (!Number.isInteger(numericId)) notFound();
 
- const [site, recommendedChannels, recommendedBlogs] = await Promise.all([
-  prisma.wholesaleSite.findUnique({
-    where: { id: numericId },
-  }),
+  const [site, recommendedChannels, recommendedBlogs] = await Promise.all([
+    prisma.wholesaleSite.findUnique({
+      where: { id: numericId },
+    }),
+    prisma.salesChannel.findMany({
+      take: 4,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        imageUrl: true,
+      },
+    }),
+    prisma.blog.findMany({
+      take: 4,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        imageUrl: true,
+      },
+    }),
+  ]);
 
-  prisma.salesChannel.findMany({
-    take: 4,
-    orderBy: {
-      createdAt: "desc",
-    },
-  }),
-
-  prisma.blog.findMany({
-    take: 4,
-    orderBy: {
-      createdAt: "desc",
-    },
-  }),
-]);
-
-if (!site) notFound();
+  if (!site) notFound();
 
   const tags = site.tags
     ? site.tags
         .split(",")
-        .map((t) => t.trim())
+        .map((tag) => tag.trim())
         .filter(Boolean)
     : [];
 
@@ -75,7 +116,7 @@ if (!site) notFound();
       <ViewTracker id={site.id} />
 
       <section className="mx-auto max-w-5xl px-4 py-10">
-        <Link href="/wholesale" className="text-sm text-neutral-500">
+        <Link href="/wholesale" prefetch className="text-sm text-neutral-500">
           ← 목록으로 돌아가기
         </Link>
 
@@ -84,16 +125,22 @@ if (!site) notFound();
             href={site.website}
             target="_blank"
             rel="noreferrer"
-            className="relative block h-[200px] w-full overflow-hidden rounded-xl bg-neutral-100 md:w-[300px]"
+            className="block overflow-hidden rounded-xl bg-white shadow-sm md:w-[320px]"
           >
            <Image
-              src={site.imageUrl || "https://placehold.co/1200x800?text=Wholesale"}
+            src={
+                   site.imageUrl &&
+                site.imageUrl.startsWith("http")
+                ? site.imageUrl
+              : PLACEHOLDER
+             }
               alt={site.name}
-             fill
-              sizes="(max-width: 768px) 100vw, 300px"
-               priority
-               className="object-contain bg-white p-4 transition hover:scale-105"
-              /> 
+              width={1200}
+              height={800}
+              priority
+              sizes="(max-width: 768px) 100vw, 320px"
+              className="aspect-[3/2] h-auto w-full object-contain p-4 transition hover:scale-105"
+            />
           </a>
 
           <div className="flex-1">
@@ -112,11 +159,13 @@ if (!site) notFound();
               </h1>
             </a>
 
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm leading-6 text-gray-500">
               {site.shortDescription}
             </p>
 
-            <div className="mt-4 text-sm">조회수: {site.views}</div>
+            <div className="mt-4 text-sm text-neutral-600">
+              조회수: {site.views}
+            </div>
           </div>
         </div>
 
@@ -139,19 +188,21 @@ if (!site) notFound();
             href={site.website}
             target="_blank"
             rel="noreferrer"
-            className="text-sm text-blue-600"
+            className="text-sm font-medium text-blue-600"
           >
             공식 사이트 방문하기 →
           </a>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          {tags.map((tag) => (
-            <span key={tag} className="rounded bg-gray-100 px-2 py-1 text-xs">
-              #{tag}
-            </span>
-          ))}
-        </div>
+        {tags.length > 0 && (
+          <div className="mt-6 flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <span key={tag} className="rounded bg-gray-100 px-2 py-1 text-xs">
+                #{tag}
+              </span>
+            ))}
+          </div>
+        )}
 
         <RecommendSection
           title="추천 판매 채널"
@@ -175,7 +226,7 @@ if (!site) notFound();
 
 function InfoCard({ title, value }: { title: string; value: string }) {
   return (
-    <div className="rounded-xl border bg-white p-4">
+    <div className="rounded-xl border bg-white p-4 shadow-sm">
       <p className="text-xs text-gray-400">{title}</p>
       <p className="text-sm font-semibold">{value || "-"}</p>
     </div>
@@ -197,25 +248,18 @@ function RecommendSection({
 
   return (
     <section className="mt-16">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{title}</h2>
-      </div>
+      <h2 className="mb-6 text-2xl font-bold">{title}</h2>
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
           <Link key={item.id} href={`${basePath}/${item.id}`} prefetch>
             <div className="cursor-pointer">
-              <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-neutral-100">
-  <Image
-    src={item.imageUrl || "https://placehold.co/1200x800?text=Item"}
-    alt={item[nameKey]}
-    fill
-    sizes="(max-width: 768px) 50vw, 25vw"
-    className="object-contain bg-white p-3"
-  />
-</div>
+              <ImageCard
+                src={item.imageUrl || PLACEHOLDER}
+                alt={item[nameKey]}
+              />
 
-              <h3 className="mt-2 text-center text-sm font-bold">
+              <h3 className="mt-2 line-clamp-2 text-center text-sm font-bold">
                 {item[nameKey]}
               </h3>
             </div>
@@ -240,23 +284,13 @@ function RecommendToolSection({
 }) {
   return (
     <section className="mt-16">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{title}</h2>
-      </div>
+      <h2 className="mb-6 text-2xl font-bold">{title}</h2>
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
           <Link key={item.id} href={item.href} prefetch>
             <div className="cursor-pointer">
-              <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-neutral-100">
-  <Image
-    src={item.imageUrl}
-    alt={item.name}
-    fill
-    sizes="(max-width: 768px) 50vw, 25vw"
-    className="object-contain bg-white p-3"
-  />
-</div>
+              <ImageCard src={item.imageUrl} alt={item.name} />
 
               <h3 className="mt-2 text-center text-sm font-bold">
                 {item.name}
@@ -266,5 +300,20 @@ function RecommendToolSection({
         ))}
       </div>
     </section>
+  );
+}
+
+function ImageCard({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+      <Image
+        src={src}
+        alt={alt}
+        width={1200}
+        height={800}
+        sizes="(max-width: 768px) 50vw, 25vw"
+        className="aspect-[3/2] h-auto w-full object-contain p-3"
+      />
+    </div>
   );
 }

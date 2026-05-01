@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 
 const SALES_CHANNEL_FEE_CATEGORIES = [
   { key: "fashion", label: "패션" },
@@ -35,24 +36,24 @@ export default function SalesChannelCompareClient({
 }: {
   channels: any[];
 }) {
+  const { data: session, status } = useSession();
+  const currentUser = session?.user;
+
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  
   const [loaded, setLoaded] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     const savedCompare = JSON.parse(
       localStorage.getItem("compareSalesChannels") || "[]"
     );
-        const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-
-    setCompareIds(savedCompare);
-    setCurrentUser(savedUser);
+    setCompareIds(savedCompare.map(String));
     setLoaded(true);
   }, []);
 
   const comparedChannels = useMemo(() => {
-    return channels.filter((item) => compareIds.includes(String(item.id)));
+    return channels.filter((item) =>
+      compareIds.includes(String(item.id))
+    );
   }, [channels, compareIds]);
 
   const clearCompare = () => {
@@ -66,7 +67,7 @@ export default function SalesChannelCompareClient({
     localStorage.setItem("compareSalesChannels", JSON.stringify(updated));
   };
 
-  if (!loaded) {
+  if (!loaded || status === "loading") {
     return (
       <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
         <div className="mx-auto max-w-7xl">불러오는 중...</div>
@@ -143,6 +144,7 @@ export default function SalesChannelCompareClient({
               }}
             >
               <CompareLabelCell label="" />
+
               {comparedChannels.map((channel) => (
                 <div
                   key={`head-${channel.id}`}
@@ -152,7 +154,7 @@ export default function SalesChannelCompareClient({
                     {channel.name}
                   </div>
                   <button
-                   onClick={() => removeCompare(String(channel.id))}
+                    onClick={() => removeCompare(String(channel.id))}
                     className="mt-3 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs hover:bg-neutral-100"
                   >
                     제거

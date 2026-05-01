@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const PAGE_SIZE = 10;
 const ADMIN_EMAIL = "admin@gmail.com";
@@ -10,26 +11,25 @@ export default function BoardPageClient({
   initialPosts,
   initialSites,
   initialBlogs,
+  initialChannels,
 }: {
   initialPosts: any[];
   initialSites: any[];
   initialBlogs: any[];
+  initialChannels: any[];
 }) {
 
 const [posts, setPosts] = useState<any[]>(initialPosts);
-const [currentUser, setCurrentUser] = useState<any>(null);
 const [page, setPage] = useState(1);
+
+const { data: session, status } = useSession();
+const currentUser = session?.user;
 
 const [sites] = useState<any[]>(initialSites);
 const [blogs] = useState<any[]>(initialBlogs);
 const [isLoading] = useState(false);
 
-  useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-    setCurrentUser(savedUser);
-  }, []);
-
-
+  
   const sortedPosts = useMemo(() => {
     const notice = posts.filter((p) => p.author === ADMIN_EMAIL);
     const normal = posts.filter((p) => p.author !== ADMIN_EMAIL);
@@ -67,29 +67,33 @@ const [isLoading] = useState(false);
 
   const latestSites = sites.slice(0, 4);
   const latestBlogs = blogs.slice(0, 4);
-
+ 
   const sellerTools = [
-    {
-      id: "margin-calculator",
-      title: "마진 계산기",
-      href: "/sellertool/margin-calculator",
-    },
-    {
-      id: "sales-price-calculator",
-      title: "판매가 계산기",
-      href: "/sellertool/sales-price-calculator",
-    },
-    {
-      id: "commission-calculator",
-      title: "수수료 계산기",
-      href: "/sellertool/commission-calculator",
-    },
-    {
-      id: "memo-check-tool",
-      title: "메모 / 체크 도구",
-      href: "/sellertool/memo-check-tool",
-    },
-  ];
+  {
+    id: "margin-calculator",
+    title: "마진 계산기",
+    description: "매입가, 배송비, 수수료, 판매가 기준으로 순이익과 마진율 계산",
+    href: "/sellertool/margin-calculator",
+  },
+  {
+    id: "sales-price-calculator",
+    title: "판매가 계산기",
+    description: "목표 마진율 기준으로 적정 판매가 계산",
+    href: "/sellertool/sales-price-calculator",
+  },
+  {
+    id: "commission-calculator",
+    title: "수수료 계산기",
+    description: "플랫폼 수수료와 차감 금액 계산",
+    href: "/sellertool/commission-calculator",
+  },
+  {
+    id: "memo-check-tool",
+    title: "메모 / 체크 도구",
+    description: "소싱 메모, 체크리스트 정리",
+    href: "/sellertool/memo-check-tool",
+  },
+];
 
   return (
     <main className="min-h-screen bg-neutral-50 px-6 py-10">
@@ -102,7 +106,7 @@ const [isLoading] = useState(false);
             </p>
           </div>
 
-          {currentUser ? (
+         {status === "loading" ? null : currentUser ? (
             <a
               href="/board/write"
               className="inline-flex rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:opacity-90"
@@ -217,111 +221,99 @@ const [isLoading] = useState(false);
         </div>
 
         <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
-            <a
-              href="/wholesale"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
+    <a href="/wholesale" className="text-sm font-medium text-neutral-600 hover:text-black">
+      전체 보기 →
+    </a>
+  </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestSites.map((site) => (
-              <a
-                key={site.id}
-                href={`/wholesale/${site.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={
-                      site.imageUrl ||
-                      "https://placehold.co/600x400?text=Wholesale"
-                    }
-                    alt={site.name}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Wholesale";
-                    }}
-                  />
-                </div>
+  <div className="grid gap-6 md:grid-cols-4">
+    {latestSites.map((site) => (
+      <a
+        key={site.id}
+        href={`/wholesale/${site.id}`}
+        className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div className="aspect-[3/2] overflow-hidden rounded-2xl bg-white">
+          <img
+            src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
+            alt={site.name}
+            className="h-full w-full object-contain bg-white p-2"
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/600x400?text=Wholesale";
+            }}
+          />
+        </div>
 
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {site.name}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+        <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
+          {site.name}
+        </h3>
+      </a>
+    ))}
+  </div>
+</section>
+
 
         <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 블로그</h2>
-            <a
-              href="/blog"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">최신 블로그</h2>
+    <a href="/blog" className="text-sm font-medium text-neutral-600 hover:text-black">
+      전체 보기 →
+    </a>
+  </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {latestBlogs.map((blog) => (
-              <a
-                key={blog.id}
-                href={`/blog/${blog.id}`}
-                className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
-              >
-                <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
-                  <img
-                    src={blog.imageUrl || "https://placehold.co/600x400?text=Blog"}
-                    alt={blog.title}
-                    className="h-full w-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://placehold.co/600x400?text=Blog";
-                    }}
-                  />
-                </div>
+  <div className="grid gap-6 md:grid-cols-4">
+    {latestBlogs.map((blog) => (
+      <a
+        key={blog.id}
+        href={`/blog/${blog.id}`}
+        className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <div className="aspect-[3/2] overflow-hidden rounded-2xl bg-white">
+          <img
+            src={blog.imageUrl || "https://placehold.co/600x400?text=Blog"}
+            alt={blog.title}
+            className="h-full w-full object-contain bg-white p-2"
+            onError={(e) => {
+              e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
+            }}
+          />
+        </div>
 
-                <div className="pt-3">
-                  <h3 className="line-clamp-2 text-center text-base font-bold leading-6">
-                    {blog.title}
-                  </h3>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
+        <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
+          {blog.title}
+        </h3>
+      </a>
+    ))}
+  </div>
+</section>
 
-        <section className="mt-14">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Seller Tools</h2>
-            <a
-              href="/sellertool"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </a>
-          </div>
+       <section className="mt-16">
+  <div className="mb-6 flex items-center justify-between">
+    <h2 className="text-2xl font-bold">Seller Tools</h2>
+    <a href="/sellertool" className="text-sm font-medium text-neutral-600 hover:text-black">
+      전체 보기 →
+    </a>
+  </div>
 
-          <div className="grid gap-6 md:grid-cols-4">
-            {sellerTools.map((tool) => (
-              <a
-                key={tool.id}
-                href={tool.href}
-                className="rounded-2xl bg-neutral-100 p-6 text-center transition hover:-translate-y-0.5"
-              >
-                <h3 className="font-bold">{tool.title}</h3>
-              </a>
-            ))}
-          </div>
-        </section>
+  <div className="grid gap-6 md:grid-cols-4">
+    {sellerTools.map((tool) => (
+      <a
+        key={tool.id}
+        href={tool.href}
+        className="flex min-h-[150px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      >
+        <h3 className="font-bold">{tool.title}</h3>
+        {tool.description && (
+          <p className="mt-3 text-sm leading-6 text-neutral-600">
+            {tool.description}
+          </p>
+        )}
+      </a>
+    ))}
+  </div>
+</section>
       </div>
     </main>
   );

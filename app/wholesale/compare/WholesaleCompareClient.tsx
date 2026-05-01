@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-
+import { useSession } from "next-auth/react";
 
 const QUICK_FILTERS = [
   { key: "dropshipping-yes", label: "위탁배송 가능" },
@@ -19,35 +19,23 @@ export default function WholesaleCompareClient({
   sites: any[];
   posts: any[];
 }) {
+  const { data: session, status } = useSession();
+  const currentUser = session?.user;
 
   const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [dynamicSites, setDynamicSites] = useState<any[]>([]);
-  const [dynamicPosts, setDynamicPosts] = useState<any[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [currentUser, setCurrentUser] = useState<any>(null);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedQuickFilters, setSelectedQuickFilters] = useState<string[]>([]);
 
   useEffect(() => {
     const savedCompare = JSON.parse(localStorage.getItem("compareSites") || "[]");
-    const savedSites = JSON.parse(localStorage.getItem("sites") || "[]");
-    const savedPosts = JSON.parse(localStorage.getItem("posts") || "[]");
-    const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-
-    setCompareIds(savedCompare);
-    setDynamicSites(savedSites);
-    setDynamicPosts(savedPosts);
-    setCurrentUser(savedUser);
+    setCompareIds(savedCompare.map(String));
     setLoaded(true);
   }, []);
 
-  const allSites = sites;
-  const allBlogPosts = posts;
-
   const comparedSites = useMemo(() => {
-    return allSites.filter((site) => compareIds.includes(String(site.id)));
-  }, [allSites, compareIds]);
+    return sites.filter((site) => compareIds.includes(String(site.id)));
+  }, [sites, compareIds]);
 
   const filteredComparedSites = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -61,7 +49,9 @@ export default function WholesaleCompareClient({
         site.usageFee,
         site.imageProvided,
         site.shortDescription,
-        ...(site.tags || []),
+        ...(typeof site.tags === "string"
+          ? site.tags.split(",").map((tag: string) => tag.trim())
+          : site.tags || []),
       ]
         .join(" ")
         .toLowerCase();
@@ -112,11 +102,11 @@ export default function WholesaleCompareClient({
     });
   }, [comparedSites, searchTerm, selectedQuickFilters]);
 
-  const recommendedSites = allSites
-  .filter((site) => !compareIds.includes(String(site.id)))
-  .slice(0, 4);
+  const recommendedSites = sites
+    .filter((site) => !compareIds.includes(String(site.id)))
+    .slice(0, 4);
 
-  const latestBlogPosts = allBlogPosts.slice(0, 4);
+  const latestBlogPosts = posts.slice(0, 4);
 
   const sellerTools = [
     {
@@ -157,7 +147,7 @@ export default function WholesaleCompareClient({
     localStorage.setItem("compareSites", JSON.stringify(updated));
   };
 
-  if (!loaded) {
+  if (!loaded || status === "loading") {
     return (
       <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
         <div className="mx-auto max-w-7xl">불러오는 중...</div>
@@ -242,6 +232,7 @@ export default function WholesaleCompareClient({
                     return (
                       <button
                         key={item.key}
+                        type="button"
                         onClick={() => {
                           setSelectedQuickFilters((prev) => {
                             if (prev.includes(item.key)) {
@@ -270,14 +261,18 @@ export default function WholesaleCompareClient({
           <div className="mt-10 rounded-2xl border border-neutral-200 bg-white p-10 text-center shadow-sm">
             {compareIds.length === 0 ? (
               <>
-                <h2 className="text-2xl font-bold">비교할 도매 사이트가 없습니다.</h2>
+                <h2 className="text-2xl font-bold">
+                  비교할 도매 사이트가 없습니다.
+                </h2>
                 <p className="mt-3 text-sm text-neutral-600">
                   도매 사이트 목록에서 비교 버튼을 눌러 추가해 주세요.
                 </p>
               </>
             ) : (
               <>
-                <h2 className="text-2xl font-bold">조건에 맞는 비교 대상이 없습니다.</h2>
+                <h2 className="text-2xl font-bold">
+                  조건에 맞는 비교 대상이 없습니다.
+                </h2>
                 <p className="mt-3 text-sm text-neutral-600">
                   검색어 또는 빠른 필터를 바꿔서 다시 확인해 주세요.
                 </p>
@@ -294,6 +289,7 @@ export default function WholesaleCompareClient({
 
               {compareIds.length > 0 && (
                 <button
+                  type="button"
                   onClick={clearCompare}
                   className="rounded-xl border px-4 py-3 text-sm hover:bg-neutral-100"
                 >
@@ -306,10 +302,15 @@ export default function WholesaleCompareClient({
           <>
             <div className="mt-10 flex items-center justify-between">
               <div className="text-sm text-neutral-600">
-                비교 중인 사이트 <span className="font-semibold">{filteredComparedSites.length}</span>개
+                비교 중인 사이트{" "}
+                <span className="font-semibold">
+                  {filteredComparedSites.length}
+                </span>
+                개
               </div>
 
               <button
+                type="button"
                 onClick={clearCompare}
                 className="rounded-xl border border-neutral-300 px-4 py-2 text-sm hover:bg-neutral-100"
               >
@@ -325,6 +326,7 @@ export default function WholesaleCompareClient({
                 }}
               >
                 <CompareLabelCell label="" />
+
                 {filteredComparedSites.map((site) => (
                   <div
                     key={`head-${site.id}`}
@@ -335,7 +337,8 @@ export default function WholesaleCompareClient({
                     </div>
 
                     <button
-                      onClick={() => removeCompare(site.id)}
+                      type="button"
+                      onClick={() => removeCompare(String(site.id))}
                       className="mt-3 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs hover:bg-neutral-100"
                     >
                       제거
@@ -438,7 +441,10 @@ export default function WholesaleCompareClient({
               >
                 <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={site.imageUrl || "https://placehold.co/600x400?text=Wholesale"}
+                    src={
+                      site.imageUrl ||
+                      "https://placehold.co/600x400?text=Wholesale"
+                    }
                     alt={site.name}
                     className="h-full w-full object-cover"
                     onError={(e) => {
@@ -478,7 +484,9 @@ export default function WholesaleCompareClient({
               >
                 <div className="h-40 w-full overflow-hidden rounded-2xl bg-neutral-100">
                   <img
-                    src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
+                    src={
+                      post.imageUrl || "https://placehold.co/600x400?text=Blog"
+                    }
                     alt={post.title}
                     className="h-full w-full object-cover"
                     onError={(e) => {

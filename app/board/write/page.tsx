@@ -1,24 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function BoardWritePage() {
   const router = useRouter();
-
-  const [currentUser, setCurrentUser] = useState<any>(null);
-  const [loaded, setLoaded] = useState(false);
+  const { data: session, status } = useSession();
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
-    setCurrentUser(savedUser);
-    setLoaded(true);
-  }, []);
+  const currentUser = session?.user;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!currentUser) {
       alert("로그인이 필요합니다.");
       return;
@@ -29,33 +25,42 @@ export default function BoardWritePage() {
       return;
     }
 
-    const savedPosts = JSON.parse(localStorage.getItem("boardPosts") || "[]");
+    try {
+      setLoading(true);
 
-    const newPost = {
-      id: `board-${Date.now()}`,
-      title: title.trim(),
-      content: content.trim(),
-      author: currentUser.email,
-      nickname: currentUser.nickname || currentUser.email?.split("@")[0] || "회원",
-      date: new Date().toISOString().slice(0, 10),
-      views: 0,
-    };
+      const res = await fetch("/api/board", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: title.trim(),
+          content: content.trim(),
+          author: currentUser.email,
+          nickname: currentUser.email?.split("@")[0] || "회원",
+        }),
+      });
 
-    const updatedPosts = [newPost, ...savedPosts];
-    localStorage.setItem("boardPosts", JSON.stringify(updatedPosts));
+      const result = await res.json();
 
-    alert("게시글이 등록되었습니다.");
-    router.push("/board");
+      if (!result.success) {
+        alert(result.message || "게시글 등록 실패");
+        return;
+      }
+
+      alert("게시글이 등록되었습니다.");
+      router.push("/board");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      alert("게시글 등록 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (!loaded) {
-    return (
-      <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
-        <div className="mx-auto max-w-3xl rounded-2xl border bg-white p-10 text-center shadow-sm">
-          불러오는 중...
-        </div>
-      </main>
-    );
+  if (status === "loading") {
+    return <main className="p-10">불러오는 중...</main>;
   }
 
   if (!currentUser) {
@@ -113,10 +118,12 @@ export default function BoardWritePage() {
             </div>
 
             <button
+              type="button"
               onClick={handleSubmit}
-              className="rounded-xl bg-black px-4 py-3 text-sm text-white"
+              disabled={loading}
+              className="rounded-xl bg-black px-4 py-3 text-sm text-white disabled:opacity-50"
             >
-              등록하기
+              {loading ? "등록 중..." : "등록하기"}
             </button>
           </div>
         </div>

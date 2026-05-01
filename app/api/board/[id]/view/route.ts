@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(
+export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
@@ -29,50 +29,24 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      data: post,
-    });
-  } catch (error) {
-    console.error("게시글 상세 조회 오류:", error);
-
-    return NextResponse.json(
-      { success: false, message: "게시글 상세 조회 실패" },
-      { status: 500 }
-    );
-  }
-}
-
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    const numericId = Number(id);
-
-    if (!Number.isInteger(numericId)) {
-      return NextResponse.json(
-        { success: false, message: "잘못된 게시글 ID입니다." },
-        { status: 400 }
-      );
-    }
-
-    await prisma.boardPost.delete({
+    const updatedPost = await prisma.boardPost.update({
       where: {
         id: numericId,
+      },
+      data: {
+        views: (post.views || 0) + 1,
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: "게시글이 삭제되었습니다.",
+      data: updatedPost,
     });
   } catch (error) {
-    console.error("게시글 삭제 오류:", error);
+    console.error("조회수 증가 오류:", error);
 
     return NextResponse.json(
-      { success: false, message: "게시글 삭제 실패" },
+      { success: false, message: "조회수 증가 실패" },
       { status: 500 }
     );
   }

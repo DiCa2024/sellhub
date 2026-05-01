@@ -1,16 +1,21 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function SignupPage() {
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreePrivacy, setAgreePrivacy] = useState(false);
 
-  const handleSignup = () => {
+  const [loading, setLoading] = useState(false);
+
+  const handleEmailSignup = async () => {
     if (!email || !password) {
       alert("Please enter email and password.");
       return;
@@ -21,33 +26,97 @@ export default function SignupPage() {
       return;
     }
 
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    const alreadyExists = users.some((user: any) => user.email === email);
+    try {
+      setLoading(true);
 
-    if (alreadyExists) {
-      alert("This email is already registered.");
-      return;
+      const res = await fetch("/api/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.message || "Sign up failed.");
+        return;
+      }
+
+      const loginResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (loginResult?.error) {
+        alert("Sign up complete. Please login.");
+        router.push("/login");
+        return;
+      }
+
+      alert("Sign up complete.");
+      router.push("/");
+      router.refresh();
+    } catch {
+      alert("Server error.");
+    } finally {
+      setLoading(false);
     }
-
-    const newUser = {
-      email,
-      password,
-      role: "USER",
-    };
-
-    const updatedUsers = [...users, newUser];
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-    window.dispatchEvent(new Event("auth-changed"));
-
-    alert("Sign up complete.");
-    router.push("/");
   };
 
+const handleSocialSignup = (provider: "kakao" | "naver" | "google") => {
+  if (!agreeTerms || !agreePrivacy) {
+    alert("필수 약관에 동의해주세요.");
+    return;
+  }
+
+  signIn(provider, { callbackUrl: "/" });
+};
+
   return (
-    <main className="flex min-h-[calc(100vh-80px)] items-center justify-center px-6 py-12">
+    <main className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-neutral-50 px-6 py-12">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
-        <h1 className="mb-6 text-center text-2xl font-bold">Sign up</h1>
+        <h1 className="mb-2 text-center text-2xl font-bold">Create account</h1>
+        <p className="mb-6 text-center text-sm text-neutral-500">
+          이메일 또는 소셜 계정으로 globalsellershop에 가입하세요.
+        </p>
+
+        <div className="space-y-3">
+         <button
+  type="button"
+  onClick={() => handleSocialSignup("kakao")}
+  className="w-full rounded-xl bg-yellow-300 py-3 font-semibold text-black"
+>
+  카카오로 회원가입
+</button>
+
+<button
+  type="button"
+  onClick={() => handleSocialSignup("naver")}
+  className="w-full rounded-xl bg-green-600 py-3 font-semibold text-white"
+>
+  네이버로 회원가입
+</button>
+
+<button
+  type="button"
+  onClick={() => handleSocialSignup("google")}
+  className="w-full rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black"
+>
+  구글로 회원가입
+</button>
+        </div>
+
+        <div className="my-6 flex items-center gap-3">
+          <div className="h-px flex-1 bg-neutral-200" />
+          <span className="text-xs text-neutral-400">or</span>
+          <div className="h-px flex-1 bg-neutral-200" />
+        </div>
 
         <input
           type="email"
@@ -72,7 +141,7 @@ export default function SignupPage() {
               checked={agreeTerms}
               onChange={() => setAgreeTerms(!agreeTerms)}
             />
-            I agree to the Terms of Service (required)
+            서비스 이용약관에 동의합니다 (필수)
           </label>
 
           <label className="flex items-center gap-2">
@@ -81,19 +150,20 @@ export default function SignupPage() {
               checked={agreePrivacy}
               onChange={() => setAgreePrivacy(!agreePrivacy)}
             />
-            I agree to the Privacy Policy (required)
+            개인정보 처리방침에 동의합니다 (필수)
           </label>
         </div>
 
         <button
-          onClick={handleSignup}
-          className="w-full rounded-xl bg-black py-3 text-white"
+          onClick={handleEmailSignup}
+          disabled={loading}
+          className="w-full rounded-xl bg-black py-3 text-white disabled:opacity-50"
         >
-          Create account
+          {loading ? "Creating..." : "이메일로 회원가입"}
         </button>
 
         <p className="mt-4 text-center text-sm text-neutral-500">
-          Already have an account?{" "}
+          이미 계정이 있으신가요?{" "}
           <a href="/login" className="font-medium text-black underline">
             Login
           </a>

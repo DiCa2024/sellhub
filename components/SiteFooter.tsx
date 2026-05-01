@@ -13,7 +13,7 @@ export default function SiteFooter() {
           </div>
 
           <p className="text-xs text-neutral-400">
-            © 2026 sellhub. All rights reserved.
+            © 2026 globalsellershop. All rights reserved.
           </p>
         </div>
 
@@ -62,8 +62,15 @@ export default function SiteFooter() {
         </div>
 
         <div className="mt-6 flex flex-col gap-2 text-xs text-neutral-400 md:flex-row md:items-center md:justify-between">
+          <div className="mt-4 flex flex-wrap gap-4 text-xs text-neutral-500">
+          <a href="/about" className="hover:underline">About</a>
+          <a href="/contact" className="hover:underline">Contact</a>
+          <a href="/privacy" className="hover:underline">Privacy</a>
+          <a href="/terms" className="hover:underline">Terms</a>
+         <a href="/disclaimer" className="hover:underline">Disclaimer</a>
+        </div>
           <p>
-            sellhub는 도매 사이트 탐색, 판매 채널 비교, 셀러 운영 도구 제공을 목적으로 하는 정보형 플랫폼입니다.
+            globalsellershop은 도매 사이트 탐색, 판매 채널 비교, 셀러 운영 도구 제공을 목적으로 하는 정보형 플랫폼입니다.
           </p>
           <p>운영 정책 및 정보는 필요에 따라 변경될 수 있습니다.</p>
         </div>
