@@ -39,11 +39,23 @@ model SalesChannel {
   website          String
   settlementDate   String
   shortDescription String
-  feeTable         Json
-  views Int @default(0)
+  views            Int      @default(0)
+
+  feeTables        FeeTable[]
 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
+}
+model FeeTable {
+  id        Int    @id @default(autoincrement())
+  category  String
+  fee       String
+
+  channelId Int
+  channel   SalesChannel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 model Blog {
   id        Int      @id @default(autoincrement())

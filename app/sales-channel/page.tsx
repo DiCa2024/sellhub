@@ -4,6 +4,9 @@ import SalesChannelPageClient from "./SalesChannelPageClient";
 export default async function SalesChannelPage() {
   const [channels, sites, posts] = await Promise.all([
     prisma.salesChannel.findMany({
+      include: {
+        feeTables: true,
+      },
       orderBy: { createdAt: "desc" },
     }),
     prisma.wholesaleSite.findMany({

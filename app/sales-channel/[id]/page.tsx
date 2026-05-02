@@ -6,11 +6,17 @@ import ViewTracker from "./ViewTracker";
 
 export async function generateMetadata({ params }: any) {
   const { id } = await params;
+  const numericId = Number(id);
+
+  if (Number.isNaN(numericId)) {
+    return {
+      title: "판매 채널 정보 | sellhub",
+      description: "판매 채널별 수수료, 정산일, 특징을 비교해보세요.",
+    };
+  }
 
   const channel = await prisma.salesChannel.findUnique({
-    where: {
-      id: Number(id),
-    },
+    where: { id: numericId },
   });
 
   if (!channel) {
@@ -26,13 +32,7 @@ export async function generateMetadata({ params }: any) {
     openGraph: {
       title: `${channel.name} | 판매 채널 분석`,
       description: channel.shortDescription,
-      images: [
-        {
-          url: channel.imageUrl,
-          width: 1200,
-          height: 800,
-        },
-      ],
+      images: [{ url: channel.imageUrl, width: 1200, height: 800 }],
     },
   };
 }
@@ -55,39 +55,11 @@ const FEE_LABELS: Record<string, string> = {
 };
 
 const sellerTools = [
-  {
-    id: 1,
-    name: "마진 계산기",
-    imageUrl: "https://placehold.co/600x400?text=Tool",
-    link: "/sellertool/margin-calculator",
-  },
-  {
-    id: 2,
-    name: "판매가 계산기",
-    imageUrl: "https://placehold.co/600x400?text=Tool",
-    link: "/sellertool/sales-price-calculator",
-  },
-  {
-    id: 3,
-    name: "수수료 계산기",
-    imageUrl: "https://placehold.co/600x400?text=Tool",
-    link: "/sellertool/commission-calculator",
-  },
-  {
-    id: 4,
-    name: "메모 도구",
-    imageUrl: "https://placehold.co/600x400?text=Tool",
-    link: "/sellertool/memo-check-tool",
-  },
+  { id: 1, name: "마진 계산기", imageUrl: "https://placehold.co/600x400?text=Tool", link: "/sellertool/margin-calculator" },
+  { id: 2, name: "판매가 계산기", imageUrl: "https://placehold.co/600x400?text=Tool", link: "/sellertool/sales-price-calculator" },
+  { id: 3, name: "수수료 계산기", imageUrl: "https://placehold.co/600x400?text=Tool", link: "/sellertool/commission-calculator" },
+  { id: 4, name: "메모 도구", imageUrl: "https://placehold.co/600x400?text=Tool", link: "/sellertool/memo-check-tool" },
 ];
-
-function normalizeFeeTable(feeTable: unknown) {
-  if (!feeTable || typeof feeTable !== "object" || Array.isArray(feeTable)) {
-    return {};
-  }
-
-  return feeTable as Record<string, string>;
-}
 
 export default async function SalesChannelDetailPage({ params }: PageProps) {
   const { id } = await params;
@@ -99,6 +71,9 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
 
   const channel = await prisma.salesChannel.findUnique({
     where: { id: numericId },
+    include: {
+      feeTables: true,
+    },
   });
 
   if (!channel) {
@@ -129,13 +104,15 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
     },
   });
 
-  const feeTable = normalizeFeeTable(channel.feeTable);
+  const feeTable = Object.fromEntries(
+    channel.feeTables.map((item) => [item.category, item.fee])
+  );
 
   const feeEntries = Object.entries(FEE_LABELS)
     .map(([key, label]) => ({
       key,
       label,
-      value: feeTable[key] || "",
+      value: String(feeTable[key] || ""),
     }))
     .filter((item) => item.value.trim() !== "");
 
@@ -144,6 +121,7 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-neutral-50">
       <ViewTracker id={channel.id} />
+
       <section className="mx-auto max-w-5xl px-4 py-10">
         <Link href="/sales-channel" className="text-sm text-neutral-500">
           ← 판매 채널 목록으로 돌아가기
@@ -157,10 +135,7 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
             className="relative block h-[200px] w-full overflow-hidden rounded-xl bg-neutral-100 md:w-[300px]"
           >
             <Image
-              src={
-                channel.imageUrl ||
-                "https://placehold.co/600x400?text=Sales+Channel"
-              }
+              src={channel.imageUrl || "https://placehold.co/600x400?text=Sales+Channel"}
               alt={channel.name}
               fill
               className="object-contain transition hover:scale-105"
@@ -227,12 +202,7 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
         </div>
 
         <div className="mt-6">
-          <a
-            href={channel.website}
-            target="_blank"
-            rel="noreferrer"
-            className="text-sm text-blue-600"
-          >
+          <a href={channel.website} target="_blank" rel="noreferrer" className="text-sm text-blue-600">
             공식 사이트 방문하기 →
           </a>
         </div>
@@ -261,11 +231,7 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
           }))}
         />
 
-        <SimpleSection
-          title="판매 도구"
-          href="/sellertool"
-          items={sellerTools}
-        />
+        <SimpleSection title="판매 도구" href="/sellertool" items={sellerTools} />
       </section>
     </main>
   );
@@ -285,11 +251,7 @@ function RecommendSection({
   items,
 }: {
   title: string;
-  items: {
-    id: number;
-    name: string;
-    imageUrl: string;
-  }[];
+  items: { id: number; name: string; imageUrl: string }[];
 }) {
   return (
     <section className="mt-16">
@@ -306,10 +268,7 @@ function RecommendSection({
               <div className="cursor-pointer">
                 <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
                   <Image
-                    src={
-                      item.imageUrl ||
-                      "https://placehold.co/600x400?text=Sales+Channel"
-                    }
+                    src={item.imageUrl || "https://placehold.co/600x400?text=Sales+Channel"}
                     alt={item.name}
                     width={300}
                     height={200}
@@ -336,12 +295,7 @@ function SimpleSection({
 }: {
   title: string;
   href: string;
-  items: {
-    id: number;
-    name: string;
-    imageUrl: string;
-    link: string;
-  }[];
+  items: { id: number; name: string; imageUrl: string; link: string }[];
 }) {
   return (
     <section className="mt-16">
@@ -362,10 +316,7 @@ function SimpleSection({
               <div className="cursor-pointer">
                 <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
                   <Image
-                    src={
-                      item.imageUrl ||
-                      "https://placehold.co/600x400?text=Item"
-                    }
+                    src={item.imageUrl || "https://placehold.co/600x400?text=Item"}
                     alt={item.name}
                     width={300}
                     height={200}

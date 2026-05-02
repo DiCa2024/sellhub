@@ -21,7 +21,6 @@ export async function PATCH(
         settlementDate: body.settlementDate,
         website: body.website,
         shortDescription: body.shortDescription,
-        feeTable: body.feeTable,
       },
     });
 

@@ -306,7 +306,12 @@ export default function SalesChannelPageClient({
 
                   const feeTable = {
                     ...createEmptyFeeTable(),
-                    ...(channel.feeTable || {}),
+                    ...Object.fromEntries(
+                      (channel.feeTables || []).map((item: any) => [
+                         item.category,
+                         item.fee,
+                      ])
+                    ),
                   };
 
                   const feeSummary = String(

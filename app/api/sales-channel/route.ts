@@ -14,23 +14,9 @@ export async function POST(req: NextRequest) {
       website,
       settlementDate,
       shortDescription,
-      feeTable,
     } = body;
 
-    let parsedFeeTable = feeTable || {};
-
-if (typeof feeTable === "string") {
-  try {
-    parsedFeeTable = JSON.parse(feeTable);
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "feeTable JSON 형식이 올바르지 않습니다." },
-      { status: 400 }
-    );
-  }
-}
-
-    // 필수값 체크
+       // 필수값 체크
     if (!name || !category || !region || !shortDescription) {
       return NextResponse.json(
         { success: false, message: "필수 값이 누락되었습니다." },
@@ -39,7 +25,7 @@ if (typeof feeTable === "string") {
     }
 
     const newChannel = await prisma.salesChannel.create({
-  data: {
+   data: {
     name,
     category,
     region,
@@ -47,7 +33,6 @@ if (typeof feeTable === "string") {
     website: website || "",
     settlementDate,
     shortDescription,
-    feeTable: parsedFeeTable,
   },
 });
 
