@@ -231,7 +231,7 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
           }))}
         />
 
-        <SimpleSection title="판매 도구" href="/sellertool" items={sellerTools} />
+        <SellerToolSection title="판매 도구" href="/sellertool" items={sellerTools} />
       </section>
     </main>
   );
@@ -312,13 +312,58 @@ function SimpleSection({
           <p className="text-sm text-gray-500">표시할 항목이 없습니다.</p>
         ) : (
           items.map((item) => (
-           <Link key={item.id} href={item.link}>
-              <div className="cursor-pointer rounded-2xl border bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
-                <h3 className="text-sm font-bold">
-                  {item.name}
-               </h3>
+  <Link key={item.id} href={item.link}>
+    <div className="cursor-pointer">
+      <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
+        <Image
+          src={item.imageUrl || "https://placehold.co/600x400?text=Item"}
+          alt={item.name}
+          width={300}
+          height={200}
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+      <h3 className="mt-2 text-center text-sm font-bold">
+        {item.name}
+      </h3>
+    </div>
+  </Link>
+))
+        )}
+      </div>
+    </section>
+  );
+}
+function SellerToolSection({
+  title,
+  href,
+  items,
+}: {
+  title: string;
+  href: string;
+  items: { id: number; name: string; link: string }[];
+}) {
+  return (
+    <section className="mt-16">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold">{title}</h2>
+
+        <Link href={href} className="text-sm text-neutral-500">
+          전체 보기 →
+        </Link>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-4">
+        {items.length === 0 ? (
+          <p className="text-sm text-gray-500">표시할 항목이 없습니다.</p>
+        ) : (
+          items.map((item) => (
+            <Link key={item.id} href={item.link}>
+              <div className="cursor-pointer rounded-2xl border bg-white p-8 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                <h3 className="text-base font-bold">{item.name}</h3>
               </div>
-           </Link>
+            </Link>
           ))
         )}
       </div>
