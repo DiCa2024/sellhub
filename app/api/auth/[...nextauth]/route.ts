@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import KakaoProvider from "next-auth/providers/kakao";
 import NaverProvider from "next-auth/providers/naver";
 import GoogleProvider from "next-auth/providers/google";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
@@ -10,10 +10,11 @@ import bcrypt from "bcryptjs";
 const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
-    KakaoProvider({
+   
+   KakaoProvider({
   clientId: process.env.KAKAO_CLIENT_ID!,
-  clientSecret: process.env.KAKAO_CLIENT_SECRET || "",
-}),
+  clientSecret: process.env.KAKAO_CLIENT_SECRET ?? "",
+})
     NaverProvider({
       clientId: process.env.NAVER_CLIENT_ID!,
       clientSecret: process.env.NAVER_CLIENT_SECRET!,
@@ -86,4 +87,5 @@ const handler = NextAuth({
 },
 });
 
-export { handler as GET, handler as POST };
+export const GET = handler;
+export const POST = handler;

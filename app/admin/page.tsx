@@ -100,6 +100,8 @@ const emptyBlogForm: BlogForm = {
   imageUrl: "",
 };
 
+
+
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<AdminTab>("wholesale");
 
@@ -118,6 +120,10 @@ export default function AdminPage() {
   );
   const [editingSalesId, setEditingSalesId] = useState<string | null>(null);
   const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
+
+  const visibleSites = sites.slice(0, 5);
+  const visibleChannels = channels.slice(0, 5);
+  const visiblePosts = posts.slice(0, 5);
 
   useEffect(() => {
   const loadAdminData = async () => {
@@ -705,7 +711,9 @@ const saveBlogPost = async () => {
             </section>
 
             <section className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-bold">등록된 도매 사이트</h2>
+              <h2 className="mb-4 text-xl font-bold">
+                 등록된 도매 사이트 최근 5개 / 전체 {sites.length}개
+              </h2>
 
               <div className="space-y-4">
                 {sites.length === 0 ? (
@@ -713,7 +721,7 @@ const saveBlogPost = async () => {
                     아직 등록된 도매 사이트가 없습니다.
                   </p>
                 ) : (
-                  sites.map((item: any) => (
+                  visibleSites.map((item: any) => (
                     <div key={item.id} className="rounded-xl border p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -842,7 +850,9 @@ const saveBlogPost = async () => {
             </section>
 
             <section className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-bold">등록된 판매 채널</h2>
+              <h2 className="mb-4 text-xl font-bold">
+                 등록된 판매 채널 최근 5개 / 전체 {channels.length}개
+               </h2>
 
               <div className="space-y-4">
                 {channels.length === 0 ? (
@@ -850,7 +860,7 @@ const saveBlogPost = async () => {
                     아직 등록된 판매 채널이 없습니다.
                   </p>
                 ) : (
-                  channels.map((item: any) => (
+                 visibleChannels.map((item: any) => (
                     <div key={item.id} className="rounded-xl border p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -965,7 +975,9 @@ const saveBlogPost = async () => {
             </section>
 
             <section className="rounded-2xl border bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-xl font-bold">등록된 블로그 글</h2>
+              <h2 className="mb-4 text-xl font-bold">
+                등록된 블로그 글 최근 5개 / 전체 {posts.length}개
+              </h2>
 
               <div className="space-y-4">
                 {posts.length === 0 ? (
@@ -973,7 +985,7 @@ const saveBlogPost = async () => {
                     아직 등록된 블로그 글이 없습니다.
                   </p>
                 ) : (
-                  posts.map((item: any) => (
+                  visiblePosts.map((item: any) => (
                     <div key={item.id} className="rounded-xl border p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
