@@ -312,23 +312,13 @@ function SimpleSection({
           <p className="text-sm text-gray-500">표시할 항목이 없습니다.</p>
         ) : (
           items.map((item) => (
-            <Link key={item.id} href={item.link}>
-              <div className="cursor-pointer">
-                <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
-                  <Image
-                    src={item.imageUrl || "https://placehold.co/600x400?text=Item"}
-                    alt={item.name}
-                    width={300}
-                    height={200}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-
-                <h3 className="mt-2 text-center text-sm font-bold">
+           <Link key={item.id} href={item.link}>
+              <div className="cursor-pointer rounded-2xl border bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+                <h3 className="text-sm font-bold">
                   {item.name}
-                </h3>
+               </h3>
               </div>
-            </Link>
+           </Link>
           ))
         )}
       </div>
