@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
 import WholesalePageClient from "./WholesalePageClient";
 
+export const dynamic = "force-dynamic";
 export default async function WholesalePage() {
   const [sites, channels, posts] = await Promise.all([
     prisma.wholesaleSite.findMany({
