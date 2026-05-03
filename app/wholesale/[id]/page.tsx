@@ -48,26 +48,26 @@ const PLACEHOLDER = "https://placehold.co/1200x800?text=Image";
 const recommendedTools = [
   {
     id: "margin-calculator",
-    name: "마진 계산기",
-    imageUrl: "https://placehold.co/1200x800?text=Margin+Calculator",
+    title: "마진 계산기",
+    description: "매입가, 배송비, 수수료, 판매가 기준으로 순이익과 마진율 계산",
     href: "/sellertool/margin-calculator",
   },
   {
     id: "sales-price-calculator",
-    name: "판매가 계산기",
-    imageUrl: "https://placehold.co/1200x800?text=Sales+Price",
+    title: "판매가 계산기",
+    description: "목표 마진율 기준으로 적정 판매가 계산",
     href: "/sellertool/sales-price-calculator",
   },
   {
     id: "commission-calculator",
-    name: "수수료 계산기",
-    imageUrl: "https://placehold.co/1200x800?text=Commission",
+    title: "수수료 계산기",
+    description: "플랫폼 수수료와 차감 금액 계산",
     href: "/sellertool/commission-calculator",
   },
   {
     id: "memo-check-tool",
-    name: "메모 / 체크 도구",
-    imageUrl: "https://placehold.co/1200x800?text=Memo+Tool",
+    title: "메모 / 체크 도구",
+    description: "소싱 메모, 체크리스트 정리",
     href: "/sellertool/memo-check-tool",
   },
 ];
@@ -277,25 +277,37 @@ function RecommendToolSection({
   title: string;
   items: {
     id: string;
-    name: string;
-    imageUrl: string;
+    title: string;
+    description: string;
     href: string;
   }[];
 }) {
   return (
     <section className="mt-16">
-      <h2 className="mb-6 text-2xl font-bold">{title}</h2>
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="text-2xl font-bold">{title}</h2>
+        <Link
+          href="/sellertool"
+          prefetch
+          className="text-sm font-medium text-neutral-600 hover:text-black"
+        >
+          전체 보기 →
+        </Link>
+      </div>
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
-          <Link key={item.id} href={item.href} prefetch>
-            <div className="cursor-pointer">
-              <ImageCard src={item.imageUrl} alt={item.name} />
+          <Link
+            key={item.id}
+            href={item.href}
+            prefetch
+            className="flex min-h-[150px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <h3 className="font-bold">{item.title}</h3>
 
-              <h3 className="mt-2 text-center text-sm font-bold">
-                {item.name}
-              </h3>
-            </div>
+            <p className="mt-3 text-sm leading-6 text-neutral-600">
+              {item.description}
+            </p>
           </Link>
         ))}
       </div>
