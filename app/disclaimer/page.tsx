@@ -5,7 +5,7 @@ export default function DisclaimerPage() {
         <h1 className="text-4xl font-bold">Disclaimer</h1>
 
         <p className="mt-6 text-lg leading-8 text-neutral-700">
-          sellhub에서 제공하는 모든 정보는 참고용으로 제공됩니다.
+          globalsellershop에서 제공하는 모든 정보는 참고용으로 제공됩니다.
         </p>
 
         <div className="mt-10 space-y-8 text-neutral-700 leading-8">

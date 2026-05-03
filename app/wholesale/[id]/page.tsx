@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: any) {
 
   if (!site) {
     return {
-      title: "도매 사이트 정보 | sellhub",
+      title: "도매 사이트 정보 | globalsellershop",
       description: "도매 사이트 정보를 확인하고 비교해보세요.",
     };
   }

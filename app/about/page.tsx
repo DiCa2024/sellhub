@@ -2,10 +2,10 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-white px-6 py-16 text-neutral-900">
       <section className="mx-auto max-w-4xl">
-        <h1 className="text-4xl font-bold">About sellhub</h1>
+        <h1 className="text-4xl font-bold">About globalsellershop</h1>
 
         <p className="mt-6 text-lg leading-8 text-neutral-700">
-          sellhub는 국내외 도매 사이트, 판매 채널, 셀러 도구, 온라인 판매 정보를
+          globalsellershop은 국내외 도매 사이트, 판매 채널, 셀러 도구, 온라인 판매 정보를
           한곳에서 비교하고 탐색할 수 있도록 만든 정보 플랫폼입니다.
         </p>
 
@@ -16,7 +16,7 @@ export default function AboutPage() {
         </p>
 
         <p className="mt-4 leading-8 text-neutral-700">
-          sellhub의 목표는 사용자가 더 빠르고 정확하게 판매 기회를 찾고,
+          globalsellershop의 목표는 사용자가 더 빠르고 정확하게 판매 기회를 찾고,
           자신에게 맞는 유통·판매 경로를 선택할 수 있도록 돕는 것입니다.
         </p>
 

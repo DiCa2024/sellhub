@@ -17,7 +17,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "초보 셀러가 처음 시작할 때 보기 좋은 국내외 도매 플랫폼을 기준별로 정리했습니다.",
     date: "2026-04-08",
-    author: "sellhub",
+    author: "globalsellershop",
   },
   {
     id: "1688-guide-for-beginners",
@@ -27,7 +27,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "1688을 처음 보는 사람도 이해할 수 있게 가입 전 체크할 점과 소싱 흐름을 정리했습니다.",
     date: "2026-04-07",
-    author: "sellhub",
+    author: "globalsellershop",
   },
   {
     id: "alibaba-vs-1688",
@@ -37,7 +37,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "대량 사입, 저단가 소싱, OEM 관점에서 Alibaba와 1688의 차이를 비교합니다.",
     date: "2026-04-06",
-    author: "sellhub",
+    author: "globalsellershop",
   },
   {
     id: "dropshipping-vs-wholesale",
@@ -47,7 +47,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "위탁판매와 사입의 구조적 차이, 장단점, 초보자에게 더 맞는 시작 방식을 정리했습니다.",
     date: "2026-04-05",
-    author: "sellhub",
+    author: "globalsellershop",
   },
   {
     id: "japan-wholesale-guide",
@@ -57,7 +57,7 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "일본 잡화와 라이프스타일 상품을 찾는 셀러를 위해 플랫폼 특징과 체크 포인트를 정리했습니다.",
     date: "2026-04-04",
-    author: "sellhub",
+    author: "globalsellershop",
   },
   {
     id: "oem-checklist",
@@ -67,6 +67,6 @@ export const blogPosts: BlogPost[] = [
     excerpt:
       "OEM/ODM 생산을 고려할 때 공급사와 소통하며 꼭 확인해야 할 핵심 항목을 정리했습니다.",
     date: "2026-04-03",
-    author: "sellhub",
+    author: "globalsellershop",
   },
 ];

@@ -5,7 +5,7 @@ export default function PrivacyPage() {
         <h1 className="text-4xl font-bold">Privacy Policy</h1>
 
         <p className="mt-6 text-lg leading-8 text-neutral-700">
-          sellhub(이하 “사이트”)는 이용자의 개인정보를 중요하게 생각하며,
+          globalsellershop(이하 “사이트”)는 이용자의 개인정보를 중요하게 생각하며,
           관련 법령을 준수하고 있습니다.
         </p>
 

@@ -18,16 +18,16 @@ export async function generateMetadata({ params }: any) {
 
   if (!post) {
     return {
-      title: "블로그 | sellhub",
+      title: "블로그 | globalsellershop",
       description: "온라인 판매, 도매 소싱, 판매 전략 관련 글을 확인해보세요.",
     };
   }
 
   return {
-    title: `${post.title} | sellhub 블로그`,
+    title: `${post.title} | globalsellershop 블로그`,
     description: post.excerpt,
     openGraph: {
-      title: `${post.title} | sellhub 블로그`,
+      title: `${post.title} | globalsellershop 블로그`,
       description: post.excerpt,
       images: [
         {

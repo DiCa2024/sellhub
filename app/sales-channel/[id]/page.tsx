@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: any) {
 
   if (Number.isNaN(numericId)) {
     return {
-      title: "판매 채널 정보 | sellhub",
+      title: "판매 채널 정보 | globalsellershop",
       description: "판매 채널별 수수료, 정산일, 특징을 비교해보세요.",
     };
   }
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: any) {
 
   if (!channel) {
     return {
-      title: "판매 채널 정보 | sellhub",
+      title: "판매 채널 정보 | globalsellershop",
       description: "판매 채널별 수수료, 정산일, 특징을 비교해보세요.",
     };
   }

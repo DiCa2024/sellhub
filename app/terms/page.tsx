@@ -5,7 +5,7 @@ export default function TermsPage() {
         <h1 className="text-4xl font-bold">Terms of Service</h1>
 
         <p className="mt-6 text-lg leading-8 text-neutral-700">
-          본 약관은 sellhub(이하 “사이트”)의 이용과 관련된 기본적인 사항을 규정합니다.
+          본 약관은 globalsellershop(이하 “사이트”)의 이용과 관련된 기본적인 사항을 규정합니다.
         </p>
 
         <div className="mt-10 space-y-8 text-neutral-700 leading-8">

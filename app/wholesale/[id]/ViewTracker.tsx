@@ -8,7 +8,7 @@ type ViewTrackerProps = {
 
 export default function ViewTracker({ id }: ViewTrackerProps) {
   useEffect(() => {
-    const viewedKey = `sellhub-viewed-${id}`;
+    const viewedKey = `globalsellershop-viewed-${id}`;
     const hasViewed = sessionStorage.getItem(viewedKey);
 
     if (hasViewed) {

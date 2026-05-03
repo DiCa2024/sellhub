@@ -40,7 +40,7 @@ export default function TopNav() {
 
             <div className="leading-tight">
               <div className="text-lg font-bold tracking-tight text-neutral-900">
-                sellhub
+                globalsellershop
               </div>
               <div className="text-xs text-neutral-500">
                 도매 사이트를 찾고, 비교하고, 배우는 곳

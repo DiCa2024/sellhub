@@ -5,7 +5,7 @@ export default function ContactPage() {
         <h1 className="text-4xl font-bold">Contact</h1>
 
         <p className="mt-6 text-lg leading-8 text-neutral-700">
-          sellhub에 대한 문의, 제휴, 오류 신고 등은 아래 연락처로 문의해 주세요.
+          globalsellershop에 대한 문의, 제휴, 오류 신고 등은 아래 연락처로 문의해 주세요.
         </p>
 
         <div className="mt-10 rounded-2xl bg-neutral-50 p-6">
