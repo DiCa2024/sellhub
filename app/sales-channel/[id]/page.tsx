@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ViewTracker from "./ViewTracker";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function generateMetadata({ params }: any) {
   const { id } = await params;
   const numericId = Number(id);
@@ -16,8 +19,11 @@ export async function generateMetadata({ params }: any) {
   }
 
   const channel = await prisma.salesChannel.findUnique({
-    where: { id: numericId },
-  });
+  where: { id: numericId },
+  include: {
+    feeTables: true,
+  },
+});
 
   if (!channel) {
     return {

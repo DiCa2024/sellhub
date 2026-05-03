@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 import SalesChannelPageClient from "./SalesChannelPageClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function SalesChannelPage() {
   const [channels, sites, posts] = await Promise.all([
     prisma.salesChannel.findMany({
