@@ -1,7 +1,7 @@
+export const revalidate = 60;
 import { prisma } from "@/lib/prisma";
 import HomeClient from "./HomeClient";
 
-export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [latestSites, popularSites, channels, latestPosts] = await Promise.all([
