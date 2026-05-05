@@ -69,47 +69,31 @@ export default function SignupPage() {
     }
   };
 
-const handleSocialSignup = (provider: "kakao" | "naver" | "google") => {
-  if (!agreeTerms || !agreePrivacy) {
-    alert("필수 약관에 동의해주세요.");
-    return;
-  }
+  const handleGoogleSignup = () => {
+    if (!agreeTerms || !agreePrivacy) {
+      alert("필수 약관에 동의해주세요.");
+      return;
+    }
 
-  signIn(provider, { callbackUrl: "/" });
-};
+    signIn("google", { callbackUrl: "/" });
+  };
 
   return (
     <main className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-neutral-50 px-6 py-12">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
         <h1 className="mb-2 text-center text-2xl font-bold">Create account</h1>
         <p className="mb-6 text-center text-sm text-neutral-500">
-          이메일 또는 소셜 계정으로 globalsellershop에 가입하세요.
+          이메일 또는 Google 계정으로 globalsellershop에 가입하세요.
         </p>
 
         <div className="space-y-3">
-         <button
-  type="button"
-  onClick={() => handleSocialSignup("kakao")}
-  className="w-full rounded-xl bg-yellow-300 py-3 font-semibold text-black"
->
-  카카오로 회원가입
-</button>
-
-<button
-  type="button"
-  onClick={() => handleSocialSignup("naver")}
-  className="w-full rounded-xl bg-green-600 py-3 font-semibold text-white"
->
-  네이버로 회원가입
-</button>
-
-<button
-  type="button"
-  onClick={() => handleSocialSignup("google")}
-  className="w-full rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black"
->
-  구글로 회원가입
-</button>
+          <button
+            type="button"
+            onClick={handleGoogleSignup}
+            className="w-full rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black"
+          >
+            Google로 회원가입
+          </button>
         </div>
 
         <div className="my-6 flex items-center gap-3">

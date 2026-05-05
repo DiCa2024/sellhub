@@ -42,10 +42,8 @@ export default function LoginPage() {
     }
   };
 
-  const handleSocialLogin = (provider: "kakao" | "naver" | "google") => {
-    alert("소셜 로그인은 준비 중입니다. 먼저 이메일로 로그인해 주세요.");
-    // 소셜 키 연결 후 아래 코드로 변경
-    // signIn(provider, { callbackUrl: "/" });
+  const handleGoogleLogin = () => {
+    signIn("google", { callbackUrl: "/" });
   };
 
   return (
@@ -53,32 +51,16 @@ export default function LoginPage() {
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
         <h1 className="mb-2 text-center text-2xl font-bold">로그인</h1>
         <p className="mb-6 text-center text-sm text-neutral-500">
-          이메일 또는 소셜 계정으로 로그인하세요.
+          이메일 또는 Google 계정으로 로그인하세요.
         </p>
 
         <div className="space-y-3">
           <button
             type="button"
-            onClick={() => handleSocialLogin("kakao")}
-            className="w-full rounded-xl bg-yellow-300 py-3 font-semibold text-black"
+            onClick={handleGoogleLogin}
+            className="w-full cursor-pointer rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black transition hover:bg-neutral-100"
           >
-            카카오로 계속하기
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSocialLogin("naver")}
-            className="w-full rounded-xl bg-green-600 py-3 font-semibold text-white"
-          >
-            네이버로 계속하기
-          </button>
-
-          <button
-            type="button"
-            onClick={() => handleSocialLogin("google")}
-            className="w-full rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black"
-          >
-            구글로 계속하기
+            Google로 계속하기
           </button>
         </div>
 
@@ -88,40 +70,43 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
-       <form
-  onSubmit={(e) => {
-    e.preventDefault();
-    handleEmailLogin();
-  }}
->
-  <input
-    type="email"
-    placeholder="이메일"
-    value={email}
-    onChange={(e) => setEmail(e.target.value)}
-    className="mb-3 w-full rounded-xl border p-3"
-  />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleEmailLogin();
+          }}
+        >
+          <input
+            type="email"
+            placeholder="이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="mb-3 w-full rounded-xl border p-3"
+          />
 
-  <input
-    type="password"
-    placeholder="비밀번호"
-    value={password}
-    onChange={(e) => setPassword(e.target.value)}
-    className="mb-4 w-full rounded-xl border p-3"
-  />
+          <input
+            type="password"
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="mb-4 w-full rounded-xl border p-3"
+          />
 
-  <button
-    type="submit"
-    disabled={loading}
-    className="w-full rounded-xl bg-black py-3 text-white disabled:opacity-50"
-  >
-    {loading ? "로그인 중..." : "이메일로 로그인"}
-  </button>
-</form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full cursor-pointer rounded-xl bg-black py-3 text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {loading ? "로그인 중..." : "이메일로 로그인"}
+          </button>
+        </form>
 
         <p className="mt-4 text-center text-sm text-neutral-500">
           아직 계정이 없으신가요?{" "}
-          <a href="/signup" className="font-medium text-black underline">
+          <a
+            href="/signup"
+            className="cursor-pointer font-medium text-black underline"
+          >
             회원가입
           </a>
         </p>
