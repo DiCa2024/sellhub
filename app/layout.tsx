@@ -3,6 +3,7 @@ import "./globals.css";
 import TopNav from "../components/TopNav";
 import SiteFooter from "../components/SiteFooter";
 import Providers from "./providers";
+import Script from "next/script";
 
 export const metadata = {
   title: "globalsellershop | 도매 사이트 비교 플랫폼",
@@ -22,7 +23,7 @@ export const metadata = {
     title: "globalsellershop | 도매 사이트 비교 플랫폼",
     description:
       "도매 사이트, 판매 채널, 셀러 도구를 한눈에 비교하세요.",
-    url: "https://sellhub.vercel.app",
+    url: "https://globalsellershop.com", // 🔥 이것도 수정해
     siteName: "globalsellershop",
     images: [
       {
@@ -38,11 +39,20 @@ export const metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="ko">
+      <head>
+  <Script
+    async
+    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5900744229489479"
+    crossOrigin="anonymous"
+    strategy="afterInteractive"
+  />
+</head>
+
       <body className="min-h-screen bg-neutral-50 text-neutral-900">
         <Providers>
           <TopNav />
