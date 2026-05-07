@@ -51,7 +51,21 @@ export default function RootLayout({
     crossOrigin="anonymous"
     strategy="afterInteractive"
   />
-</head>
+  <Script
+  src="https://www.googletagmanager.com/gtag/js?id=G-W1VKRT1LKZ"
+  strategy="afterInteractive"
+/>
+
+<Script id="google-analytics" strategy="afterInteractive">
+  {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-W1VKRT1LKZ');
+  `}
+</Script>
+    </head>
 
       <body className="min-h-screen bg-neutral-50 text-neutral-900">
         <Providers>
