@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ViewTracker from "./ViewTracker";
+import RecentWholesaleTracker from "./RecentWholesaleTracker";
 
 export async function generateMetadata({ params }: any) {
   const { id } = await params;
@@ -114,6 +115,15 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-neutral-50">
       <ViewTracker id={site.id} />
+      <RecentWholesaleTracker
+       site={{
+       id: site.id,
+       name: site.name,
+       imageUrl: site.imageUrl,
+       category: site.category,
+       region: site.region,
+      }}
+    />
 
       <section className="mx-auto max-w-5xl px-4 py-10">
         <Link href="/wholesale" prefetch className="text-sm text-neutral-500">

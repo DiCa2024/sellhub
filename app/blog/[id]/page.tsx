@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ViewTracker from "./ViewTracker";
+import RecentBlogTracker from "./RecentBlogTracker";
 import BlogCommentClient from "./BlogCommentClient";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -144,6 +145,13 @@ export default async function BlogDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-[calc(100vh-80px)] bg-white px-6 py-10 text-neutral-900">
       <ViewTracker id={post.id} />
+      <RecentBlogTracker
+        post={{
+        id: post.id,
+        title: post.title,
+        imageUrl: post.imageUrl,
+       }}
+     />
 
       <div className="mx-auto max-w-7xl">
         <Link

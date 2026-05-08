@@ -4,14 +4,14 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
-    const { email, password } = await req.json();
+    const { nickname, email, password } = await req.json();
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { message: "Email and password are required." },
-        { status: 400 }
-      );
-    }
+    if (!nickname || !email || !password) {
+  return NextResponse.json(
+    { message: "Nickname, email and password are required." },
+    { status: 400 }
+  );
+}
 
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -30,6 +30,7 @@ export async function POST(req: Request) {
 
     await prisma.user.create({
       data: {
+        name: nickname,
         email,
         password: hashedPassword,
         role: "USER",

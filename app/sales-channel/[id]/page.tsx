@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ViewTracker from "./ViewTracker";
+import RecentSalesChannelTracker from "./RecentSalesChannelTracker";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -127,6 +128,15 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-neutral-50">
       <ViewTracker id={channel.id} />
+      <RecentSalesChannelTracker
+       channel={{
+       id: channel.id,
+       name: channel.name,
+       imageUrl: channel.imageUrl,
+       category: channel.category,
+       region: channel.region,
+      }}
+      />
 
       <section className="mx-auto max-w-5xl px-4 py-10">
         <Link href="/sales-channel" className="text-sm text-neutral-500">

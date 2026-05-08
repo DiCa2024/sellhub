@@ -80,6 +80,9 @@ export default function TopNav() {
         <div className="flex items-center gap-3">
           {status === "loading" ? null : currentUser ? (
             <>
+            <div className="hidden text-sm font-medium text-neutral-700 md:block">
+              안녕하세요, {currentUser.name || "사용자"}님
+           </div>
               <Link
                 href="/mypage"
                 className="rounded-xl border border-neutral-300 px-4 py-2 text-sm font-medium text-neutral-700 transition hover:bg-neutral-100"

@@ -7,6 +7,8 @@ import { useState } from "react";
 export default function SignupPage() {
   const router = useRouter();
 
+  const [nickname, setNickname] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -16,10 +18,10 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
 
   const handleEmailSignup = async () => {
-    if (!email || !password) {
-      alert("Please enter email and password.");
-      return;
-    }
+    if (!nickname || !email || !password) {
+  alert("닉네임, 이메일, 비밀번호를 입력해주세요.");
+  return;
+}
 
     if (!agreeTerms || !agreePrivacy) {
       alert("Please agree to the required terms.");
@@ -35,8 +37,9 @@ export default function SignupPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email,
-          password,
+               nickname,
+               email,
+               password,
         }),
       });
 
@@ -128,6 +131,13 @@ export default function SignupPage() {
         </div>
 
         <form onSubmit={handleSubmit}>
+          <input
+             type="text"
+             placeholder="Nickname"
+             value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+             className="mb-3 w-full rounded-xl border p-3 outline-none transition focus:border-black"
+          />
           <input
             type="email"
             placeholder="Email"
