@@ -33,6 +33,7 @@ export default function LoginPage() {
       }
 
       alert("로그인되었습니다.");
+
       router.push("/");
       router.refresh();
     } catch {
@@ -46,19 +47,41 @@ export default function LoginPage() {
     signIn("google", { callbackUrl: "/" });
   };
 
+  const handleKakaoLogin = () => {
+    signIn("kakao", { callbackUrl: "/" });
+  };
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    await handleEmailLogin();
+  };
+
   return (
     <main className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-neutral-50 px-6 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
-        <h1 className="mb-2 text-center text-2xl font-bold">로그인</h1>
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
+        <h1 className="mb-2 text-center text-2xl font-bold">
+          로그인
+        </h1>
+
         <p className="mb-6 text-center text-sm text-neutral-500">
-          이메일 또는 Google 계정으로 로그인하세요.
+          이메일 또는 소셜 계정으로 로그인하세요.
         </p>
 
         <div className="space-y-3">
           <button
             type="button"
+            onClick={handleKakaoLogin}
+            className="w-full cursor-pointer rounded-xl bg-[#FEE500] py-3 font-semibold text-black transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+          >
+            카카오로 계속하기
+          </button>
+
+          <button
+            type="button"
             onClick={handleGoogleLogin}
-            className="w-full cursor-pointer rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black transition hover:bg-neutral-100"
+            className="w-full cursor-pointer rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black transition duration-200 hover:-translate-y-1 hover:bg-neutral-100 hover:shadow-lg"
           >
             Google로 계속하기
           </button>
@@ -70,18 +93,13 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleEmailLogin();
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="이메일"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mb-3 w-full rounded-xl border p-3"
+            className="mb-3 w-full rounded-xl border p-3 outline-none transition focus:border-black"
           />
 
           <input
@@ -89,13 +107,13 @@ export default function LoginPage() {
             placeholder="비밀번호"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mb-4 w-full rounded-xl border p-3"
+            className="mb-4 w-full rounded-xl border p-3 outline-none transition focus:border-black"
           />
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full cursor-pointer rounded-xl bg-black py-3 text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full cursor-pointer rounded-xl bg-black py-3 text-white transition duration-200 hover:-translate-y-1 hover:bg-neutral-800 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "로그인 중..." : "이메일로 로그인"}
           </button>
@@ -105,7 +123,7 @@ export default function LoginPage() {
           아직 계정이 없으신가요?{" "}
           <a
             href="/signup"
-            className="cursor-pointer font-medium text-black underline"
+            className="cursor-pointer font-medium text-black underline transition hover:text-neutral-600"
           >
             회원가입
           </a>

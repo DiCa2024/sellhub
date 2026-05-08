@@ -78,19 +78,44 @@ export default function SignupPage() {
     signIn("google", { callbackUrl: "/" });
   };
 
+  const handleKakaoSignup = () => {
+    if (!agreeTerms || !agreePrivacy) {
+      alert("필수 약관에 동의해주세요.");
+      return;
+    }
+
+    signIn("kakao", { callbackUrl: "/" });
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await handleEmailSignup();
+  };
+
   return (
     <main className="flex min-h-[calc(100vh-80px)] items-center justify-center bg-neutral-50 px-6 py-12">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow">
-        <h1 className="mb-2 text-center text-2xl font-bold">Create account</h1>
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
+        <h1 className="mb-2 text-center text-2xl font-bold">
+          Create account
+        </h1>
+
         <p className="mb-6 text-center text-sm text-neutral-500">
-          이메일 또는 Google 계정으로 globalsellershop에 가입하세요.
+          이메일 또는 소셜 계정으로 globalsellershop에 가입하세요.
         </p>
 
         <div className="space-y-3">
           <button
             type="button"
+            onClick={handleKakaoSignup}
+            className="w-full cursor-pointer rounded-xl bg-[#FEE500] py-3 font-semibold text-black transition duration-200 hover:-translate-y-1 hover:shadow-lg"
+          >
+            카카오로 회원가입
+          </button>
+
+          <button
+            type="button"
             onClick={handleGoogleSignup}
-            className="w-full rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black"
+            className="w-full cursor-pointer rounded-xl border border-neutral-300 bg-white py-3 font-semibold text-black transition duration-200 hover:-translate-y-1 hover:shadow-lg"
           >
             Google로 회원가입
           </button>
@@ -102,53 +127,58 @@ export default function SignupPage() {
           <div className="h-px flex-1 bg-neutral-200" />
         </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="mb-3 w-full rounded-xl border p-3"
-        />
+        <form onSubmit={handleSubmit}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="mb-3 w-full rounded-xl border p-3 outline-none transition focus:border-black"
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="mb-4 w-full rounded-xl border p-3"
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="mb-4 w-full rounded-xl border p-3 outline-none transition focus:border-black"
+          />
 
-        <div className="mb-4 space-y-2 text-sm">
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={agreeTerms}
-              onChange={() => setAgreeTerms(!agreeTerms)}
-            />
-            서비스 이용약관에 동의합니다 (필수)
-          </label>
+          <div className="mb-4 space-y-2 text-sm">
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                checked={agreeTerms}
+                onChange={() => setAgreeTerms(!agreeTerms)}
+              />
+              서비스 이용약관에 동의합니다 (필수)
+            </label>
 
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={agreePrivacy}
-              onChange={() => setAgreePrivacy(!agreePrivacy)}
-            />
-            개인정보 처리방침에 동의합니다 (필수)
-          </label>
-        </div>
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                checked={agreePrivacy}
+                onChange={() => setAgreePrivacy(!agreePrivacy)}
+              />
+              개인정보 처리방침에 동의합니다 (필수)
+            </label>
+          </div>
 
-        <button
-          onClick={handleEmailSignup}
-          disabled={loading}
-          className="w-full rounded-xl bg-black py-3 text-white disabled:opacity-50"
-        >
-          {loading ? "Creating..." : "이메일로 회원가입"}
-        </button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full cursor-pointer rounded-xl bg-black py-3 text-white transition duration-200 hover:-translate-y-1 hover:bg-neutral-800 hover:shadow-lg disabled:opacity-50"
+          >
+            {loading ? "Creating..." : "이메일로 회원가입"}
+          </button>
+        </form>
 
         <p className="mt-4 text-center text-sm text-neutral-500">
           이미 계정이 있으신가요?{" "}
-          <a href="/login" className="font-medium text-black underline">
+          <a
+            href="/login"
+            className="cursor-pointer font-medium text-black underline transition hover:text-neutral-600"
+          >
             Login
           </a>
         </p>
