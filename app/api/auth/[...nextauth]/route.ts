@@ -1,6 +1,5 @@
 import NextAuth from "next-auth";
 import KakaoProvider from "next-auth/providers/kakao";
-import NaverProvider from "next-auth/providers/naver";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
@@ -17,29 +16,25 @@ const handler = NextAuth({
   },
 
   providers: [
-   KakaoProvider({
-  clientId: process.env.KAKAO_CLIENT_ID!,
-  clientSecret: process.env.KAKAO_CLIENT_SECRET!,
-  allowDangerousEmailAccountLinking: true,
+    KakaoProvider({
+      clientId: process.env.KAKAO_CLIENT_ID!,
+      clientSecret: process.env.KAKAO_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
 
-  authorization: {
-    params: {
-      scope: "profile_nickname profile_image account_email",
-    },
-  },
+      authorization: {
+        params: {
+          scope: "profile_nickname account_email",
+        },
+      },
 
-  profile(profile) {
-    return {
-      id: String(profile.id),
-      name: profile.kakao_account?.profile?.nickname ?? null,
-      email: profile.kakao_account?.email ?? null,
-      image: profile.kakao_account?.profile?.profile_image_url ?? null,
-    };
-  },
-}),
-    NaverProvider({
-      clientId: process.env.NAVER_CLIENT_ID!,
-      clientSecret: process.env.NAVER_CLIENT_SECRET!,
+      profile(profile) {
+        return {
+          id: String(profile.id),
+          name: profile.kakao_account?.profile?.nickname ?? null,
+          email: profile.kakao_account?.email ?? null,
+          image: null,
+        };
+      },
     }),
 
     GoogleProvider({
