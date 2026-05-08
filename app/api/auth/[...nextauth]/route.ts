@@ -21,6 +21,21 @@ const handler = NextAuth({
   clientId: process.env.KAKAO_CLIENT_ID!,
   clientSecret: process.env.KAKAO_CLIENT_SECRET!,
   allowDangerousEmailAccountLinking: true,
+
+  authorization: {
+    params: {
+      scope: "profile_nickname profile_image account_email",
+    },
+  },
+
+  profile(profile) {
+    return {
+      id: String(profile.id),
+      name: profile.kakao_account?.profile?.nickname ?? null,
+      email: profile.kakao_account?.email ?? null,
+      image: profile.kakao_account?.profile?.profile_image_url ?? null,
+    };
+  },
 }),
     NaverProvider({
       clientId: process.env.NAVER_CLIENT_ID!,
