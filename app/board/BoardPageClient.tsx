@@ -107,19 +107,19 @@ const [isLoading] = useState(false);
           </div>
 
          {status === "loading" ? null : currentUser ? (
-            <a
+            <Link
               href="/board/write"
               className="inline-flex rounded-xl bg-black px-4 py-3 text-sm font-medium text-white hover:opacity-90"
             >
               글쓰기
-            </a>
+            </Link>
           ) : (
-            <a
+            <Link
               href="/login"
               className="inline-flex rounded-xl border px-4 py-3 text-sm font-medium hover:bg-neutral-100"
             >
               로그인 후 글쓰기
-            </a>
+            </Link>
           )}
         </div>
 
@@ -223,14 +223,14 @@ const [isLoading] = useState(false);
         <section className="mt-14">
   <div className="mb-6 flex items-center justify-between">
     <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
-    <a href="/wholesale" className="text-sm font-medium text-neutral-600 hover:text-black">
+    <Link href="/wholesale" className="text-sm font-medium text-neutral-600 hover:text-black">
       전체 보기 →
-    </a>
+    </Link>
   </div>
 
   <div className="grid gap-6 md:grid-cols-4">
     {latestSites.map((site) => (
-      <a
+      <Link
         key={site.id}
         href={`/wholesale/${site.id}`}
         className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -249,7 +249,7 @@ const [isLoading] = useState(false);
         <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
           {site.name}
         </h3>
-      </a>
+      </Link>
     ))}
   </div>
 </section>
@@ -258,14 +258,14 @@ const [isLoading] = useState(false);
         <section className="mt-14">
   <div className="mb-6 flex items-center justify-between">
     <h2 className="text-2xl font-bold">최신 블로그</h2>
-    <a href="/blog" className="text-sm font-medium text-neutral-600 hover:text-black">
+    <Link href="/blog" className="text-sm font-medium text-neutral-600 hover:text-black">
       전체 보기 →
-    </a>
+    </Link>
   </div>
 
   <div className="grid gap-6 md:grid-cols-4">
     {latestBlogs.map((blog) => (
-      <a
+      <Link
         key={blog.id}
         href={`/blog/${blog.id}`}
         className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -284,7 +284,7 @@ const [isLoading] = useState(false);
         <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
           {blog.title}
         </h3>
-      </a>
+      </Link>
     ))}
   </div>
 </section>
@@ -292,14 +292,14 @@ const [isLoading] = useState(false);
        <section className="mt-16">
   <div className="mb-6 flex items-center justify-between">
     <h2 className="text-2xl font-bold">Seller Tools</h2>
-    <a href="/sellertool" className="text-sm font-medium text-neutral-600 hover:text-black">
+    <Link href="/sellertool" className="text-sm font-medium text-neutral-600 hover:text-black">
       전체 보기 →
-    </a>
+    </Link>
   </div>
 
   <div className="grid gap-6 md:grid-cols-4">
     {sellerTools.map((tool) => (
-      <a
+      <Link
         key={tool.id}
         href={tool.href}
         className="flex min-h-[150px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -310,7 +310,7 @@ const [isLoading] = useState(false);
             {tool.description}
           </p>
         )}
-      </a>
+      </Link>
     ))}
   </div>
 </section>

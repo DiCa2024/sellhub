@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+
 
 const SALES_CHANNEL_FEE_CATEGORIES = [
   { key: "fashion", label: "패션" },
@@ -83,12 +85,12 @@ export default function SalesChannelCompareClient({
           <p className="mt-3 text-sm text-neutral-600">
             판매 채널 비교 페이지는 로그인한 회원만 이용할 수 있습니다.
           </p>
-          <a
+          <Link
             href="/login"
             className="mt-6 inline-flex rounded-xl bg-black px-4 py-3 text-sm text-white"
           >
             로그인하러 가기
-          </a>
+          </Link>
         </div>
       </main>
     );
@@ -97,12 +99,12 @@ export default function SalesChannelCompareClient({
   return (
     <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-7xl">
-        <a
+        <Link
           href="/sales-channel"
           className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
         >
           ← 판매 채널로 돌아가기
-        </a>
+        </Link>
 
         <div className="mt-4 flex items-center justify-between">
           <div>
@@ -128,12 +130,12 @@ export default function SalesChannelCompareClient({
             <p className="mt-3 text-sm text-neutral-600">
               판매 채널 목록에서 비교 버튼을 눌러 추가해 주세요.
             </p>
-            <a
+            <Link
               href="/sales-channel"
               className="mt-6 inline-flex rounded-xl bg-black px-4 py-3 text-sm text-white"
             >
               판매 채널 보러가기
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="mt-10 overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">

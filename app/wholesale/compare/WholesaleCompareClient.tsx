@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+
 
 const QUICK_FILTERS = [
   { key: "dropshipping-yes", label: "위탁배송 가능" },
@@ -163,12 +165,12 @@ export default function WholesaleCompareClient({
           <p className="mt-3 text-sm text-neutral-600">
             도매 사이트 비교 페이지는 로그인한 회원만 이용할 수 있습니다.
           </p>
-          <a
+          <Link
             href="/login"
             className="mt-6 inline-flex rounded-xl bg-black px-4 py-3 text-sm text-white"
           >
             로그인하러 가기
-          </a>
+          </Link>
         </div>
       </main>
     );
@@ -177,12 +179,12 @@ export default function WholesaleCompareClient({
   return (
     <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-7xl">
-        <a
+        <Link
           href="/wholesale"
           className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
         >
           ← 도매 사이트로 돌아가기
-        </a>
+        </Link>
 
         <div className="mt-4">
           <h1 className="text-3xl font-bold">도매 사이트 비교</h1>
@@ -280,12 +282,12 @@ export default function WholesaleCompareClient({
             )}
 
             <div className="mt-6 flex justify-center gap-3">
-              <a
+              <Link
                 href="/wholesale"
                 className="rounded-xl bg-black px-4 py-3 text-sm text-white"
               >
                 도매 사이트 보러가기
-              </a>
+              </Link>
 
               {compareIds.length > 0 && (
                 <button
@@ -424,17 +426,17 @@ export default function WholesaleCompareClient({
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
-            <a
+            <Link
               href="/wholesale"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
             {recommendedSites.map((site) => (
-              <a
+              <Link
                 key={site.id}
                 href={`/wholesale/${site.id}`}
                 className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
@@ -459,7 +461,7 @@ export default function WholesaleCompareClient({
                     {site.name}
                   </h3>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
@@ -467,17 +469,17 @@ export default function WholesaleCompareClient({
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">블로그</h2>
-            <a
+            <Link
               href="/blog"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
             {latestBlogPosts.map((post) => (
-              <a
+              <Link
                 key={post.id}
                 href={`/blog/${post.id}`}
                 className="block overflow-hidden bg-white transition hover:-translate-y-0.5"
@@ -501,7 +503,7 @@ export default function WholesaleCompareClient({
                     {post.title}
                   </h3>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
@@ -509,23 +511,23 @@ export default function WholesaleCompareClient({
         <section className="mt-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Seller Tools</h2>
-            <a
+            <Link
               href="/sellertool"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
             {sellerTools.map((tool) => (
-              <a
+              <Link
                 key={tool.id}
                 href={tool.href}
                 className="rounded-2xl bg-neutral-100 p-6 text-center transition hover:-translate-y-0.5"
               >
                 <h3 className="font-bold">{tool.title}</h3>
-              </a>
+              </Link>
             ))}
           </div>
         </section>

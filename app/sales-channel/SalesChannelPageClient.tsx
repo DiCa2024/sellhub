@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 const ITEMS_PER_PAGE = 20;
 const REGION_ITEMS = ["전체", "국내", "해외"];
@@ -249,12 +250,12 @@ export default function SalesChannelPageClient({
                 <span className="ml-1 text-neutral-500">(최대 10개)</span>
               </div>
 
-              <a
+              <Link
                 href="/sales-channel/compare"
                 className="rounded-xl bg-black px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
                 비교하러 가기
-              </a>
+              </Link>
             </div>
 
             <div className="grid gap-3 md:grid-cols-5">
@@ -264,12 +265,12 @@ export default function SalesChannelPageClient({
                   className="flex items-center justify-between rounded-xl border border-neutral-200 px-4 py-3"
                 >
                   <div className="min-w-0">
-                    <a
+                    <Link
                       href={`/sales-channel/${channel.id}`}
                       className="block truncate text-sm font-semibold text-neutral-900 hover:underline"
                     >
                       {channel.name}
-                    </a>
+                    </Link>
 
                     <div className="mt-1 truncate text-xs text-neutral-500">
                       {channel.category || "-"} · {channel.region || "-"}
@@ -326,7 +327,7 @@ export default function SalesChannelPageClient({
                       className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3 hover:bg-neutral-50"
                     >
                       <div className="flex min-w-0 items-center gap-4">
-                        <a
+                        <Link
                           href={`/sales-channel/${channel.id}`}
                           className="shrink-0"
                         >
@@ -344,15 +345,15 @@ export default function SalesChannelPageClient({
                               }}
                             />
                           </div>
-                        </a>
+                        </Link>
 
                         <div className="min-w-0 whitespace-nowrap overflow-hidden text-ellipsis text-sm text-neutral-800">
-                          <a
+                          <Link
                             href={`/sales-channel/${channel.id}`}
                             className="font-semibold text-neutral-900 hover:underline"
                           >
                             {channel.name}
-                          </a>
+                          </Link>
 
                           <span className="mx-2 text-neutral-400">·</span>
                           <span>{channel.category || "-"}</span>
@@ -369,12 +370,12 @@ export default function SalesChannelPageClient({
                       </div>
 
                       <div className="ml-4 flex shrink-0 gap-2">
-                        <a
+                        <Link
                           href={`/sales-channel/${channel.id}`}
                           className="rounded-lg border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-100"
                         >
                           상세
-                        </a>
+                        </Link>
 
                         <button
                           onClick={() => handleCompareToggle(channel.id)}
@@ -419,17 +420,17 @@ export default function SalesChannelPageClient({
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Seller Tools</h2>
 
-            <a
+            <Link
               href="/sellertool"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
             {sellerTools.map((tool) => (
-              <a
+              <Link
                 key={tool.id}
                 href={tool.href}
                 className="rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -439,7 +440,7 @@ export default function SalesChannelPageClient({
                 <p className="mt-3 text-sm leading-6 text-neutral-600">
                   {tool.description}
                 </p>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
@@ -464,12 +465,12 @@ function RecommendSection({
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>
 
-        <a
+        <Link
           href={href}
           className="text-sm font-medium text-neutral-600 hover:text-black"
         >
           전체 보기 →
-        </a>
+        </Link>
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
@@ -483,7 +484,7 @@ function RecommendSection({
               : "https://placehold.co/600x400?text=Wholesale";
 
           return (
-            <a
+            <Link
               key={item.id}
               href={link}
               className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -502,7 +503,7 @@ function RecommendSection({
               <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
                 {titleText}
               </h3>
-            </a>
+            </Link>
           );
         })}
       </div>

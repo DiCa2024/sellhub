@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function SellertoolPageClient({
   initialSites,
   initialChannels,
@@ -87,12 +89,12 @@ export default function SellertoolPageClient({
               </p>
 
               <div className="mt-auto pt-5">
-                <a
+                <Link
                   href={tool.href}
                   className="block w-full rounded-xl bg-black px-4 py-3 text-center text-sm font-medium text-white hover:opacity-90"
                 >
                   도구 열기
-                </a>
+                </Link>
               </div>
             </div>
           ))}
@@ -101,14 +103,14 @@ export default function SellertoolPageClient({
         <section className="mt-16">
   <div className="mb-6 flex items-center justify-between">
     <h2 className="text-2xl font-bold">최신 도매 사이트</h2>
-    <a href="/wholesale" className="text-sm font-medium text-neutral-600 hover:text-black">
+    <Link href="/wholesale" className="text-sm font-medium text-neutral-600 hover:text-black">
       전체 보기 →
-    </a>
+    </Link>
   </div>
 
   <div className="grid gap-6 md:grid-cols-4">
     {latestSites.map((site) => (
-      <a
+      <Link
         key={site.id}
         href={`/wholesale/${site.id}`}
         className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -127,7 +129,7 @@ export default function SellertoolPageClient({
         <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
           {site.name}
         </h3>
-      </a>
+      </Link>
     ))}
   </div>
 </section>
@@ -135,14 +137,14 @@ export default function SellertoolPageClient({
         <section className="mt-16">
   <div className="mb-6 flex items-center justify-between">
     <h2 className="text-2xl font-bold">판매 채널</h2>
-    <a href="/sales-channel" className="text-sm font-medium text-neutral-600 hover:text-black">
+    <Link href="/sales-channel" className="text-sm font-medium text-neutral-600 hover:text-black">
       전체 보기 →
-    </a>
+    </Link>
   </div>
 
   <div className="grid gap-6 md:grid-cols-4">
     {latestChannels.map((channel) => (
-      <a
+      <Link
         key={channel.id}
         href={`/sales-channel/${channel.id}`}
         className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -161,21 +163,21 @@ export default function SellertoolPageClient({
         <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
           {channel.name}
         </h3>
-      </a>
+      </Link>
     ))}
   </div>
 </section>
 <section className="mt-16">
   <div className="mb-6 flex items-center justify-between">
     <h2 className="text-2xl font-bold">블로그</h2>
-    <a href="/blog" className="text-sm font-medium text-neutral-600 hover:text-black">
+    <Link href="/blog" className="text-sm font-medium text-neutral-600 hover:text-black">
       전체 보기 →
-    </a>
+    </Link>
   </div>
 
   <div className="grid gap-6 md:grid-cols-4">
     {latestBlogs.map((blog) => (
-      <a
+      <Link
         key={blog.id}
         href={`/blog/${blog.id}`}
         className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
@@ -194,7 +196,7 @@ export default function SellertoolPageClient({
         <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
           {blog.title}
         </h3>
-      </a>
+      </Link>
     ))}
   </div>
 </section>

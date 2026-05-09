@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 const POSTS_PER_PAGE = 6;
 
@@ -145,7 +146,7 @@ export default function BlogPageClient({
         {featuredPost ? (
           <section className="mb-16 grid gap-8 lg:grid-cols-[1.35fr_0.75fr]">
             <div>
-              <a
+              <Link
                 href={`/blog/${featuredPost.id}`}
                 className="group block overflow-hidden rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
@@ -178,7 +179,7 @@ export default function BlogPageClient({
                     조회수 {featuredPost.views ?? 0}
                   </div>
                 </div>
-              </a>
+              </Link>
 
               <div className="mt-6 grid gap-5 md:grid-cols-2">
                 {subPosts.map((post) => (
@@ -192,7 +193,7 @@ export default function BlogPageClient({
                 <h2 className="mb-5 text-xl font-bold">인기 글 TOP 5</h2>
                 <div className="space-y-4">
                   {popularPosts.map((post, index) => (
-                    <a
+                    <Link
                       key={post.id}
                       href={`/blog/${post.id}`}
                       className="flex gap-3 rounded-2xl p-2 transition hover:bg-neutral-50"
@@ -208,7 +209,7 @@ export default function BlogPageClient({
                           조회수 {post.views ?? 0}
                         </p>
                       </div>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -217,7 +218,7 @@ export default function BlogPageClient({
                 <h2 className="mb-5 text-xl font-bold">추천 글</h2>
                 <div className="space-y-4">
                   {sidePosts.map((post) => (
-                    <a
+                    <Link
                       key={post.id}
                       href={`/blog/${post.id}`}
                       className="flex gap-4 rounded-2xl p-2 transition hover:bg-neutral-50"
@@ -244,7 +245,7 @@ export default function BlogPageClient({
                           {post.category}
                         </p>
                       </div>
-                    </a>
+                    </Link>
                   ))}
                 </div>
               </div>
@@ -296,23 +297,23 @@ export default function BlogPageClient({
         <section>
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold">Seller Tools</h2>
-            <a
+            <Link
               href="/sellertool"
               className="text-sm font-medium text-neutral-600 hover:text-black"
             >
               전체 보기 →
-            </a>
+            </Link>
           </div>
 
           <div className="grid gap-6 md:grid-cols-4">
             {sellerTools.map((tool) => (
-              <a
+              <Link
                 key={tool.id}
                 href={tool.href}
                 className="rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <h3 className="font-bold">{tool.title}</h3>
-              </a>
+              </Link>
             ))}
           </div>
         </section>
@@ -323,7 +324,7 @@ export default function BlogPageClient({
 
 function BlogSmallCard({ post }: { post: any }) {
   return (
-    <a
+    <Link
       href={`/blog/${post.id}`}
       className="block rounded-[24px] border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
@@ -340,13 +341,13 @@ function BlogSmallCard({ post }: { post: any }) {
       <h3 className="mt-3 line-clamp-2 text-base font-bold leading-6">
         {post.title}
       </h3>
-    </a>
+    </Link>
   );
 }
 
 function BlogCard({ post }: { post: any }) {
   return (
-    <a
+    <Link
       href={`/blog/${post.id}`}
       className="flex h-full flex-col rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
@@ -376,7 +377,7 @@ function BlogCard({ post }: { post: any }) {
       <div className="mt-auto pt-4 text-xs text-neutral-500">
         조회수 {post.views ?? 0}
       </div>
-    </a>
+    </Link>
   );
 }
 
@@ -395,17 +396,17 @@ function RecommendSection({
     <section className="mb-16">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>
-        <a
+        <Link
           href={href}
           className="text-sm font-medium text-neutral-600 hover:text-black"
         >
           전체 보기 →
-        </a>
+        </Link>
       </div>
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
-          <a
+          <Link
             key={item.id}
             href={`/${type === "site" ? "wholesale" : "sales-channel"}/${
               item.id
@@ -433,7 +434,7 @@ function RecommendSection({
             <h3 className="mt-3 line-clamp-2 text-center text-sm font-bold leading-6">
               {item.name}
             </h3>
-          </a>
+          </Link>
         ))}
       </div>
     </section>
