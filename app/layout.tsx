@@ -5,10 +5,13 @@ import SiteFooter from "../components/SiteFooter";
 import Providers from "./providers";
 import Script from "next/script";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "globalsellershop | 도매 사이트 비교 플랫폼",
   description:
     "국내외 도매 사이트, 판매 채널, 셀러 도구를 한곳에서 비교하고 탐색하세요.",
+  verification: {
+    google: "sJx0",
+  },
   keywords: [
     "도매 사이트",
     "도매 쇼핑몰",
@@ -21,9 +24,8 @@ export const metadata = {
   ],
   openGraph: {
     title: "globalsellershop | 도매 사이트 비교 플랫폼",
-    description:
-      "도매 사이트, 판매 채널, 셀러 도구를 한눈에 비교하세요.",
-    url: "https://globalsellershop.com", // 🔥 이것도 수정해
+    description: "도매 사이트, 판매 채널, 셀러 도구를 한눈에 비교하세요.",
+    url: "https://globalsellershop.com",
     siteName: "globalsellershop",
     images: [
       {
@@ -44,37 +46,34 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head>
-  <Script
-    async
-    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5900744229489479"
-    crossOrigin="anonymous"
-    strategy="afterInteractive"
-  />
-  <Script
-  src="https://www.googletagmanager.com/gtag/js?id=G-W1VKRT1LKZ"
-  strategy="afterInteractive"
-/>
-
-<Script id="google-analytics" strategy="afterInteractive">
-  {`
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'G-W1VKRT1LKZ');
-  `}
-</Script>
-<meta name="google-site-verification: googleb678919855591be4.html"
-       content="sJx0" />
-    </head>
-
       <body className="min-h-screen bg-neutral-50 text-neutral-900">
         <Providers>
           <TopNav />
           {children}
           <SiteFooter />
         </Providers>
+
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5900744229489479"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
+
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-W1VKRT1LKZ"
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-W1VKRT1LKZ');
+          `}
+        </Script>
       </body>
     </html>
   );
