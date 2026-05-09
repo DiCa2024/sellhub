@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     "국내외 도매 사이트, 판매 채널, 셀러 도구를 한곳에서 비교하고 탐색하세요.",
   verification: {
-    google: "sJx0",
+    google: "sJx0DMcLLfpbBxgwS5E6NFgAl9F-X-mbQQdHApttpfA",
   },
   keywords: [
     "도매 사이트",
