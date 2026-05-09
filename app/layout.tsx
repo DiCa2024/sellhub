@@ -65,6 +65,8 @@ export default function RootLayout({
     gtag('config', 'G-W1VKRT1LKZ');
   `}
 </Script>
+<meta> name="google-site-verification=sJx0DMcLLfpbBxgwS5E6NFgAl9F-X-mbQQdHApttpfA"
+       content="sJx0" /</meta>
     </head>
 
       <body className="min-h-screen bg-neutral-50 text-neutral-900">
