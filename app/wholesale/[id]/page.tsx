@@ -139,11 +139,11 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
           >
            <Image
             src={
-                   site.imageUrl &&
-                site.imageUrl.startsWith("http")
-                ? site.imageUrl
-              : PLACEHOLDER
-             }
+                  site.imageUrl?.trim() &&
+                  site.imageUrl.trim().startsWith("http")
+                  ? site.imageUrl.trim()
+                  : PLACEHOLDER
+               }
               alt={site.name}
               width={1200}
               height={800}

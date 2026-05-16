@@ -69,6 +69,20 @@ model Blog {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+model SeoPost {
+  id          Int      @id @default(autoincrement())
+  title       String
+  slug        String   @unique
+  category    String
+  excerpt     String
+  content     String
+  imageUrl    String?
+  views       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model BlogComment {
   id        Int      @id @default(autoincrement())
   blogId    Int

@@ -332,7 +332,7 @@ function SimpleSection({
     <div className="cursor-pointer">
       <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
         <Image
-          src={item.imageUrl || "https://placehold.co/600x400?text=Item"}
+          src={item.imageUrl.trim() || "https://placehold.co/600x400?text=Item"}
           alt={item.name}
           width={300}
           height={200}

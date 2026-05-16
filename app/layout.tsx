@@ -21,6 +21,8 @@ export const metadata: Metadata = {
     "쿠팡 판매",
     "스마트스토어",
     "셀러 도구",
+    "e도매",
+    "b2b",
   ],
   openGraph: {
     title: "globalsellershop | 도매 사이트 비교 플랫폼",

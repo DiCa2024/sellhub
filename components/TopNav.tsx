@@ -29,6 +29,31 @@ export default function TopNav() {
     });
   };
 
+  function SubMenuGroup({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; href: string }[];
+}) {
+  return (
+    <div>
+      <h3 className="mb-3 text-sm font-bold text-neutral-900">{title}</h3>
+      <div className="space-y-2">
+        {items.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="block text-sm leading-6 text-neutral-600 transition hover:text-black"
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
   return (
     <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
@@ -50,23 +75,29 @@ export default function TopNav() {
 
           <nav className="hidden items-center gap-6 md:flex">
             <Link href="/wholesale" className={navLinkClass("/wholesale")}>
-              도매사이트
+              Wholesale
             </Link>
 
             <Link href="/sales-channel" className={navLinkClass("/sales-channel")}>
-              판매 채널
+              Sales Channel
             </Link>
 
+             <Link href="/seo" className={navLinkClass("/seo")}>
+    SEO
+  </Link>
+           
             <Link href="/blog" className={navLinkClass("/blog")}>
-              블로그
+              Blog
             </Link>
+
+             
 
             <Link href="/sellertool" className={navLinkClass("/sellertool")}>
-              셀러툴
+              Seller Tool
             </Link>
 
             <Link href="/board" className={navLinkClass("/board")}>
-              게시판
+              Board
             </Link>
 
             {isAdmin && (

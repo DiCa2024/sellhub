@@ -367,7 +367,7 @@ function ImageCard({
     <>
       <div className="overflow-hidden rounded-2xl bg-neutral-100">
         <Image
-          src={src || PLACEHOLDER}
+          src={src?.trim() || PLACEHOLDER}
           alt={alt}
           width={1200}
           height={800}
