@@ -164,7 +164,7 @@ export default function SeoPageClient({
 function SeoCard({ post }: { post: any }) {
   return (
     <Link
-      href={`/seo/${post.category}/${post.slug}`}
+      href={`/seo/${post.category.trim()}/${post.slug.trim()}`}
       className="flex h-full flex-col rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="h-44 overflow-hidden rounded-2xl bg-neutral-100">
