@@ -24,21 +24,31 @@ export async function generateMetadata({ params }: any) {
     };
   }
 
-  return {
+  const imageUrl =
+  post.imageUrl?.trim() ||
+  "https://placehold.co/1200x800?text=Blog";
+
+const description =
+  post.excerpt ||
+  post.content.slice(0, 120);
+
+return {
+  title: `${post.title} | globalsellershop 블로그`,
+  description,
+
+  openGraph: {
     title: `${post.title} | globalsellershop 블로그`,
-    description: post.excerpt,
-    openGraph: {
-      title: `${post.title} | globalsellershop 블로그`,
-      description: post.excerpt,
-      images: [
-        {
-          url: post.imageUrl,
-          width: 1200,
-          height: 800,
-        },
-      ],
-    },
-  };
+    description,
+
+    images: [
+      {
+        url: imageUrl,
+        width: 1200,
+        height: 800,
+      },
+    ],
+  },
+};
 }
 
 
