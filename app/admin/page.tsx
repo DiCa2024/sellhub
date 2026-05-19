@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type AdminTab = "wholesale" | "sales" | "blog";
+type AdminTab = "wholesale" | "sales" | "blog" | "seo";
 
 const SALES_CHANNEL_FEE_CATEGORIES = [
   { key: "fashion", label: "패션" },
@@ -67,6 +67,15 @@ type BlogForm = {
   imageUrl: string;
 };
 
+type SeoForm = {
+  title: string;
+  category: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  imageUrl: string;
+};
+
 const emptyWholesaleForm: WholesaleForm = {
   category: "",
   name: "",
@@ -100,6 +109,15 @@ const emptyBlogForm: BlogForm = {
   imageUrl: "",
 };
 
+const emptySeoForm: SeoForm = {
+  title: "",
+  category: "",
+  slug: "",
+  excerpt: "",
+  content: "",
+  imageUrl: "",
+};
+
 
 
 export default function AdminPage() {
@@ -108,22 +126,53 @@ export default function AdminPage() {
   const [sites, setSites] = useState<any[]>([]);
   const [channels, setChannels] = useState<any[]>([]);
   const [posts, setPosts] = useState<any[]>([]);
+  const [seoPosts, setSeoPosts] = useState<any[]>([]);
 
   const [wholesaleForm, setWholesaleForm] =
     useState<WholesaleForm>(emptyWholesaleForm);
   const [salesForm, setSalesForm] =
     useState<SalesChannelForm>(emptySalesChannelForm);
   const [blogForm, setBlogForm] = useState<BlogForm>(emptyBlogForm);
+  const [seoForm, setSeoForm] = useState<SeoForm>(emptySeoForm);
 
   const [editingWholesaleId, setEditingWholesaleId] = useState<string | null>(
     null
   );
   const [editingSalesId, setEditingSalesId] = useState<string | null>(null);
   const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
+  const [editingSeoId, setEditingSeoId] = useState<string | null>(null);
 
-  const visibleSites = sites.slice(0, 5);
-  const visibleChannels = channels.slice(0, 5);
-  const visiblePosts = posts.slice(0, 5);
+  const ITEMS_PER_PAGE = 5;
+
+const [sitePage, setSitePage] = useState(1);
+const [channelPage, setChannelPage] = useState(1);
+const [blogPage, setBlogPage] = useState(1);
+const [seoPage, setSeoPage] = useState(1);
+
+const visibleSites = sites.slice(
+  (sitePage - 1) * ITEMS_PER_PAGE,
+  sitePage * ITEMS_PER_PAGE
+);
+
+const visibleChannels = channels.slice(
+  (channelPage - 1) * ITEMS_PER_PAGE,
+  channelPage * ITEMS_PER_PAGE
+);
+
+const visiblePosts = posts.slice(
+  (blogPage - 1) * ITEMS_PER_PAGE,
+  blogPage * ITEMS_PER_PAGE
+);
+
+const visibleSeoPosts = seoPosts.slice(
+  (seoPage - 1) * ITEMS_PER_PAGE,
+  seoPage * ITEMS_PER_PAGE
+);
+
+const siteTotalPages = Math.max(1, Math.ceil(sites.length / ITEMS_PER_PAGE));
+const channelTotalPages = Math.max(1, Math.ceil(channels.length / ITEMS_PER_PAGE));
+const blogTotalPages = Math.max(1, Math.ceil(posts.length / ITEMS_PER_PAGE));
+const seoTotalPages = Math.max(1, Math.ceil(seoPosts.length / ITEMS_PER_PAGE));
 
   useEffect(() => {
   const loadAdminData = async () => {
@@ -152,6 +201,13 @@ export default function AdminPage() {
          setPosts(blogData.data);
          } 
 
+     const seoRes = await fetch("/api/seo-post");
+     const seoData = await seoRes.json();
+
+     if (seoData.success) {
+          setSeoPosts(seoData.data);
+      }
+
     } catch (error) {
       console.error("관리자 데이터 로딩 오류:", error);
     }
@@ -174,6 +230,12 @@ export default function AdminPage() {
     setBlogForm(emptyBlogForm);
     setEditingBlogId(null);
   };
+
+  const resetSeoForm = () => {
+  setSeoForm(emptySeoForm);
+  setEditingSeoId(null);
+  };
+
 
 const saveWholesale = async () => {
   if (editingWholesaleId) {
@@ -568,6 +630,116 @@ const saveBlogPost = async () => {
   }
 };
 
+const saveSeoPost = async () => {
+  if (
+    !seoForm.title.trim() ||
+    !seoForm.category.trim() ||
+    !seoForm.slug.trim() ||
+    !seoForm.excerpt.trim() ||
+    !seoForm.content.trim()
+  ) {
+    alert("SEO 글은 제목, 카테고리, slug, 요약, 본문이 필수입니다.");
+    return;
+  }
+
+  const payload = {
+    title: seoForm.title.trim(),
+    category: seoForm.category.trim(),
+    slug: seoForm.slug.trim(),
+    excerpt: seoForm.excerpt.trim(),
+    content: seoForm.content.trim(),
+    imageUrl: seoForm.imageUrl.trim(),
+  };
+
+  if (editingSeoId) {
+    const res = await fetch(`/api/seo-post/${editingSeoId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await res.json();
+
+    if (!result.success) {
+      alert("SEO 글 수정 실패");
+      return;
+    }
+
+    alert("SEO 글 수정 완료");
+
+    const refreshed = await fetch("/api/seo-post");
+    const data = await refreshed.json();
+
+    if (data.success) {
+      setSeoPosts(data.data);
+    }
+
+    resetSeoForm();
+    return;
+  }
+
+  const res = await fetch("/api/seo-post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const result = await res.json();
+
+  if (!result.success) {
+    alert(result.message || "SEO 글 등록 실패");
+    return;
+  }
+
+  alert("SEO 글이 등록되었습니다.");
+
+  const refreshed = await fetch("/api/seo-post");
+  const data = await refreshed.json();
+
+  if (data.success) {
+    setSeoPosts(data.data);
+  }
+
+  resetSeoForm();
+};
+
+const editSeoPost = (item: any) => {
+  setActiveTab("seo");
+  setEditingSeoId(String(item.id));
+  setSeoForm({
+    title: item.title || "",
+    category: item.category || "",
+    slug: item.slug || "",
+    excerpt: item.excerpt || "",
+    content: item.content || "",
+    imageUrl: item.imageUrl || "",
+  });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const deleteSeoPost = async (id: string) => {
+  if (!confirm("삭제할까요?")) return;
+
+  const res = await fetch(`/api/seo-post/${id}`, {
+    method: "DELETE",
+  });
+
+  const result = await res.json();
+
+  if (!result.success) {
+    alert("SEO 글 삭제 실패");
+    return;
+  }
+
+  alert("SEO 글 삭제 완료");
+
+  setSeoPosts((prev) => prev.filter((item) => item.id !== Number(id)));
+};
+
   return (
     <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-10">
       <div className="mx-auto max-w-7xl">
@@ -593,6 +765,11 @@ const saveBlogPost = async () => {
             active={activeTab === "blog"}
             onClick={() => setActiveTab("blog")}
             label="블로그 관리"
+          />
+          <TabButton
+            active={activeTab === "seo"}
+            onClick={() => setActiveTab("seo")}
+            label="SEO 관리"
           />
         </div>
 
@@ -753,6 +930,11 @@ const saveBlogPost = async () => {
                   ))
                 )}
               </div>
+              <Pagination
+                page={sitePage}
+                totalPages={siteTotalPages}
+                onChange={setSitePage}
+              />
             </section>
           </div>
         )}
@@ -910,6 +1092,11 @@ const saveBlogPost = async () => {
                   ))
                 )}
               </div>
+             <Pagination
+               page={channelPage}
+               totalPages={channelTotalPages}
+               onChange={setChannelPage}
+              /> 
             </section>
           </div>
         )}
@@ -1017,9 +1204,136 @@ const saveBlogPost = async () => {
                   ))
                 )}
               </div>
+              <Pagination
+                 page={blogPage}
+                 totalPages={blogTotalPages}
+                 onChange={setBlogPage}
+              />
             </section>
           </div>
         )}
+
+        {activeTab === "seo" && (
+  <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+    <section className="rounded-2xl border bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-xl font-bold">
+        {editingSeoId ? "SEO 글 수정" : "SEO 글 등록"}
+      </h2>
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <Input
+          label="제목"
+          value={seoForm.title}
+          onChange={(v) => setSeoForm({ ...seoForm, title: v })}
+        />
+        <Input
+          label="카테고리"
+          value={seoForm.category}
+          onChange={(v) => setSeoForm({ ...seoForm, category: v })}
+        />
+        <Input
+          label="Slug"
+          value={seoForm.slug}
+          onChange={(v) => setSeoForm({ ...seoForm, slug: v })}
+        />
+        <Input
+          label="썸네일 URL"
+          value={seoForm.imageUrl}
+          onChange={(v) => setSeoForm({ ...seoForm, imageUrl: v })}
+        />
+      </div>
+
+      <p className="mt-3 text-xs text-neutral-500">
+        카테고리는 basics, on-page, off-page, technical, ai-automation, case-study 중 하나를 입력하세요.
+      </p>
+
+      <div className="mt-3">
+        <Textarea
+          label="요약"
+          value={seoForm.excerpt}
+          onChange={(v) => setSeoForm({ ...seoForm, excerpt: v })}
+        />
+      </div>
+
+      <div className="mt-3">
+        <Textarea
+          label="본문"
+          rows={14}
+          value={seoForm.content}
+          onChange={(v) => setSeoForm({ ...seoForm, content: v })}
+        />
+      </div>
+
+      <div className="mt-4 flex gap-2">
+        <button
+          onClick={saveSeoPost}
+          className="rounded-xl bg-black px-4 py-3 text-white hover:opacity-90"
+        >
+          {editingSeoId ? "수정 저장" : "SEO 글 등록"}
+        </button>
+
+        {editingSeoId && (
+          <button
+            onClick={resetSeoForm}
+            className="rounded-xl border px-4 py-3 hover:bg-neutral-100"
+          >
+            취소
+          </button>
+        )}
+      </div>
+    </section>
+
+    <section className="rounded-2xl border bg-white p-6 shadow-sm">
+      <h2 className="mb-4 text-xl font-bold">
+        등록된 SEO 글 최근 5개 / 전체 {seoPosts.length}개
+      </h2>
+
+      <div className="space-y-4">
+        {seoPosts.length === 0 ? (
+          <p className="text-sm text-neutral-500">
+            아직 등록된 SEO 글이 없습니다.
+          </p>
+        ) : (
+          visibleSeoPosts.map((item: any) => (
+            <div key={item.id} className="rounded-xl border p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-bold">{item.title}</p>
+                  <p className="text-sm text-neutral-500">
+                    {item.category} / {item.slug}
+                  </p>
+                  <p className="mt-2 line-clamp-2 text-sm text-neutral-600">
+                    {item.excerpt}
+                  </p>
+                </div>
+
+                <div className="flex shrink-0 gap-2">
+                  <button
+                    onClick={() => editSeoPost(item)}
+                    className="rounded-lg border px-3 py-2 text-xs hover:bg-neutral-100"
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={() => deleteSeoPost(String(item.id))}
+                    className="rounded-lg border px-3 py-2 text-xs hover:bg-neutral-100"
+                  >
+                    삭제
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+         <Pagination
+           page={seoPage}
+           totalPages={seoTotalPages}
+           onChange={setSeoPage}
+          />
+    </section>
+  </div>
+)}
       </div>
     </main>
   );
@@ -1089,6 +1403,74 @@ function Textarea({
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-xl border p-3"
       />
+    </div>
+  );
+}
+function Pagination({
+  page,
+  totalPages,
+  onChange,
+}: {
+  page: number;
+  totalPages: number;
+  onChange: (page: number) => void;
+}) {
+  if (totalPages <= 1) return null;
+
+  const MAX_VISIBLE = 5;
+
+  let startPage = Math.max(
+    1,
+    page - Math.floor(MAX_VISIBLE / 2)
+  );
+
+  let endPage = startPage + MAX_VISIBLE - 1;
+
+  if (endPage > totalPages) {
+    endPage = totalPages;
+    startPage = Math.max(1, endPage - MAX_VISIBLE + 1);
+  }
+
+  const pages = [];
+
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
+
+  return (
+    <div className="mt-6 flex flex-wrap justify-center gap-2">
+      <button
+        type="button"
+        disabled={page === 1}
+        onClick={() => onChange(page - 1)}
+        className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
+      >
+        ←
+      </button>
+
+      {pages.map((pageNumber) => (
+        <button
+          key={pageNumber}
+          type="button"
+          onClick={() => onChange(pageNumber)}
+          className={`rounded-lg px-3 py-2 text-sm ${
+            page === pageNumber
+              ? "bg-black text-white"
+              : "border bg-white hover:bg-neutral-100"
+          }`}
+        >
+          {pageNumber}
+        </button>
+      ))}
+
+      <button
+        type="button"
+        disabled={page === totalPages}
+        onClick={() => onChange(page + 1)}
+        className="rounded-lg border px-3 py-2 text-sm disabled:opacity-40"
+      >
+        →
+      </button>
     </div>
   );
 }

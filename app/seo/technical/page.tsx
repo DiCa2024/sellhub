@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
-export default async function OffPageSeoPage() {
+export default async function TechnicalSeoPage() {
   const posts = await prisma.seoPost.findMany({
-    where: { category: "off-page" },
+    where: { category: "technical" },
     orderBy: { createdAt: "desc" },
   });
 
   return (
     <CategoryPage
-      title="Off-page SEO"
-      description="백링크, 도메인 권위, 브랜드 신뢰도 전략을 정리합니다."
+      title="Technical SEO"
+      description="robots.txt, sitemap.xml, 페이지 속도 개선 등 기술 SEO를 정리합니다."
       posts={posts}
     />
   );

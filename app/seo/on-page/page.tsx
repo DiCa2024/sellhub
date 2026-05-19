@@ -1,25 +1,16 @@
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 
-const posts = [
-  {
-    title: "Content optimization",
-    href: "/seo/on-page/content-optimization",
-  },
-  {
-    title: "Internal link structure",
-    href: "/seo/on-page/internal-link",
-  },
-  {
-    title: "User experience (UX) and SEO",
-    href: "/seo/on-page/ux-seo",
-  },
-];
+export default async function OnPageSeoPage() {
+  const posts = await prisma.seoPost.findMany({
+    where: { category: "on-page" },
+    orderBy: { createdAt: "desc" },
+  });
 
-export default function OnPageSeoPage() {
   return (
     <CategoryPage
       title="On-page SEO"
-      description="콘텐츠 구조와 페이지 최적화 전략"
+      description="콘텐츠 최적화, 내부링크 구조, UX와 SEO를 정리합니다."
       posts={posts}
     />
   );
@@ -27,24 +18,59 @@ export default function OnPageSeoPage() {
 
 function CategoryPage({ title, description, posts }: any) {
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-12">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="text-4xl font-bold">{title}</h1>
+    <main className="min-h-[calc(100vh-80px)] bg-neutral-50 px-6 py-12 text-neutral-900">
+      <div className="mx-auto max-w-7xl">
+        <section className="mb-10 rounded-[28px] border border-neutral-200 bg-white p-8 shadow-sm">
+          <p className="mb-3 text-sm font-medium text-neutral-500">SEO Category</p>
+          <h1 className="text-4xl font-bold">{title}</h1>
+          <p className="mt-4 text-neutral-600">{description}</p>
+        </section>
 
-        <p className="mt-4 text-neutral-600">{description}</p>
-
-        <div className="mt-8 grid gap-4">
-          {posts.map((post: any) => (
-            <Link
-              key={post.href}
-              href={post.href}
-              className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm hover:bg-neutral-50"
-            >
-              {post.title}
-            </Link>
-          ))}
-        </div>
+        {posts.length === 0 ? (
+          <div className="rounded-2xl border border-neutral-200 bg-white p-10 text-center text-neutral-500">
+            아직 등록된 글이 없습니다.
+          </div>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {posts.map((post: any) => (
+              <SeoCard key={post.id} post={post} />
+            ))}
+          </div>
+        )}
       </div>
     </main>
+  );
+}
+
+function SeoCard({ post }: { post: any }) {
+  return (
+    <Link
+      href={`/seo/${post.category}/${post.slug}`}
+      className="flex h-full flex-col rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+    >
+      <div className="h-44 overflow-hidden rounded-2xl bg-neutral-100">
+        <img
+          src={post.imageUrl?.trim() || "https://placehold.co/600x400?text=SEO"}
+          alt={post.title}
+          className="h-full w-full object-cover"
+        />
+      </div>
+
+      <div className="mt-4 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
+        {post.category}
+      </div>
+
+      <h2 className="mt-3 line-clamp-2 text-lg font-bold leading-7">
+        {post.title}
+      </h2>
+
+      <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
+        {post.excerpt}
+      </p>
+
+      <div className="mt-auto pt-4 text-xs text-neutral-500">
+        조회수 {post.views ?? 0}
+      </div>
+    </Link>
   );
 }
