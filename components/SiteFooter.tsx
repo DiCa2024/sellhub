@@ -5,7 +5,7 @@ export default function SiteFooter() {
         <div className="mb-8 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <div className="text-lg font-bold tracking-tight text-neutral-900">
-              globalsellermall
+              globalsellershop
             </div>
             <p className="mt-2 text-sm leading-6 text-neutral-600">
               도매 정보, 판매 채널 정보, 셀러 도구를 한곳에서 확인할 수 있는 플랫폼입니다.
@@ -25,7 +25,7 @@ export default function SiteFooter() {
 
             <div className="space-y-2 text-sm text-neutral-600">
               <p>
-                <span className="font-medium text-neutral-900">사이트명</span> : Globalsellermall
+                <span className="font-medium text-neutral-900">사이트명</span> : globalsellershop
               </p>
               <p>
                 <span className="font-medium text-neutral-900">상호명</span> : HIGH WAY
