@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "gi.esmplus.com",
+      },
+      {
+        protocol: "https",
         hostname: "placehold.co",
       },
       {
@@ -28,6 +32,7 @@ const nextConfig: NextConfig = {
          protocol: "https",
          hostname: "logo.clearbit.com",
        },
+
     ],
   },
 };
