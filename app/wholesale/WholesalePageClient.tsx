@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -387,18 +388,13 @@ export default function WholesalePageClient({
                       <div className="flex min-w-0 items-center gap-4">
                         <Link href={`/wholesale/${site.id}`} className="shrink-0">
                           <div className="group h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
-                            <img
-                              src={
-                                site.imageUrl ||
-                                "https://placehold.co/400x300?text=Wholesale"
-                              }
-                              alt={site.name}
-                              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                              onError={(e) => {
-                                e.currentTarget.src =
-                                  "https://placehold.co/400x300?text=Wholesale";
-                              }}
-                            />
+                            <OptimizedImage
+                               src={site.imageUrl}
+                               fallback="https://placehold.co/400x300?text=Wholesale"
+                               alt={site.name}
+                               className="object-cover transition duration-300 group-hover:scale-105"
+                               sizes="80px"
+                             />
                           </div>
                         </Link>
 
@@ -587,6 +583,33 @@ export default function WholesalePageClient({
 
       </div>
     </main>
+  );
+}
+
+function OptimizedImage({
+  src,
+  fallback,
+  alt,
+  className,
+  sizes = "160px",
+}: {
+  src?: string;
+  fallback: string;
+  alt: string;
+  className?: string;
+  sizes?: string;
+}) {
+  const [imageSrc, setImageSrc] = useState(src || fallback);
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={alt}
+      fill
+      sizes={sizes}
+      className={className}
+      onError={() => setImageSrc(fallback)}
+    />
   );
 }
 
