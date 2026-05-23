@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+
 
 const ITEMS_PER_PAGE = 20;
 const REGION_ITEMS = ["전체", "국내", "해외"];
@@ -331,18 +333,13 @@ export default function SalesChannelPageClient({
                           href={`/sales-channel/${channel.id}`}
                           className="shrink-0"
                         >
-                          <div className="h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
-                            <img
-                              src={
-                                channel.imageUrl ||
-                                "https://placehold.co/400x300?text=Channel"
-                              }
-                              alt={channel.name}
-                              className="h-full w-full object-contain bg-white p-1"
-                              onError={(e) => {
-                                e.currentTarget.src =
-                                  "https://placehold.co/400x300?text=Channel";
-                              }}
+                          <div className="relative h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
+                            <OptimizedImage
+                               src={channel.imageUrl || ""}
+                               fallback="https://placehold.co/400x300?text=Channel"
+                               alt={channel.name || "Channel"}
+                               className="object-contain bg-white p-1"
+                               sizes="80px"
                             />
                           </div>
                         </Link>
@@ -449,6 +446,33 @@ export default function SalesChannelPageClient({
   );
 }
 
+function OptimizedImage({
+  src,
+  fallback,
+  alt,
+  className,
+  sizes = "160px",
+}: {
+  src?: string;
+  fallback: string;
+  alt: string;
+  className?: string;
+  sizes?: string;
+}) {
+  const [imageSrc, setImageSrc] = useState(src || fallback);
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={alt}
+      fill
+      sizes={sizes}
+      className={className}
+      onError={() => setImageSrc(fallback)}
+    />
+  );
+}
+
 function RecommendSection({
   title,
   href,
@@ -489,15 +513,14 @@ function RecommendSection({
               href={link}
               className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
-              <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
-                <img
-                  src={item.imageUrl || fallback}
-                  alt={titleText}
-                  className="h-full w-full object-contain bg-white p-2"
-                  onError={(e) => {
-                    e.currentTarget.src = fallback;
-                  }}
-                />
+              <div className="relative h-40 overflow-hidden rounded-2xl bg-neutral-100">
+                <OptimizedImage
+                   src={item.imageUrl || ""}
+                   fallback="https://placehold.co/400x300?text=Channel"
+                   alt={item.name || "Channel"}
+                   className="object-contain bg-white p-1"
+                   sizes="80px"
+               />
               </div>
 
               <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">

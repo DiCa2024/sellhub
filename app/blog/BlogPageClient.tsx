@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const POSTS_PER_PAGE = 6;
 
@@ -150,20 +151,15 @@ export default function BlogPageClient({
                 href={`/blog/${featuredPost.id}`}
                 className="group block overflow-hidden rounded-[28px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
-                <div className="aspect-[3/2] w-full overflow-hidden rounded-2xl bg-white group">
-  <img
-    src={
-      featuredPost.imageUrl ||
-      "https://placehold.co/600x400?text=Blog"
-    }
-    alt={featuredPost.title}
-    className="h-full w-full object-contain bg-white transition duration-300 group-hover:scale-105"
-    onError={(e) => {
-      e.currentTarget.src =
-        "https://placehold.co/600x400?text=Blog";
-    }}
-  />
-</div>
+                <div className="relative aspect-[3/2] w-full overflow-hidden rounded-2xl bg-white group">
+                   <OptimizedImage
+                      src={featuredPost.imageUrl || ""}
+                      fallback="https://placehold.co/600x400?text=Blog"
+                      alt={featuredPost.title || "Blog"}
+                      className="object-contain bg-white transition duration-300 group-hover:scale-105"
+                      sizes="800px"
+                     />
+                </div>
 
                 <div className="mt-5">
                   <div className="mb-3 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
@@ -223,19 +219,14 @@ export default function BlogPageClient({
                       href={`/blog/${post.id}`}
                       className="flex gap-4 rounded-2xl p-2 transition hover:bg-neutral-50"
                     >
-                      <div className="h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
-                        <img
-                          src={
-                            post.imageUrl ||
-                            "https://placehold.co/400x300?text=Blog"
-                          }
-                          alt={post.title}
-                          className="h-full w-full object-contain bg-white"
-                          onError={(e) => {
-                            e.currentTarget.src =
-                              "https://placehold.co/400x300?text=Blog";
-                          }}
-                        />
+                     <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+                       <OptimizedImage
+                          src={post.imageUrl || ""}
+                          fallback="https://placehold.co/400x300?text=Blog"
+                          alt={post.title || "Blog"}
+                          className="object-contain bg-white"
+                          sizes="120px"
+                       />
                       </div>
                       <div>
                         <h3 className="line-clamp-3 text-sm font-bold leading-6">
@@ -328,15 +319,14 @@ function BlogSmallCard({ post }: { post: any }) {
       href={`/blog/${post.id}`}
       className="block rounded-[24px] border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
-        <img
-          src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
-          alt={post.title}
-          className="h-full w-full object-contain bg-white"
-          onError={(e) => {
-            e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
-          }}
-        />
+      <div className="relative h-40 overflow-hidden rounded-2xl bg-neutral-100">
+             <OptimizedImage
+                src={post.imageUrl || ""}
+                fallback="https://placehold.co/600x400?text=Blog"
+                alt={post.title || "Blog"}
+                className="object-contain bg-white"
+                sizes="400px"
+              />
       </div>
       <h3 className="mt-3 line-clamp-2 text-base font-bold leading-6">
         {post.title}
@@ -351,15 +341,14 @@ function BlogCard({ post }: { post: any }) {
       href={`/blog/${post.id}`}
       className="flex h-full flex-col rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className="h-44 overflow-hidden rounded-2xl bg-neutral-100">
-        <img
-          src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
-          alt={post.title}
-          className="h-full w-full object-contain bg-white"
-          onError={(e) => {
-            e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
-          }}
-        />
+      <div className="relative h-44 overflow-hidden rounded-2xl bg-neutral-100">
+          <OptimizedImage
+             src={post.imageUrl || ""}
+             fallback="https://placehold.co/600x400?text=Blog"
+             alt={post.title || "Blog"}
+             className="object-contain bg-white"
+             sizes="500px"
+          />
       </div>
 
       <div className="mt-4 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
@@ -413,23 +402,17 @@ function RecommendSection({
             }`}
             className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
-            <div className="h-36 overflow-hidden rounded-2xl bg-neutral-100">
-              <img
-                src={
-                  item.imageUrl ||
-                  `https://placehold.co/600x400?text=${
-                    type === "site" ? "Wholesale" : "Channel"
-                  }`
-                }
-                alt={item.name}
-                className="h-full w-full object-contain bg-white p-2"
-                onError={(e) => {
-                  e.currentTarget.src = `https://placehold.co/600x400?text=${
-                    type === "site" ? "Wholesale" : "Channel"
-                  }`;
-                }}
-              />
-            </div>
+            <div className="relative h-36 overflow-hidden rounded-2xl bg-neutral-100">
+               <OptimizedImage
+                 src={item.imageUrl || ""}
+                 fallback={`https://placehold.co/600x400?text=${
+                 type === "site" ? "Wholesale" : "Channel"
+                 }`}
+                 alt={item.name || "Item"}
+                 className="object-contain bg-white p-2"
+                 sizes="300px"
+                 />
+             </div>
 
             <h3 className="mt-3 line-clamp-2 text-center text-sm font-bold leading-6">
               {item.name}
@@ -470,5 +453,32 @@ function Pagination({
         );
       })}
     </div>
+  );
+}
+
+function OptimizedImage({
+  src,
+  fallback,
+  alt,
+  className,
+  sizes = "160px",
+}: {
+  src?: string;
+  fallback: string;
+  alt: string;
+  className?: string;
+  sizes?: string;
+}) {
+  const [imageSrc, setImageSrc] = useState(src || fallback);
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={alt}
+      fill
+      sizes={sizes}
+      className={className}
+      onError={() => setImageSrc(fallback)}
+    />
   );
 }

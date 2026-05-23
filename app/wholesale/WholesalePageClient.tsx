@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -386,19 +387,14 @@ export default function WholesalePageClient({
                     >
                       <div className="flex min-w-0 items-center gap-4">
                         <Link href={`/wholesale/${site.id}`} className="shrink-0">
-                          <div className="group h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
-                            <img
-                               src={
-                                site.imageUrl ||
-                                "https://placehold.co/400x300?text=Wholesale"
-                                }
-                               alt={site.name}
-                               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-                               onError={(e) => {
-                                e.currentTarget.src =
-                               "https://placehold.co/400x300?text=Wholesale";
-                             }}
-                            />
+                          <div className="group relative h-14 w-20 overflow-hidden rounded-md bg-neutral-100">
+                               <OptimizedImage
+                                  src={site.imageUrl}
+                                  fallback="https://placehold.co/400x300?text=Wholesale"
+                                  alt={site.name}
+                                  className="object-cover transition duration-300 group-hover:scale-105"
+                                  sizes="80px"
+                              />
                           </div>
                         </Link>
 
@@ -507,15 +503,14 @@ export default function WholesalePageClient({
         href={`/sales-channel/${item.id}`}
         className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
       >
-        <div className="aspect-[3/2] overflow-hidden rounded-2xl bg-white">
-          <img
-            src={item.imageUrl || "https://placehold.co/600x400?text=Channel"}
-            alt={item.name}
-            className="h-full w-full object-contain bg-white p-2"
-            onError={(e) => {
-              e.currentTarget.src = "https://placehold.co/600x400?text=Channel";
-            }}
-          />
+        <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-white">
+             <OptimizedImage
+                src={item.imageUrl}
+                fallback="https://placehold.co/600x400?text=Channel"
+                alt={item.name}
+                className="object-contain bg-white p-2"
+                sizes="300px"
+              />
         </div>
 
         <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
@@ -540,17 +535,15 @@ export default function WholesalePageClient({
         href={`/blog/${post.id}`}
         className="block rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
       >
-        <div className="aspect-[3/2] overflow-hidden rounded-2xl bg-white">
-          <img
-            src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
-            alt={post.title}
-            className="h-full w-full object-contain bg-white p-2"
-            onError={(e) => {
-              e.currentTarget.src = "https://placehold.co/600x400?text=Blog";
-            }}
-          />
-        </div>
-
+       <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-white">
+             <OptimizedImage
+                src={post.imageUrl || ""}
+                fallback="https://placehold.co/600x400?text=Blog"
+                alt={post.title || "Blog"}
+                className="object-contain bg-white p-2"
+                sizes="300px"
+             />
+       </div>
         <h3 className="mt-3 line-clamp-2 text-center text-base font-bold leading-6">
           {post.title}
         </h3>
@@ -590,6 +583,32 @@ export default function WholesalePageClient({
   );
 }
 
+function OptimizedImage({
+  src,
+  fallback,
+  alt,
+  className,
+  sizes = "160px",
+}: {
+  src?: string;
+  fallback: string;
+  alt: string;
+  className?: string;
+  sizes?: string;
+}) {
+  const [imageSrc, setImageSrc] = useState(src || fallback);
+
+  return (
+    <Image
+      src={imageSrc}
+      alt={alt}
+      fill
+      sizes={sizes}
+      className={className}
+      onError={() => setImageSrc(fallback)}
+    />
+  );
+}
 
 function ActiveChip({ label }: { label: string }) {
   return (
