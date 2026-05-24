@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 
 const POSTS_PER_PAGE = 6;
 
@@ -167,20 +168,15 @@ function SeoCard({ post }: { post: any }) {
       href={`/seo/${post.category.trim()}/${post.slug.trim()}`}
       className="flex h-full flex-col rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
-      <div className="h-44 overflow-hidden rounded-2xl bg-neutral-100">
-        <img
-          src={
-            post.imageUrl ||
-            "https://placehold.co/600x400?text=SEO"
-          }
-          alt={post.title}
-          className="h-full w-full object-cover"
-          onError={(e) => {
-            e.currentTarget.src =
-              "https://placehold.co/600x400?text=SEO";
-          }}
-        />
-      </div>
+      <div className="relative h-44 overflow-hidden rounded-2xl bg-neutral-100">
+  <Image
+    src={post.imageUrl || "https://placehold.co/600x400?text=SEO"}
+    alt={post.title || "SEO"}
+    fill
+    sizes="(max-width: 768px) 100vw, 33vw"
+    className="object-cover"
+  />
+</div>
 
       <div className="mt-4 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
         {post.category}

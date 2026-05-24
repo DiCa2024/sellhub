@@ -42,7 +42,7 @@ type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const PLACEHOLDER = "https://placehold.co/1200x800?text=Image";
 
@@ -79,7 +79,7 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
 
   if (!Number.isInteger(numericId)) notFound();
 
-  const [site, recommendedChannels, recommendedBlogs] = await Promise.all([
+  const [site, recommendedChannels] = await Promise.all([
     prisma.wholesaleSite.findUnique({
       where: { id: numericId },
     }),
@@ -126,7 +126,7 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
     />
 
       <section className="mx-auto max-w-5xl px-4 py-10">
-        <Link href="/wholesale" prefetch className="text-sm text-neutral-500">
+        <Link href="/wholesale" prefetch={false} className="text-sm text-neutral-500">
           ← 목록으로 돌아가기
         </Link>
 
@@ -221,14 +221,7 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
           nameKey="name"
         />
 
-        <RecommendSection
-          title="추천 블로그"
-          items={recommendedBlogs}
-          basePath="/blog"
-          nameKey="title"
-        />
-
-        <RecommendToolSection title="추천 판매 도구" items={recommendedTools} />
+                <RecommendToolSection title="추천 판매 도구" items={recommendedTools} />
       </section>
     </main>
   );
@@ -262,7 +255,7 @@ function RecommendSection({
 
       <div className="grid gap-6 md:grid-cols-4">
         {items.map((item) => (
-          <Link key={item.id} href={`${basePath}/${item.id}`} prefetch>
+          <Link key={item.id} href={`${basePath}/${item.id}`} prefetch={false}>
             <div className="cursor-pointer">
               <ImageCard
                 src={item.imageUrl || PLACEHOLDER}
@@ -298,7 +291,7 @@ function RecommendToolSection({
         <h2 className="text-2xl font-bold">{title}</h2>
         <Link
           href="/sellertool"
-          prefetch
+          prefetch={false}
           className="text-sm font-medium text-neutral-600 hover:text-black"
         >
           전체 보기 →
@@ -310,7 +303,7 @@ function RecommendToolSection({
           <Link
             key={item.id}
             href={item.href}
-            prefetch
+            prefetch={false}
             className="flex min-h-[150px] flex-col rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <h3 className="font-bold">{item.title}</h3>

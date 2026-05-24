@@ -5,8 +5,7 @@ import { prisma } from "@/lib/prisma";
 import ViewTracker from "./ViewTracker";
 import RecentSalesChannelTracker from "./RecentSalesChannelTracker";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 3600;
 
 export async function generateMetadata({ params }: any) {
   const { id } = await params;
@@ -76,40 +75,58 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const channel = await prisma.salesChannel.findUnique({
-    where: { id: numericId },
-    include: {
-      feeTables: true,
-    },
-  });
+  const [channel, recommendedChannels, wholesaleSites, blogPosts] =
+  await Promise.all([
+    prisma.salesChannel.findUnique({
+      where: { id: numericId },
+      include: {
+        feeTables: true,
+      },
+    }),
+
+    prisma.salesChannel.findMany({
+      take: 4,
+      where: {
+        NOT: { id: numericId },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        name: true,
+        imageUrl: true,
+      },
+    }),
+
+    prisma.wholesaleSite.findMany({
+      take: 4,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        name: true,
+        imageUrl: true,
+      },
+    }),
+
+    prisma.blog.findMany({
+      take: 4,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        imageUrl: true,
+      },
+    }),
+  ]);
 
   if (!channel) {
-    notFound();
-  }
-
-  const recommendedChannels = await prisma.salesChannel.findMany({
-    take: 4,
-    where: {
-      NOT: { id: numericId },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  const wholesaleSites = await prisma.wholesaleSite.findMany({
-    take: 4,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  const blogPosts = await prisma.blog.findMany({
-    take: 4,
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+  notFound();
+}
 
   const feeTable = Object.fromEntries(
     channel.feeTables.map((item) => [item.category, item.fee])
@@ -139,7 +156,7 @@ export default async function SalesChannelDetailPage({ params }: PageProps) {
       />
 
       <section className="mx-auto max-w-5xl px-4 py-10">
-        <Link href="/sales-channel" className="text-sm text-neutral-500">
+        <Link href="/sales-channel" prefetch={false} className="text-sm text-neutral-500">
           ← 판매 채널 목록으로 돌아가기
         </Link>
 
@@ -280,7 +297,7 @@ function RecommendSection({
           <p className="text-sm text-gray-500">추천 채널이 아직 없습니다.</p>
         ) : (
           items.map((item) => (
-            <Link key={item.id} href={`/sales-channel/${item.id}`}>
+            <Link key={item.id} href={`/sales-channel/${item.id}`} prefetch={false}>
               <div className="cursor-pointer">
                 <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
                   <Image
@@ -318,7 +335,7 @@ function SimpleSection({
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>
 
-        <Link href={href} className="text-sm text-neutral-500">
+        <Link href={href} prefetch={false} className="text-sm text-neutral-500">
           전체 보기 →
         </Link>
       </div>
@@ -328,7 +345,7 @@ function SimpleSection({
           <p className="text-sm text-gray-500">표시할 항목이 없습니다.</p>
         ) : (
           items.map((item) => (
-  <Link key={item.id} href={item.link}>
+  <Link key={item.id} href={item.link} prefetch={false} >
     <div className="cursor-pointer">
       <div className="h-40 overflow-hidden rounded-2xl bg-neutral-100">
         <Image
@@ -365,7 +382,7 @@ function SellerToolSection({
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-2xl font-bold">{title}</h2>
 
-        <Link href={href} className="text-sm text-neutral-500">
+        <Link href={href}  prefetch={false} className="text-sm text-neutral-500">
           전체 보기 →
         </Link>
       </div>
@@ -375,7 +392,7 @@ function SellerToolSection({
           <p className="text-sm text-gray-500">표시할 항목이 없습니다.</p>
         ) : (
           items.map((item) => (
-            <Link key={item.id} href={item.link}>
+            <Link key={item.id} href={item.link} prefetch={false} >
               <div className="cursor-pointer rounded-2xl border bg-white p-8 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-md">
                 <h3 className="text-base font-bold">{item.name}</h3>
               </div>
