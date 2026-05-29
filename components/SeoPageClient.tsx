@@ -169,14 +169,14 @@ function SeoCard({ post }: { post: any }) {
       className="flex h-full flex-col rounded-[24px] border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
     >
       <div className="relative h-44 overflow-hidden rounded-2xl bg-neutral-100">
-  <Image
-    src={post.imageUrl || "https://placehold.co/600x400?text=SEO"}
-    alt={post.title || "SEO"}
-    fill
-    sizes="(max-width: 768px) 100vw, 33vw"
-    className="object-cover"
-  />
-</div>
+        <Image
+            src={post.imageUrl || "https://placehold.co/600x400?text=SEO"}
+           alt={post.title || "SEO"}
+           fill
+           sizes="(max-width: 768px) 100vw, 33vw"
+           className="object-cover"
+        />
+     </div>
 
       <div className="mt-4 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
         {post.category}
