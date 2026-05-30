@@ -56,36 +56,9 @@ type PageProps = {
   params: Promise<{ id: string }>;
 };
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const PLACEHOLDER = "https://placehold.co/1200x800?text=Blog";
-
-const sellerTools = [
-  {
-    id: "margin-calculator",
-    title: "마진 계산기",
-    description: "매입가, 배송비, 수수료, 판매가 기준으로 순이익과 마진율을 계산합니다.",
-    href: "/sellertool/margin-calculator",
-  },
-  {
-    id: "sales-price-calculator",
-    title: "판매가 계산기",
-    description: "목표 마진율을 기준으로 적정 판매가를 계산합니다.",
-    href: "/sellertool/sales-price-calculator",
-  },
-  {
-    id: "commission-calculator",
-    title: "수수료 계산기",
-    description: "플랫폼 수수료와 차감 금액을 간단히 계산합니다.",
-    href: "/sellertool/commission-calculator",
-  },
-  {
-    id: "memo-check-tool",
-    title: "메모 / 체크 도구",
-    description: "소싱 메모와 체크리스트를 빠르게 정리할 수 있습니다.",
-    href: "/sellertool/memo-check-tool",
-  },
-];
 
 export default async function BlogDetailPage({ params }: PageProps) {
   const { id } = await params;
@@ -93,62 +66,62 @@ export default async function BlogDetailPage({ params }: PageProps) {
 
   if (!Number.isInteger(numericId)) notFound();
 
-  const [post, latestPosts, latestWholesaleSites, latestSalesChannels, comments] =
-    await Promise.all([
-      prisma.blog.findUnique({
-        where: { id: numericId },
-      }),
+  const [post, latestPosts, relatedPosts, comments] =
+  await Promise.all([
+    prisma.blog.findUnique({
+      where: { id: numericId },
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        content: true,
+        imageUrl: true,
+        views: true,
+        category: true,
+      },
+    }),
 
-      prisma.blog.findMany({
-        where: {
-          NOT: {
-            id: numericId,
-          },
-        },
-        take: 7,
-        orderBy: {
-          createdAt: "desc",
-        },
-        select: {
-          id: true,
-          title: true,
-          imageUrl: true,
-        },
-      }),
+    prisma.blog.findMany({
+      where: {
+        NOT: { id: numericId },
+      },
+      take: 7,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        imageUrl: true,
+      },
+    }),
 
-      prisma.wholesaleSite.findMany({
-        take: 4,
-        orderBy: {
-          createdAt: "desc",
-        },
-        select: {
-          id: true,
-          name: true,
-          imageUrl: true,
-        },
-      }),
+    prisma.blog.findMany({
+      where: {
+        NOT: { id: numericId },
+      },
+      take: 5,
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+        title: true,
+        excerpt: true,
+        imageUrl: true,
+      },
+    }),
 
-      prisma.salesChannel.findMany({
-        take: 4,
-        orderBy: {
-          createdAt: "desc",
-        },
-        select: {
-          id: true,
-          name: true,
-          imageUrl: true,
-        },
-      }),
-
-      prisma.blogComment.findMany({
-        where: {
-          blogId: numericId,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-      }),
-    ]);
+    prisma.blogComment.findMany({
+      where: {
+        blogId: numericId,
+      },
+      take: 20,
+      orderBy: {
+        createdAt: "desc",
+      },
+    }),
+  ]);
 
   if (!post) notFound();
 
@@ -166,7 +139,7 @@ export default async function BlogDetailPage({ params }: PageProps) {
       <div className="mx-auto max-w-7xl">
         <Link
           href="/blog"
-          prefetch
+          prefetch={false}
           className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
         >
           ← 블로그로 돌아가기
@@ -244,11 +217,11 @@ export default async function BlogDetailPage({ params }: PageProps) {
             <h2 className="mb-5 text-2xl font-bold">최신 글</h2>
 
             <div className="space-y-4">
-              {latestPosts.slice(0, 5).map((item) => (
+              {latestPosts.slice(0, 7).map((item) => (
                 <Link
                   key={item.id}
                   href={`/blog/${item.id}`}
-                  prefetch
+                  prefetch={false}
                   className="flex gap-4"
                 >
                   <div className="h-24 w-32 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
@@ -272,123 +245,45 @@ export default async function BlogDetailPage({ params }: PageProps) {
             </div>
           </aside>
         </section>
-
-        <BlogCommentClient blogId={post.id} initialComments={comments} />
-
-        <CardSection title="도매 사이트" href="/wholesale">
-          {latestWholesaleSites.map((site) => (
-            <Link
-              key={site.id}
-              href={`/wholesale/${site.id}`}
-              prefetch
-              className="block overflow-hidden rounded-2xl bg-white transition hover:-translate-y-0.5"
-            >
-              <ImageCard src={site.imageUrl} alt={site.name} label={site.name} />
-            </Link>
-          ))}
-        </CardSection>
-
-        <CardSection title="판매 채널" href="/sales-channel">
-          {latestSalesChannels.map((item) => (
-            <Link
-              key={item.id}
-              href={`/sales-channel/${item.id}`}
-              prefetch
-              className="block overflow-hidden rounded-2xl bg-white transition hover:-translate-y-0.5"
-            >
-              <ImageCard src={item.imageUrl} alt={item.name} label={item.name} />
-            </Link>
-          ))}
-        </CardSection>
-
         <section className="mt-16">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Seller Tools</h2>
-            <Link
-              href="/sellertool"
-              prefetch
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </Link>
-          </div>
+  <h2 className="mb-6 text-2xl font-bold">
+    관련 글
+  </h2>
 
-          <div className="grid gap-5 md:grid-cols-4">
-            {sellerTools.map((tool) => (
-              <Link
-                key={tool.id}
-                href={tool.href}
-                prefetch
-                className="flex min-h-[150px] flex-col rounded-2xl bg-neutral-50 p-5 transition hover:-translate-y-0.5"
-              >
-                <h3 className="text-lg font-bold">{tool.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
-                  {tool.description}
-                </p>
-                <div className="mt-auto pt-4 text-sm font-medium text-neutral-800">
-                  바로 가기 →
-                </div>
-              </Link>
-            ))}
-          </div>
-        </section>
-      </div>
+  <div className="space-y-4">
+    {relatedPosts.map((item) => (
+      <Link
+        key={item.id}
+        href={`/blog/${item.id}`}
+        prefetch={false}
+        className="flex gap-4 rounded-2xl border border-neutral-200 bg-white p-4 transition hover:bg-neutral-50"
+      >
+        <div className="h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-neutral-100">
+          <Image
+            src={item.imageUrl || PLACEHOLDER}
+            alt={item.title}
+            width={400}
+            height={300}
+            sizes="128px"
+            className="h-full w-full object-contain bg-white"
+          />
+        </div>
+
+       <div className="flex flex-1 flex-col justify-center">
+          <h3 className="line-clamp-2 text-base font-bold">
+            {item.title}
+          </h3>
+
+          <p className="mt-2 line-clamp-2 text-sm text-neutral-600">
+            {item.excerpt}
+          </p>
+        </div>
+      </Link>
+    ))}
+  </div>
+</section>
+        <BlogCommentClient blogId={post.id} initialComments={comments} />
+     </div>
     </main>
-  );
-}
-
-function CardSection({
-  title,
-  href,
-  children,
-}: {
-  title: string;
-  href: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="mt-16">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="text-2xl font-bold">{title}</h2>
-        <Link
-          href={href}
-          prefetch
-          className="text-sm font-medium text-neutral-600 hover:text-black"
-        >
-          전체 보기 →
-        </Link>
-      </div>
-
-      <div className="grid gap-5 md:grid-cols-4">{children}</div>
-    </section>
-  );
-}
-
-function ImageCard({
-  src,
-  alt,
-  label,
-}: {
-  src?: string;
-  alt: string;
-  label: string;
-}) {
-  return (
-    <>
-      <div className="overflow-hidden rounded-2xl bg-neutral-100">
-        <Image
-          src={src?.trim() || PLACEHOLDER}
-          alt={alt}
-          width={1200}
-          height={800}
-          sizes="(max-width: 768px) 50vw, 25vw"
-          className="h-full w-full object-contain bg-white"
-        />
-      </div>
-
-      <div className="pt-3">
-        <h3 className="line-clamp-2 text-base font-bold leading-6">{label}</h3>
-      </div>
-    </>
   );
 }

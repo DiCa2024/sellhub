@@ -81,7 +81,22 @@ export default async function WholesaleDetailPage({ params }: PageProps) {
 
   const [site, recommendedChannels] = await Promise.all([
     prisma.wholesaleSite.findUnique({
-      where: { id: numericId },
+       where: { id: numericId },
+       select: {
+       id: true,
+       name: true,
+       category: true,
+       region: true,
+       imageUrl: true,
+       website: true,
+       shortDescription: true,
+       usageFee: true,
+       dropshipping: true,
+       businessRequired: true,
+       imageProvided: true,
+       tags: true,
+       views: true,
+      },
     }),
     prisma.salesChannel.findMany({
       take: 4,

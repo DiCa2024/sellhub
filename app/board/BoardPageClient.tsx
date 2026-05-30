@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 const PAGE_SIZE = 10;
 const ADMIN_EMAIL = "admin@gmail.com";
