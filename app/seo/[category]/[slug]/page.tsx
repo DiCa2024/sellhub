@@ -145,6 +145,26 @@ export default async function SeoPostDetailPage({
           ← SEO로 돌아가기
         </Link>
 
+        <nav className="mt-4 text-sm text-neutral-500">
+          <Link href="/" prefetch={false} className="hover:text-neutral-900">
+              홈
+          </Link>
+            <span className="mx-2">/</span>
+          <Link href="/seo" prefetch={false} className="hover:text-neutral-900">
+            SEO
+          </Link>
+            <span className="mx-2">/</span>
+           <Link
+             href={`/seo/${post.category}`}
+             prefetch={false}
+            className="hover:text-neutral-900"
+            >
+              {post.category}
+            </Link>
+               <span className="mx-2">/</span>
+              <span className="text-neutral-900">{post.title}</span>
+          </nav>
+
         <section className="mt-6 grid gap-10 lg:grid-cols-[1.65fr_0.75fr]">
           <div>
             <h1 className="text-3xl font-bold leading-tight md:text-5xl">

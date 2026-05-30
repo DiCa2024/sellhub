@@ -47,30 +47,34 @@ export default function SeoCommentClient({
     <section className="mt-16">
       <h2 className="mb-5 text-2xl font-bold">댓글</h2>
 
-      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="이름"
-          className="mb-3 w-full rounded-xl border bg-white p-3 text-sm"
-        />
+      <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4">
+  <div className="flex flex-col gap-2 md:flex-row">
+    <input
+      value={name}
+      onChange={(e) => setName(e.target.value)}
+      placeholder="이름"
+      className="h-12 w-full rounded-xl border bg-white px-3 text-sm md:w-32"
+    />
 
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="댓글을 입력하세요"
-          rows={4}
-          className="w-full rounded-xl border bg-white p-3 text-sm"
-        />
+    <input
+      value={text}
+      onChange={(e) => setText(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") submitComment();
+      }}
+      placeholder="댓글을 입력하세요"
+      className="h-12 flex-1 rounded-xl border bg-white px-3 text-sm"
+    />
 
-        <button
-          type="button"
-          onClick={submitComment}
-          className="mt-3 rounded-xl bg-black px-4 py-3 text-sm font-medium text-white"
-        >
-          댓글 등록
-        </button>
-      </div>
+    <button
+      type="button"
+      onClick={submitComment}
+      className="h-12 rounded-xl bg-black px-5 text-sm font-medium text-white"
+    >
+      등록
+    </button>
+  </div>
+</div>
 
       <div className="mt-6 space-y-4">
         {comments.length === 0 ? (
