@@ -147,7 +147,7 @@ export default async function SeoPostDetailPage({
 
         <nav className="mt-4 text-sm text-neutral-500">
           <Link href="/" prefetch={false} className="hover:text-neutral-900">
-              홈
+              HOME
           </Link>
             <span className="mx-2">/</span>
           <Link href="/seo" prefetch={false} className="hover:text-neutral-900">
