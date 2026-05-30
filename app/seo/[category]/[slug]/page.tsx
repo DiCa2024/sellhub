@@ -111,10 +111,17 @@ export default async function SeoPostDetailPage({
         id: post.id,
       },
     },
-    take: 3,
+    take: 5,
     orderBy: {
       createdAt: "desc",
     },
+     select: {
+    id: true,
+    title: true,
+    category: true,
+    slug: true,
+    excerpt: true,
+  },
   }),
 
   prisma.seoComment.findMany({
@@ -132,7 +139,7 @@ export default async function SeoPostDetailPage({
       <div className="mx-auto max-w-7xl">
         <Link
           href="/seo"
-          prefetch
+          prefetch={false}
           className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
         >
           ← SEO로 돌아가기
@@ -210,36 +217,39 @@ export default async function SeoPostDetailPage({
               </ReactMarkdown>
             </div>
 
-            <SeoCommentClient seoPostId={post.id} initialComments={comments} />
-
             {relatedPosts.length > 0 && (
               <section className="mt-16">
                 <h2 className="mb-5 text-2xl font-bold">관련 글</h2>
 
-                <div className="grid gap-5 md:grid-cols-3">
-                  {relatedPosts.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={`/seo/${item.category}/${item.slug}`}
-                      prefetch
-                      className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                    >
-                      <div className="mb-3 inline-flex rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
-                        {item.category}
-                      </div>
+                <div className="space-y-4">
+            {relatedPosts.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/seo/${item.category}/${item.slug}`}
+                  prefetch={false}
+                  className="flex gap-4 rounded-2xl border border-neutral-200 bg-white p-4 transition hover:bg-neutral-50"
+                 >
+             <div className="flex flex-1 flex-col justify-center">
+               <div className="mb-2 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs text-neutral-600">
+                   {item.category}
+               </div>
 
-                      <h3 className="line-clamp-2 font-bold leading-6">
-                        {item.title}
-                      </h3>
+             <h3 className="line-clamp-2 text-base font-bold">
+               {item.title}
+             </h3>
 
-                      <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-                        {item.excerpt}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
+               <p className="mt-2 line-clamp-2 text-sm text-neutral-600">
+                 {item.excerpt}
+               </p>
+              </div>
+            </Link>
+           ))}
+            </div>
+                
+                
               </section>
             )}
+            <SeoCommentClient seoPostId={post.id} initialComments={comments} />
           </div>
 
           <aside>
@@ -250,7 +260,7 @@ export default async function SeoPostDetailPage({
                 <Link
                   key={item.id}
                   href={`/seo/${item.category}/${item.slug}`}
-                  prefetch
+                  prefetch={false}
                   className="flex gap-4"
                 >
                   <div className="h-24 w-32 shrink-0 overflow-hidden rounded-lg bg-neutral-100">
