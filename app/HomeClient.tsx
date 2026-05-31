@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,12 +24,6 @@ export default function HomeClient({
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
-  router.prefetch("/wholesale");
-  router.prefetch("/sales-channel");
-  router.prefetch("/blog");
-}, []);
-
-  useEffect(() => {
     const savedUser = JSON.parse(localStorage.getItem("currentUser") || "null");
     setCurrentUser(savedUser);
   }, []);
@@ -47,287 +42,167 @@ export default function HomeClient({
     const keyword = searchTerm.trim();
 
     if (keyword) {
-      router.push(`/wholesale?query=${encodeURIComponent(keyword)}`);
+      router.push(`/search?query=${encodeURIComponent(keyword)}`);
     } else {
-      router.prefetch("/wholesale");
+       router.push("/search");
     }
   };
 
   const handleQuickSearch = (keyword: string) => {
-    router.push(`/wholesale?query=${encodeURIComponent(keyword)}`);
+    router.push(`/search?query=${encodeURIComponent(keyword)}`);
   };
 
   return (
     <div className="min-h-screen bg-neutral-50 text-neutral-900">
       <main>
-        <section className="border-b border-neutral-200 bg-white">
-          <div className="mx-auto max-w-7xl px-6 py-20">
-            <div className="mb-4 inline-flex rounded-full border border-neutral-200 bg-neutral-100 px-4 py-1 text-sm font-medium text-neutral-700">
-              글로벌 셀러를 위한 도매 탐색 플랫폼
-            </div>
+  <section className="flex min-h-[80vh] items-center justify-center bg-neutral-950 px-6 text-white">
+    <div className="mx-auto max-w-5xl text-center">
+      <p className="mb-5 text-sm font-medium uppercase tracking-[0.3em] text-neutral-400">
+        Global Seller Platform
+      </p>
 
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
-              도매처를 찾고 판매 채널까지 연결해보세요
-            </h1>
+      <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
+        도매처부터 판매채널,
+        <br />
+        SEO와 셀러도구까지 한곳에서
+      </h1>
 
-            <p className="mt-4 max-w-2xl text-base leading-7 text-neutral-600">
-              카테고리별 도매 사이트를 탐색하고, 판매 채널과 셀러 운영 정보까지 한곳에서 확인할 수 있습니다.
-            </p>
+      <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-neutral-300 md:text-lg">
+        글로벌 셀러를 위한 도매 사이트, 판매 채널, 운영 도구, 콘텐츠 가이드를
+        한 번에 탐색하세요.
+      </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSearch();
-                }}
-                placeholder="도매처찾기"
-                className="w-full rounded-2xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-neutral-900"
-              />
-
-              <button
-                onClick={handleSearch}
-                className="rounded-2xl bg-neutral-900 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:opacity-90"
-              >
-                도매처 찾기
-              </button>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-3 text-sm text-neutral-500">
-              {[
-                "종합",
-                "리빙",
-                "식품",
-                "자동차",
-                "디지털/가전",
-                "아동/문구",
-                "반려/펫",
-                "헬스케어",
-                "뷰티",
-                "스포츠/레저",
-              ].map((item) => (
-                <button
-                  key={item}
-                  onClick={() => handleQuickSearch(item)}
-                  className="rounded-full bg-neutral-100 px-3 py-1 transition hover:bg-neutral-200"
-                >
-                  {item}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <WholesaleSection
-          title="최신 등록 도매 사이트"
-          href="/wholesale"
-          hrefText="전체 보기 →"
-          sites={latestSites}
-          getTagArray={getTagArray}
+      <div className="mx-auto mt-9 flex max-w-2xl flex-col gap-3 rounded-full bg-white p-2 shadow-2xl sm:flex-row">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSearch();
+          }}
+          placeholder="도매처, 판매채널, SEO, 블로그 검색"
+          className="min-h-12 flex-1 rounded-full px-5 text-sm text-neutral-900 outline-none"
         />
 
-        <WholesaleSection
-          title="인기 도매 사이트"
-          href="/wholesale"
-          hrefText="더 보기 →"
-          sites={popularSites}
-          getTagArray={getTagArray}
-          popular
-        />
+        <button
+          onClick={handleSearch}
+          className="rounded-full bg-neutral-950 px-7 py-3 text-sm font-semibold text-white transition hover:bg-neutral-800"
+        >
+          통합 검색
+        </button>
+      </div>
 
-        <section className="mx-auto max-w-7xl px-6 py-14">
-          <div className="mb-8 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold">최신 판매 채널</h2>
-              <p className="mt-2 text-sm text-neutral-600">
-                새로 등록된 판매 채널을 확인해보세요.
-              </p>
-            </div>
+      <div className="mt-7 flex flex-wrap justify-center gap-2 text-sm text-neutral-300">
+        {["도매사이트", "판매채널", "SEO", "블로그", "셀러도구"].map((item) => (
+          <button
+            key={item}
+            onClick={() => handleQuickSearch(item)}
+            className="rounded-full border border-white/20 px-4 py-2 transition hover:bg-white hover:text-black"
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
 
-            <Link
-              href="/sales-channel"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </Link>
+  <AppleBanner
+    href="/wholesale"
+    imageUrl="https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=2400&q=80"
+    label="Wholesale Platform"
+    title={
+      <>
+        전 세계 도매 사이트를
+        <br />
+        한곳에서 탐색하세요
+      </>
+    }
+    description="한국, 중국, 일본, 미국, 유럽의 도매 플랫폼 정보를 제공합니다."
+  />
+
+  <AppleBanner
+    href="/sales-channel"
+    imageUrl="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=2400&q=80"
+    label="Sales Channel"
+    title={
+      <>
+        상품에 맞는
+        <br />
+        판매 채널 찾기
+      </>
+    }
+    description="국내외 판매 플랫폼 정보를 한곳에서 비교해보세요."
+  />
+
+  <AppleBanner
+    href="/sellertool"
+    imageUrl="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=2400&q=80"
+    label="Seller Tools"
+    title={
+      <>
+        셀러 운영을 위한
+        <br />
+        필수 도구
+      </>
+    }
+    description="마진 계산부터 이미지 제작까지 판매에 필요한 기능을 제공합니다."
+  />
+
+  <section className="grid gap-4 bg-neutral-50 px-4 py-4 md:grid-cols-2">
+    <SmallAppleBanner
+      href="/seo"
+      imageUrl="https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?auto=format&fit=crop&w=1600&q=80"
+      label="SEO Guide"
+      title={
+        <>
+          검색 노출을 높이는
+          <br />
+          실전 SEO 가이드
+        </>
+      }
+    />
+
+    <SmallAppleBanner
+      href="/blog"
+      imageUrl="https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=1600&q=80"
+      label="Blog Guide"
+      title={
+        <>
+          실전 셀러 운영
+          <br />
+          노하우 모음
+        </>
+      }
+    />
+  </section>
+
+  <section className="mx-auto max-w-5xl px-6 py-12">
+    <div className="mb-5 flex items-center justify-between">
+      <h2 className="text-lg font-bold">최신 글</h2>
+      <Link href="/blog" className="text-sm text-neutral-500 hover:text-black">
+        전체 보기 →
+      </Link>
+    </div>
+
+    <div className="divide-y divide-neutral-200 border-y border-neutral-200">
+      {latestPosts.slice(0, 3).map((post) => (
+        <Link
+          key={post.id}
+          href={`/blog/${post.id}`}
+          className="flex items-center justify-between gap-6 py-4 transition hover:bg-neutral-50"
+        >
+          <div>
+            <p className="text-xs text-neutral-500">{post.category}</p>
+            <h3 className="mt-1 line-clamp-1 text-sm font-semibold text-neutral-900">
+              {post.title}
+            </h3>
           </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {channels.map((item) => (
-              <div
-                key={item.id}
-                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <Link
-                  href={`/sales-channel/${item.id}`}
-                  className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
-                >
-                  <img
-                    src={
-                      item.imageUrl ||
-                      "https://placehold.co/600x400?text=Sales+Channel"
-                    }
-                    alt={item.name}
-                    className="h-32 w-full bg-white object-contain p-2 transition hover:scale-105"
-                  />
-                </Link>
-
-                <h3 className="line-clamp-2 text-lg font-bold leading-7">
-                  {item.name}
-                </h3>
-
-                <p className="mt-1 text-sm text-neutral-500">
-                  {item.region} · {item.category}
-                </p>
-
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-                  {item.shortDescription}
-                </p>
-
-                <div className="mt-auto pt-5">
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/sales-channel/${item.id}`}
-                      className="flex-1 rounded-xl border border-neutral-300 px-3 py-2.5 text-center text-sm font-medium transition hover:bg-neutral-100"
-                    >
-                      상세 보기
-                    </Link>
-
-                    {item.website ? (
-                      <a
-                        href={item.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex-1 rounded-xl bg-neutral-900 px-3 py-2.5 text-center text-sm font-medium text-white transition hover:opacity-90"
-                      >
-                        채널 이동
-                      </a>
-                    ) : (
-                      <div className="flex-1 rounded-xl bg-neutral-200 px-3 py-2.5 text-center text-sm font-medium text-neutral-500">
-                        링크 없음
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-6 py-14">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">최신 블로그 글</h2>
-            <Link
-              href="/blog"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 보기 →
-            </Link>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {latestPosts.map((post) => (
-              <div
-                key={post.id}
-                className="flex h-full flex-col rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-              >
-                <Link
-                  href={`/blog/${post.id}`}
-                  className="mb-4 block overflow-hidden rounded-2xl bg-neutral-100"
-                >
-                  <img
-                    src={post.imageUrl || "https://placehold.co/600x400?text=Blog"}
-                    alt={post.title}
-                    className="h-32 w-full bg-white object-contain p-2 transition hover:scale-105"
-                  />
-                </Link>
-
-                <div className="mb-3 inline-flex w-fit rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-                  {post.category}
-                </div>
-
-                <h3 className="line-clamp-2 text-lg font-bold leading-7">
-                  {post.title}
-                </h3>
-
-                <p className="mt-3 line-clamp-3 text-sm leading-6 text-neutral-600">
-                  {post.excerpt}
-                </p>
-
-                <div className="mt-auto pt-5">
-                  <Link
-                    href={`/blog/${post.id}`}
-                    className="inline-flex rounded-xl border border-neutral-300 px-4 py-2.5 text-sm font-medium transition hover:bg-neutral-100"
-                  >
-                    글 보기
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-6 py-14">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Seller Tools</h2>
-            <Link
-              href="/sellertool"
-              className="text-sm font-medium text-neutral-600 hover:text-black"
-            >
-              전체 도구 보기 →
-            </Link>
-          </div>
-
-          <p className="mb-6 max-w-3xl text-sm leading-6 text-neutral-600">
-            셀러 운영에 자주 쓰는 실전 도구를 빠르게 사용할 수 있습니다. 마진 계산, 판매가 계산,
-            수수료 계산, 메모 정리까지 한곳에서 관리해보세요.
-          </p>
-
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-            <ToolCard
-              title="마진 계산기"
-              description="매입가, 배송비, 수수료, 판매가를 넣고 예상 순이익과 마진율을 계산합니다."
-              href="/sellertool/margin-calculator"
-            />
-            <ToolCard
-              title="판매가 계산기"
-              description="원하는 마진율을 기준으로 적정 판매가를 계산할 수 있습니다."
-              href="/sellertool/sales-price-calculator"
-            />
-            <ToolCard
-              title="수수료 계산기"
-              description="플랫폼 수수료와 기타 비용을 반영해 실제 차감 금액을 계산합니다."
-              href="/sellertool/commission-calculator"
-            />
-            <ToolCard
-              title="메모 / 체크 도구"
-              description="소싱 검토 내용, 체크리스트, 아이디어를 정리할 수 있는 간단한 도구입니다."
-              href="/sellertool/memo-check-tool"
-            />
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-7xl px-6 py-14">
-          <div className="grid gap-6 md:grid-cols-3">
-            <BottomLink
-              href="/wholesale"
-              title="도매처 찾기"
-              description="카테고리와 태그를 기준으로 원하는 도매 사이트를 빠르게 찾을 수 있습니다."
-            />
-            <BottomLink
-              href="/sales-channel"
-              title="판매 채널"
-              description="상품 유형에 맞는 국내 판매 채널과 확장 방향을 확인할 수 있습니다."
-            />
-            <BottomLink
-              href="/blog"
-              title="셀러 가이드"
-              description="도매, 소싱, 세금, 운영 팁 등 셀러를 위한 실전 정보를 모아볼 수 있습니다."
-            />
-          </div>
-        </section>
-      </main>
+          <span className="shrink-0 text-sm text-neutral-400">읽기</span>
+        </Link>
+      ))}
+    </div>
+  </section>
+</main>
     </div>
   );
 }
@@ -457,22 +332,86 @@ function ToolCard({
   );
 }
 
-function BottomLink({
+function AppleBanner({
   href,
+  imageUrl,
+  label,
   title,
   description,
 }: {
   href: string;
-  title: string;
+  imageUrl: string;
+  label: string;
+  title: React.ReactNode;
   description: string;
 }) {
   return (
-    <a
+    <Link
       href={href}
-      className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      className="group relative block h-[650px] overflow-hidden bg-black"
     >
-      <h3 className="text-xl font-bold">{title}</h3>
-      <p className="mt-3 text-sm leading-6 text-neutral-600">{description}</p>
-    </a>
+      <Image
+        src={imageUrl}
+        alt={label}
+        fill
+        sizes="100vw"
+        className="object-cover opacity-70 transition duration-700 group-hover:scale-105"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/60" />
+
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center text-white">
+        <p className="mb-4 text-sm font-medium uppercase tracking-[0.28em] text-white/70">
+          {label}
+        </p>
+
+        <h2 className="text-4xl font-bold tracking-tight md:text-6xl">
+          {title}
+        </h2>
+
+        <p className="mt-5 max-w-xl text-base leading-7 text-white/80 md:text-lg">
+          {description}
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+function SmallAppleBanner({
+  href,
+  imageUrl,
+  label,
+  title,
+}: {
+  href: string;
+  imageUrl: string;
+  label: string;
+  title: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group relative block h-[500px] overflow-hidden rounded-[2rem] bg-black"
+    >
+      <Image
+        src={imageUrl}
+        alt={label}
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className="object-cover opacity-75 transition duration-700 group-hover:scale-105"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/10 to-black/60" />
+
+      <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 text-center text-white">
+        <p className="mb-4 text-sm font-medium uppercase tracking-[0.25em] text-white/70">
+          {label}
+        </p>
+
+        <h2 className="text-3xl font-bold tracking-tight md:text-5xl">
+          {title}
+        </h2>
+      </div>
+    </Link>
   );
 }
