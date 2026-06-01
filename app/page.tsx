@@ -1,10 +1,17 @@
 export const revalidate = 60;
+
 import { prisma } from "@/lib/prisma";
 import HomeClient from "./HomeClient";
 
-
 export default async function HomePage() {
-  const [latestSites, popularSites, channels, latestPosts] = await Promise.all([
+  const [
+    latestSites,
+    popularSites,
+    channels,
+    latestPosts,
+    popularSeoPosts,
+    popularBlogPosts,
+  ] = await Promise.all([
     prisma.wholesaleSite.findMany({
       take: 6,
       orderBy: {
@@ -32,6 +39,20 @@ export default async function HomePage() {
         createdAt: "desc",
       },
     }),
+
+    prisma.seoPost.findMany({
+      take: 3,
+      orderBy: {
+        views: "desc",
+      },
+    }),
+
+    prisma.blog.findMany({
+      take: 3,
+      orderBy: {
+        views: "desc",
+      },
+    }),
   ]);
 
   return (
@@ -40,6 +61,8 @@ export default async function HomePage() {
       popularSites={popularSites}
       channels={channels}
       latestPosts={latestPosts}
+      popularSeoPosts={popularSeoPosts}
+      popularBlogPosts={popularBlogPosts}
     />
   );
 }
