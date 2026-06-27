@@ -30,20 +30,20 @@ export default function SeoPageClient({
 
     return posts.filter((post) => {
       const searchTarget = [
-        post.title,
-        post.category,
-        post.excerpt,
-        post.content,
-      ]
+          post.title,
+          post.category,
+          post.excerpt,
+          post.content,
+        ]
         .join(" ")
         .toLowerCase();
 
       const matchSearch =
         keyword.length === 0 || searchTarget.includes(keyword);
 
-      const matchCategory =
-        selectedCategory === "전체" ||
-        post.category === selectedCategory;
+       const matchCategory =
+         selectedCategory === "전체" ||
+         post.category === selectedCategory;
 
       return matchSearch && matchCategory;
     });
@@ -104,7 +104,7 @@ export default function SeoPageClient({
 
             {/* CATEGORY */}
             <div className="mt-5 flex flex-wrap gap-2">
-              {categories.map((item) => {
+               {categories.map((item) => {
                 const active = selectedCategory === item;
 
                 return (
