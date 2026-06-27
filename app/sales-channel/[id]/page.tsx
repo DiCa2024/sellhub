@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ViewTracker from "./ViewTracker";
 import RecentSalesChannelTracker from "./RecentSalesChannelTracker";
+import { Metadata } from "next";
 
 export const revalidate = 3600;
 
@@ -33,14 +34,26 @@ export async function generateMetadata({ params }: any) {
   }
 
   return {
+  title: `${channel.name} | 판매 채널 분석`,
+  description: channel.shortDescription,
+
+  alternates: {
+    canonical: `https://globalsellershop.com/sales-channel/${numericId}`,
+  },
+
+  openGraph: {
     title: `${channel.name} | 판매 채널 분석`,
     description: channel.shortDescription,
-    openGraph: {
-      title: `${channel.name} | 판매 채널 분석`,
-      description: channel.shortDescription,
-      images: [{ url: channel.imageUrl, width: 1200, height: 800 }],
-    },
-  };
+    url: `https://globalsellershop.com/sales-channel/${numericId}`,
+    images: [
+      {
+        url: channel.imageUrl,
+        width: 1200,
+        height: 800,
+      },
+    ],
+  },
+};
 }
 
 type PageProps = {

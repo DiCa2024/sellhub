@@ -7,14 +7,15 @@ import RecentWholesaleTracker from "./RecentWholesaleTracker";
 
 export async function generateMetadata({ params }: any) {
   const { id } = await params;
+  const numericId = Number(id);
 
   const site = await prisma.wholesaleSite.findUnique({
     where: {
-      id: Number(id),
+      id: numericId,
     },
   });
 
-  if (!site) {
+  if (!site || Number.isNaN(numericId)) {
     return {
       title: "도매 사이트 정보 | globalsellershop",
       description: "도매 사이트 정보를 확인하고 비교해보세요.",
@@ -24,9 +25,15 @@ export async function generateMetadata({ params }: any) {
   return {
     title: `${site.name} | 도매 사이트 분석`,
     description: site.shortDescription,
+
+    alternates: {
+      canonical: `https://globalsellershop.com/wholesale/${numericId}`,
+    },
+
     openGraph: {
       title: `${site.name} | 도매 사이트 분석`,
       description: site.shortDescription,
+      url: `https://globalsellershop.com/wholesale/${numericId}`,
       images: [
         {
           url: site.imageUrl,

@@ -36,9 +36,14 @@ return {
   title: `${post.title} | globalsellershop 블로그`,
   description,
 
+  alternates: {
+    canonical: `https://globalsellershop.com/blog/${id}`,
+  },
+
   openGraph: {
     title: `${post.title} | globalsellershop 블로그`,
     description,
+    url: `https://globalsellershop.com/blog/${id}`,
 
     images: [
       {
